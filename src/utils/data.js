@@ -1,0 +1,51 @@
+export const isEmpty = (prop) => (
+    prop === null ||
+    prop === false ||
+    prop === undefined ||
+    (prop.hasOwnProperty('length') && prop.length === 0) ||
+    (prop.hasOwnProperty('size') && prop.size === 0) ||
+    (prop.constructor === Object && Object.keys(prop).length === 0)
+  );
+  
+  
+  /**
+  *  Monad Maybe para o tratamento de dados incertos
+  **/
+  export const Maybe = function(value) {
+    let Nothing = {
+      bind: function(fn) {
+        return this;
+      },
+      isNothing: function() {
+        return true;
+      },
+      val: function() {
+        throw new Error("cannot call val() nothing");
+      },
+      maybe: function(def, fn) {
+        return def;
+      }
+    };
+  
+    let Something = function(value) {
+      return {
+        bind: function(fn) {
+          return Maybe(fn.call(this, value));
+        },
+        isNothing: function() {
+          return false;
+        },
+        val: function() {
+          return value;
+        },
+        maybe: function(def, fn) {
+          return fn.call(this, value);
+        }
+      };
+    };
+  
+    if (isEmpty(value))
+      return Nothing;
+  
+    return Something(value);
+  };
