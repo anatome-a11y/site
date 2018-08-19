@@ -8,33 +8,12 @@ import request from '../utils/request'
 
 class FormPecas extends Component{
 
-    state = {
-        treeData: []
-    }
-
-    componentDidMount(){
-        request('/api/pecas')
-        .then(r => {
-            this.setState({treeData: r.data.map(p => ({
-                title: p.nome,
-                value: p.id,
-                key: p.id,
-                children: p.partes.map(pp => ({
-                    title: pp.nome,
-                    value: pp.id,
-                    key: pp.id
-                }))
-            }))})
-        })
-        .catch(e => console.error(e))
-    }
 
     render(){
-        const {onChange, partes } = this.props;
-        const {treeData} = this.state;
+        const {onChange, partes, pecas } = this.props;
 
         const tProps = {
-            treeData,
+            treeData: pecas,
             value: partes,
             onChange: onChange('partes'),
             notFoundContent: 'Nada foi encontrado',

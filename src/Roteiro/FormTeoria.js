@@ -16,139 +16,126 @@ const props = {
 
 const columns = [
     {
-    title: 'Informação teórica',
-    dataIndex: 'singular',
-  }, 
-  {
-    title: 'Partes',
-    dataIndex: 'partesOriginais',
-    render: partes => partes.map((p, idx) => <Tag>{p.nome}</Tag>)
-  },
-  {
-      title: 'Mídias',
-      dataIndex: 'midias',
-      render: midias => {
+        title: 'Informação teórica',
+        dataIndex: 'frases',
+        render: frases => frases.map((p, idx) => <div>{p}</div>)
+    },
+    {
+        title: 'Partes',
+        dataIndex: 'partesOriginais',
+        render: partes => partes.map((p, idx) => <Tag>{p.nome}</Tag>)
+    },
+    {
+        title: 'Mídias',
+        dataIndex: 'midias',
+        render: midias => {
             return midias.length > 0 ? midias.map((m, idx) => (
-            <Midia file={m} idx={idx} midias={midias} />
-          )) : 'Nenhuma'
-      }
-  }
+                <Midia file={m} idx={idx} midias={midias} />
+            )) : 'Nenhuma'
+        }
+    }
 ];
- 
 
 
-class FormTeoria extends Component{
 
-    state = {
-        selected: [],
-        originalContent: [],
-        unselected: []
+class FormTeoria extends Component {
+
+
+    componentDidMount() {
+        this.onFilterContent(this.props.partes)
     }
 
-    componentDidMount(){
-        request('/api/pecas')
-        .then(r => {
-            this.setState({
-                originalContent: [].concat.apply([], r.data.map(p => {
-                return p.conteudoTeorico.map(ct => {
-                    const partesOriginais = p.partes.filter(pt => ct.partes.indexOf(pt.id) != -1);
-                    return {...ct, partesOriginais}
-                })
-                }))
-            }, () => this.onFilterContent(this.props))
-        })
-        .catch(e => console.error(e))       
-    }
-
-    componentWillReceiveProps(next){
+    componentWillReceiveProps(next) {
         //Se a seleção de partes mudou
-        if(this.props.partes.join('_') != next.partes.join('_')){
-            this.onFilterContent(next)
+        if (this.props.partes.join('_') != next.partes.join('_')) {
+            this.onFilterContent(next.partes)
         }
     }
 
 
-    render(){
-        const { selected, unselected } = this.state;
+    render() {
+        const { selected, unselected } = this.props;
 
 
         return (
             <div className='table-no-border'>
-                <Card 
+                <Card
                     extra={
                         <Search
-                        placeholder="Filtrar conteúdo"
-                        onSearch={value => console.log(value)}
-                        style={{ width: 200, marginRight: 5 }}
-                    />                    
+                            placeholder="Filtrar conteúdo"
+                            onSearch={value => console.log(value)}
+                            style={{ width: 200, marginRight: 5 }}
+                        />
                     }
-                    type='inner' title='Conteúdo selecionado' style={{marginBottom: 40, marginTop: 40}}>
-                    <Table 
-                        rowSelection={{onChange: this.onUnSelect, selectedRowKeys: []}} 
-                        columns={columns} 
-                        dataSource={selected} 
+                    type='inner' title='Conteúdo selecionado' style={{ marginBottom: 40, marginTop: 40 }}>
+                    <Table
+                        rowKey='id'
+                        rowSelection={{ onChange: this.onUnSelect, selectedRowKeys: [] }}
+                        columns={columns}
+                        dataSource={selected}
                         pagination={false}
                         size='small'
                         bordered={false}
-                        locale={{emptyText: 'Nenhum conteúdo selecionado'}}
+                        locale={{ emptyText: 'Nenhum conteúdo selecionado' }}
                     />
                 </Card>
-    
-                <Card 
+
+                <Card
                     extra={
                         <Search
-                        placeholder="Filtrar conteúdo"
-                        onSearch={value => console.log(value)}
-                        style={{ width: 200, marginRight: 5 }}
-                    />                    
-                    }            
-                type='inner' title='Conteúdo não selecionado'>
-                    <Table 
-                        rowSelection={{onChange: this.onSelect, selectedRowKeys: []}} 
-                        columns={columns} 
-                        dataSource={unselected} 
+                            placeholder="Filtrar conteúdo"
+                            onSearch={value => console.log(value)}
+                            style={{ width: 200, marginRight: 5 }}
+                        />
+                    }
+                    type='inner' title='Conteúdo não selecionado'>
+                    <Table
+                        rowKey='id'
+                        rowSelection={{ onChange: this.onSelect, selectedRowKeys: [] }}
+                        columns={columns}
+                        dataSource={unselected}
                         pagination={false}
                         size='small'
-                        locale={{emptyText: 'Nenhuma conteúdo para selecionar'}}
+                        locale={{ emptyText: 'Nenhum conteúdo para selecionar' }}
                     />
-                </Card>                                    
+                </Card>
             </div>
         )
     }
 
 
-    onFilterContent = ({partes}) => {
-        const {originalContent} = this.state;
+    onFilterContent = partes => {
+        const { conteudoExpandido, onChange } = this.props;
 
-        const conteudo = partes.map(selId => originalContent.filter(o => o.partes.indexOf(selId) != -1));
+        const conteudo = partes.map(selId => conteudoExpandido.filter(o => o.partes.indexOf(selId) != -1));
         const flat = [].concat.apply([], conteudo);
-        
-        this.setState({
+
+        onChange({
             unselected: flat.filter((i, pos) => flat.findIndex(ii => ii.id == i.id) == pos)
         })
     }
 
     onSelect = (selectedRowKeys, selectedRows) => {
-        const {unselected, selected} = this.state;
+        const { unselected, selected, onChange } = this.props;
 
         const ids = selectedRows.map(s => s.id);
 
-        this.setState({
-            selected: [...unselected.filter(u => ids.indexOf(u.id) != -1) ,...selected],
+        onChange({
+            selected: [...unselected.filter(u => ids.indexOf(u.id) != -1), ...selected],
             unselected: unselected.filter(u => ids.indexOf(u.id) == -1)
         })
-      }
+    }
 
-      onUnSelect = (selectedRowKeys, selectedRows) => {
-        const {unselected, selected} = this.state;
+    onUnSelect = (selectedRowKeys, selectedRows) => {
+        const { unselected, selected, onChange } = this.props;
 
         const ids = selectedRows.map(s => s.id);
 
-        this.setState({
-            unselected: [...selected.filter(u => ids.indexOf(u.id) != -1) ,...unselected],
+        onChange({
+            unselected: [...selected.filter(u => ids.indexOf(u.id) != -1), ...unselected],
             selected: selected.filter(u => ids.indexOf(u.id) == -1)
         })
-      }      
+    }
 }
 
 

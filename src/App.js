@@ -6,22 +6,32 @@ import Inicio from './Inicio'
 import Peca from './Peca'
 import Roteiro from './Roteiro'
 
+
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const { Item } = Menu;
+
+const _initialClicked = {
+	res: '',
+	mode: '',
+	item: {
+		_id: ''
+	}
+}
 
 
 class App extends Component {
 	state = {
 		current: 'roteiro',
 		loading: false,
+        clicked: {..._initialClicked}		
 	}
 
 
 	render() {
 		return (
 			<Fragment>
-				<div style={{height: 20, backgroundColor: '#1890ff', color: '#fff', textAlign: 'right'}}>Acessibilidade...</div>
+				<div style={{ height: 20, backgroundColor: '#1890ff', color: '#fff', textAlign: 'right' }}>Acessibilidade...</div>
 				<Menu
 					onClick={this.onChangeMenu}
 					selectedKeys={[this.state.current]}
@@ -38,53 +48,45 @@ class App extends Component {
 						</MenuItemGroup>
 					</SubMenu>
 				</Menu>
-				<div style={{padding: 25}}>
-				{this.getBody()}				
+				<div style={{ padding: 25 }}>
+					{this.getBody()}
 				</div>
 			</Fragment>
 		)
 	}
 
+    onSetClicked = (res = '', mode = '', item = {_id: ''}) => () => this.setState({clicked: {res, mode, item}})  	
+
 	onChangeMenu = (e) => {
-		this.setState({
-			current: e.key,
-		});
-	}	
+		this.setState({ current: e.key });
+	}
+
+	onSetAppState = state => this.setState(state)
 
 	getBody = () => {
-		const {current} = this.state;
+		const { current, clicked } = this.state;
 
-		switch(current){
-			case 'inicio': return <Inicio 
-			onChangeMenu={this.onChangeMenu} 
-			onRequest={this.onRequest} 
-			onOpenSnackbar={this.onOpenSnackbar} 
+		switch (current) {
+			case 'inicio': return <Inicio
+				clicked={clicked}
+				onChangeMenu={this.onChangeMenu}
+				onSetAppState={this.onSetAppState}
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetClicked={this.onSetClicked}
 			/>;
-			case 'peca': return <Peca onRequest={this.onRequest} onOpenSnackbar={this.onOpenSnackbar}  />;
-			case 'roteiro': return <Roteiro onRequest={this.onRequest} onOpenSnackbar={this.onOpenSnackbar}  />;
+			case 'peca': return <Peca
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'peca' ? clicked.item : undefined}
+			/>;
+			case 'roteiro': return <Roteiro
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'roteiro' ? clicked.item : undefined}
+			/>;
 		}
 	}
 
-	onRequest = promise => {
-		return promise
-			.then(ret => {
-				return new Promise((res, rej) => {
-					if (ret.code !== 200) {
-						rej(ret)
-						throw ret.data
-					} else {
-						res(ret)
-					}
-				})
-			})
-			.catch(e => {
-				console.error(e)
-				const msg = typeof e === 'string' ? e : 'Ocorreu um erro no tratamento de dados';
-				this.onOpenSnackbar(msg)
-			})
-			.finally(() => this.setState({ loading: false }))
-	}
-	
 	onCloseSnackbar = () => {
 		const { snackbar } = this.state;
 		this.setState({ snackbar: { ...snackbar, open: false } })
@@ -92,7 +94,7 @@ class App extends Component {
 
 	onOpenSnackbar = (msg, type = 'error') => {
 		message[type](msg);
-	  };		
+	};
 }
 
 export default App;

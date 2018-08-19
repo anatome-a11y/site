@@ -1,42 +1,56 @@
 import React, { Component, Fragment } from 'react';
 
-import { List, Popover, Tooltip, Button, Select, Input, Icon, Upload, Tag } from 'antd'
+import { List, Popover, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 'antd'
 
 import Midia from '../components/Midia'
+import { filter } from '../utils/data'
+import * as filestack from 'filestack-js';
 
 const uuidv4 = require('uuid/v4');
 
 const { Item } = List;
 const { Option } = Select;
 
+const client = filestack.init('AHygjPe34Q2GWp3UI9BrQz');
+
+const onProgress = (evt) => {
+    console.log(evt.totalPercent)
+    // document.getElementById('progress').innerHTML = `${evt.totalPercent}%`;
+};
 
 
 
 class FormTeoria extends Component {
 
+    state = {
+        loading: false
+    }
 
     render() {
+        const { loading } = this.state;
         const { conteudoTeorico, onChangeConteudoTeorico, partes, onAddConteudoTeorico } = this.props;
 
         return (
             <Fragment>
                 <div style={{ marginBottom: 10, textAlign: 'right' }}>
-                    <Button style={{marginRight: 5}} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
+                    <Button style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
                     <Button onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
-                </div>                
+                </div>
                 <List
+                    rowKey='id'
                     size="small"
                     bordered={true}
                     locale={{ emptyText: 'Esta peça não possui informações teóricas' }}
                     dataSource={conteudoTeorico}
                     renderItem={(item, idx) => (
                         <Item key={item.id} actions={[
-                            <Upload showUploadList={false} onChange={this.onUpload(idx, item.midias)} beforeUpload={this.beforeUpload}>
+                            <Upload showUploadList={false} onChange={this.onUpload(idx, item.midias)} beforeUpload={this.beforeUpload(item.id)}>
                                 <Tooltip title='Adicionar mídia'>
-                                    <Button shape='circle' icon='paper-clip' />
-                                </Tooltip></Upload>,                                 
-                                <Tooltip title='Excluir'><Button onClick={this.onDelete(idx)} icon='delete' shape='circle' /></Tooltip>
-                                ]}>
+                                    <Button shape='circle' icon='paper-clip' disabled={loading} />
+                                </Tooltip>
+                            </Upload>,
+                            <Tooltip title='Excluir'><Button onClick={this.onDelete(idx)} icon='delete' shape='circle' /></Tooltip>
+                        ]}>
                             <div style={_style.item}>
                                 <div style={{ width: '40%', marginRight: 5 }}>
                                     <Select
@@ -45,8 +59,8 @@ class FormTeoria extends Component {
                                         style={{ width: '100%' }}
                                         placeholder="Partes da peça"
                                         value={item.partes}
-                                        optionFilterProp='nome'
-                                        filterOption={true}
+                                        optionFilterProp="children"
+                                        filterOption={filter}
                                         onChange={onChangeConteudoTeorico('partes', idx)}
                                     >
                                         {partes.map(({ nome, id }) => <Option value={id} key={id}>{nome}</Option>)}
@@ -56,8 +70,9 @@ class FormTeoria extends Component {
                                     {item.partes.length > 1 && <Input style={{ marginBottom: 10 }} value={item.plural} onChange={e => onChangeConteudoTeorico('plural', idx)(e.target.value)} placeholder={`Conteúdo teórico - Plural`} />}
                                     <Input value={item.singular} onChange={e => onChangeConteudoTeorico('singular', idx)(e.target.value)} placeholder={`Conteúdo teórico - Singular`} />
                                 </div>
-                                <div style={{alignSelf: 'center'}}>
-                                    {item.midias.map((t, idxMidia) => <Midia key={t.uid} file={t} idx={idxMidia} midias={item.midias} onChange={onChangeConteudoTeorico('midias', idx)} />)}
+                                <div style={{ alignSelf: 'center' }}>
+                                    {item.midias.map((t, idxMidia) => <Fragment key={t.id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChangeConteudoTeorico('midias', idx)} /></Fragment>)}
+                                    {loading == item.id ? <Spin /> : null}
                                 </div>
                             </div>
                         </Item>)}
@@ -66,14 +81,36 @@ class FormTeoria extends Component {
         )
     }
 
-    beforeUpload = () => false
+    beforeUpload = id => () => {
+        this.setState({ loading: id })
+        return false
+    }
 
     onUpload = (idx, midias) => info => {
-        const { onChangeConteudoTeorico,  } = this.props;
+        const { onChangeConteudoTeorico, onOpenS } = this.props;
         if (info.file.status !== 'uploading') {
+            //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
                 const { uid, type, name } = info.file;
-                onChangeConteudoTeorico('midias', idx)([...midias, { id: uuidv4(), uid, type, name, tags: [], original: info.file }])
+                const token = {};
+
+                client.upload(info.file, {}, {}, token)
+                    .then(res => {
+                        this.setState({ loading: false });
+                        onChangeConteudoTeorico('midias', idx)([...midias, {
+                            id: uuidv4(),
+                            type,
+                            name,
+                            tags: [],
+                            url: res.url,
+                            handle: res.handle,
+                            original: info.file
+                        }])
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    });
+
             } else {
                 onChangeConteudoTeorico('midias', idx)(midias.filter(f => f.uid != info.file.uid))
             }
@@ -87,24 +124,24 @@ class FormTeoria extends Component {
     }
 
     onCopy = idx => () => {
-        const {onChange, conteudoTeorico} = this.props;
+        const { onChange, conteudoTeorico } = this.props;
 
         onChange('conteudoTeorico')([
             ...conteudoTeorico.slice(0, idx),
-            {...conteudoTeorico[idx]},
-            {...conteudoTeorico[idx], id: uuidv4()},
-            ...conteudoTeorico.slice(idx+1),
+            { ...conteudoTeorico[idx] },
+            { ...conteudoTeorico[idx], id: uuidv4() },
+            ...conteudoTeorico.slice(idx + 1),
         ])
     }
 
     onDelete = idx => () => {
-        const {onChange, conteudoTeorico} = this.props;
+        const { onChange, conteudoTeorico } = this.props;
 
         onChange('conteudoTeorico')([
             ...conteudoTeorico.slice(0, idx),
-            ...conteudoTeorico.slice(idx+1),
+            ...conteudoTeorico.slice(idx + 1),
         ])
-    }    
+    }
 }
 
 

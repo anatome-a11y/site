@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { Form, Input, Select } from 'antd';
-
+import {filter} from '../utils/data'
 
 const Option = Select.Option;
 
@@ -39,10 +39,11 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
             >
                 <Select
                     showSearch
+                    value={idioma}
                     onChange={onChange('idioma')}
                     notFoundContent='Nada foi encontrado'
                     optionFilterProp="children"
-                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                    filterOption={filter}
                 >
                     {listaIdiomas.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
                 </Select>
@@ -55,10 +56,11 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
             >
                 <Select
                     showSearch
+                    value={regiao}
                     onChange={onChange('regiao')}
                     notFoundContent='Nada foi encontrado'
                     optionFilterProp="children"
-                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}                
+                    filterOption={filter}                
                 >
                     {listaRegiao.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
                 </Select>
@@ -71,10 +73,11 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
             >
                 <Select
                     showSearch
+                    value={sistema}
                     onChange={onChange('sistema')}
                     notFoundContent='Nada foi encontrado'
                     optionFilterProp="children"
-                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}                  
+                    filterOption={filter}                  
                 >
                     {listaSistema.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
                 </Select>

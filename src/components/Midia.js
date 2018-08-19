@@ -2,14 +2,14 @@ import React, { Component, Fragment } from 'react';
 
 import { List, Popover, Tooltip, Button, Select, Input, Icon, Upload, Tag } from 'antd'
 
-
+import {filter} from '../utils/data'
 const Option = Select.Option;
 
 const _tags = [
-    { id: 1, nome: 'Texto' },
-    { id: 2, nome: 'Língua portuguesa' },
-    { id: 3, nome: 'Língua inglesa' },
-    { id: 4, nome: 'Libras' },
+    { id: "1", nome: 'Texto' },
+    { id: "2", nome: 'Língua portuguesa' },
+    { id: "3", nome: 'Língua inglesa' },
+    { id: "4", nome: 'Libras' },
 ]
 
 
@@ -39,14 +39,14 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
         <div>
             <div>
                 {onChange ? (
-                    <Select
+                    <Select                    
                     notFoundContent='Nenhuma tag foi encontrada'
                     mode="multiple"
                     style={{width: '100%', marginBottom: 10}}
                     placeholder="Tags"
                     value={file.tags}
-                    optionFilterProp='nome'
-                    filterOption={true}                    
+                    optionFilterProp='children'
+                    filterOption={filter}                    
                     onChange={tags => onChange([
                         ...midias.slice(0, idx),
                         {...midias[idx], tags},
@@ -62,7 +62,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                     </div>
                 )}                
             </div>
-            <div style={{ textAlign: 'center' }}><Button><Icon type="download" />Baixar</Button></div>
+            <div style={{ textAlign: 'center' }}><Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button></div>
         </div>
     )
 }

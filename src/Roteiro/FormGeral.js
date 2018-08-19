@@ -24,7 +24,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange }) => {
             <FormItem
                 validateStatus={_erros.nome != -1 ? 'error' : ''}
                 help={erros.msgs[_erros.nome] || ''}
-                label='Nome da peça'
+                label='Nome do roteiro'
                 {...props}
             >
                 <Input autoFocus placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />

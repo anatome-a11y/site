@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
 
-import { Collapse, Button } from 'antd';
+import { Collapse, Button, Modal, List, Icon } from 'antd';
 
 import { listaIdiomas, listaRegiao, listaSistema } from '../utils/mock'
 
-import request from '../utils/request'
+import { request } from '../utils/data'
 
 import FormPeca from './FormPeca'
 import FormPartes from './FormPartes';
@@ -15,6 +15,7 @@ import Header from '../components/Header'
 
 const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
+const Item = List.Item;
 
 const _modelConteudoTeorico = {
     id: uuidv4(),
@@ -23,8 +24,6 @@ const _modelConteudoTeorico = {
     plural: '',
     singular: ''
 }
-
-
 
 class Peca extends Component {
 
@@ -36,7 +35,7 @@ class Peca extends Component {
             sistema: '',
             regiao: '',
             partes: [],
-            conteudoTeorico: [{..._modelConteudoTeorico}]
+            conteudoTeorico: [{ ..._modelConteudoTeorico }]
         },
         options: {
             listaSistema,
@@ -49,44 +48,84 @@ class Peca extends Component {
         },
         activeKey: 'geral',
         loading: false,
-        clickUID: uuidv4()
+        clickUID: uuidv4(),
+        pendencias: [],
+        open: false
     }
 
     componentDidMount() {
-
+        const { model } = this.props;
+        if (model) {
+            this.setState({ model })
+        }
     }
 
 
     render() {
-        const { model, options, erros, activeKey, clickUID } = this.state;
+        const { model, options, erros, activeKey, clickUID, loading, open, pendencias } = this.state;
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Criação e edição de peça genérica" />} key='geral'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="1 - Criação e edição de peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} erros={erros} onChange={this.onChange} />
-                        <div style={{textAlign: 'right'}}>
-                            <Button type='primary' onClick={() => this.onChangePanel('partes')}>Pŕoximo</Button>
+                        <div style={{ textAlign: 'right' }}>
+                            <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático" />} key='partes'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="2 - Inclusão de conteúdo prático" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
-                        <div style={{textAlign: 'right'}}>
-                            <Button type='primary' onClick={() => this.onChangePanel('teoria')}>Pŕoximo</Button>
-                        </div>                    
+                        <div style={{ textAlign: 'right' }}>
+                            <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
+                        </div>
                     </Panel>
-                    <Panel header={<Header contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico (informações teóricas) às partes" />} key='teoria'>
+                    <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="3 - Inclusão de conteúdo teórico (informações teóricas) às partes" />} key='teoria'>
                         <FormTeoria {...model} erros={erros} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
+                        <div style={{ textAlign: 'right', marginTop: 15 }}>
+                            <Button onClick={this.onCheckPendencias} size='large' style={{ marginRight: 3 }}>Verificar pendências</Button>
+                            <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>
+                        </div>
                     </Panel>
                 </Collapse>
-                <div style={{textAlign: 'center', marginTop: 15}}>
-                    <Button type='primary' onClick={this.onSave} size='large'>Salvar peça</Button>
-                </div>
+                <Modal
+                    title='Lista de pendências'
+                    visible={open}
+                    okText='Fechar'
+                    onOk={this.onClose}
+                    cancelButtonProps={{style: {display: 'none'}}}
+                >
+                    <div>
+                        {pendencias.length > 0 && <span style={{fontWeight: 'bold'}}>Partes não associadas a um conteúdo teórico:</span>}
+                    <List
+                        size="small"
+                        locale={{ emptyText: 'Nenhuma pendência foi encontrada' }}
+                        dataSource={pendencias}
+                        renderItem={item => (<Item><Icon style={{marginTop: 3, marginRight: 10, color: 'red'}} type="warning" /> {item.nome}</Item>)}
+                    />                        
+                    </div>
+                </Modal>
             </div>
         )
     }
 
+    onClose = () => this.setState({open: false})
+
+    onCheckPendencias = () => {
+        const { conteudoTeorico, partes } = this.state.model;
+
+        const pt = partes.map(p => p.id);
+        const ctFlat = [].concat.apply([], conteudoTeorico.map(ct => ct.partes));
+        const ctUnique = ctFlat.filter((item, pos) => ctFlat.indexOf(item) == pos);
+
+        const ids = pt.filter(i => ctUnique.indexOf(i) < 0);
+
+        const pendencias = partes.filter(p => ids.indexOf(p.id) != -1);
+        console.log(pendencias)
+
+        this.setState({ pendencias, open: true })
+    }
+
     onChangePanel = activeKey => {
-        const newState = activeKey == 'teoria' ? {clickUID: uuidv4()} : {};
+        const newState = activeKey == 'teoria' ? { clickUID: uuidv4() } : {};
         this.setState({ activeKey, ...newState })
     }
 
@@ -95,7 +134,7 @@ class Peca extends Component {
     onChange = field => value => this.setState({ model: { ...this.state.model, [field]: value } })
 
     onChangeConteudoTeorico = (field, idx) => value => {
-        const {model} = this.state;
+        const { model } = this.state;
 
         this.setState({
             model: {
@@ -106,7 +145,7 @@ class Peca extends Component {
                     ...model.conteudoTeorico.slice(idx + 1),
                 ]
             }
-        })          
+        })
     }
 
     onRemoveParte = id => () => {
@@ -115,19 +154,19 @@ class Peca extends Component {
 
         const isUsed = model.conteudoTeorico.find(ct => ct.partes.indexOf(id) != -1)
 
-        if(isUsed){
+        if (isUsed) {
             onOpenSnackbar('Não é possível excluir partes associadas a algum conteúdo teórico', 'warning');
-        }else{
+        } else {
             this.setState({
                 model: {
                     ...model,
                     partes: model.partes.filter(p => p.id != id),
                 }
-            })             
+            })
         }
 
 
-               
+
     }
 
     onChangeParte = (idx, nome) => {
@@ -148,85 +187,90 @@ class Peca extends Component {
     onAddConteudoTeorico = (isNew = false) => () => {
         const { conteudoTeorico } = this.state.model;
 
-        if(isNew){
+        if (isNew) {
             this.onChange('conteudoTeorico')([
-                {..._modelConteudoTeorico, id: uuidv4()},
-                ...conteudoTeorico,            
+                { ..._modelConteudoTeorico, id: uuidv4() },
+                ...conteudoTeorico,
             ])
-        }else{
+        } else {
             this.onChange('conteudoTeorico')([
-                {..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], id: uuidv4()},
-                ...conteudoTeorico,            
-            ])            
+                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], id: uuidv4() },
+                ...conteudoTeorico,
+            ])
         }
 
-    }    
+    }
 
 
     onValidate = () => {
         const { nome, idioma, sistema, regiao, partes } = this.state.model;
         let campos = [], msgs = []
 
-        if(nome == ''){
+        if (nome == '') {
             campos = [...campos, 'nome'];
             msgs = [...msgs, 'Campo obrigatório'];
         }
 
-        if(idioma == ''){
+        if (idioma == '') {
             campos = [...campos, 'idioma'];
             msgs = [...msgs, 'Campo obrigatório'];
-        }  
-        
-        if(sistema == ''){
-            campos = [...campos, 'sistema'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }  
-        
-        if(regiao == ''){
-            campos = [...campos, 'regiao'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }  
-        
-        if(partes.length == 0){
-            campos = [...campos, 'partes'];
-            msgs = [...msgs, 'Inclua ao menos uma parte à peça'];            
         }
 
-        return {campos, msgs}
+        if (sistema == '') {
+            campos = [...campos, 'sistema'];
+            msgs = [...msgs, 'Campo obrigatório'];
+        }
+
+        if (regiao == '') {
+            campos = [...campos, 'regiao'];
+            msgs = [...msgs, 'Campo obrigatório'];
+        }
+
+        if (partes.length == 0) {
+            campos = [...campos, 'partes'];
+            msgs = [...msgs, 'Inclua ao menos uma parte à peça'];
+        }
+
+        return { campos, msgs }
     }
 
     onSave = () => {
-        const { onRequest, onOpenSnackbar } = this.props;
+        const { onOpenSnackbar, onSetAppState } = this.props;
         const { model } = this.state;
 
         const erros = this.onValidate();
 
-        if(erros.campos.length > 0){
-            this.setState({erros})
+        if (erros.campos.length > 0) {
+            this.setState({ erros })
             return false;
         }
 
-        this.setState({loading: true})
-        const toPost = {
-            ...model, 
+        this.setState({ loading: true })
+        const body = {
+            ...model,
             conteudoTeorico: model.conteudoTeorico.map(ct => ({
                 ...ct,
-                midias: ct.midias.map(({original, ...resto}) => ({...resto}))
+                midias: ct.midias.map(({ original, ...resto }) => ({ ...resto }))
             }))
         }
 
-        const midias = model.conteudoTeorico.map(ct => ct.midias.map(({original}) => original))
-        
-        onRequest(request('/api/pecas', 'POST', toPost))
+        const _request = model.hasOwnProperty('_id') ? request(`peca/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('peca', { method: 'POST', body: JSON.stringify(body) })
+
+        _request
             .then(ret => {
-                onOpenSnackbar('Peça salva com sucesso!', 'success')
+                if (ret.status == 200) {
+                    onOpenSnackbar(`O conteúdo digital da peça ${model.nome} foi salvo com sucesso!`, 'success')
+                    onSetAppState({ current: 'inicio' })
+                } else {
+                    throw 'Não foi possível salvar o conteúdo digital da peça.'
+                }
             })
             .catch(e => {
                 onOpenSnackbar('Não foi possível salvar a peça')
                 console.error(e)
             })
             .finally(() => {
-                this.setState({loading: false})
+                this.setState({ loading: false })
             })
     }
 
