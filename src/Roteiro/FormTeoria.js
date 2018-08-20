@@ -42,13 +42,13 @@ class FormTeoria extends Component {
 
 
     componentDidMount() {
-        this.onFilterContent(this.props.partes)
+        this.onFilterContent(this.props)
     }
 
     componentWillReceiveProps(next) {
         //Se a seleção de partes mudou
         if (this.props.partes.join('_') != next.partes.join('_')) {
-            this.onFilterContent(next.partes)
+            this.onFilterContent(next)
         }
     }
 
@@ -103,15 +103,21 @@ class FormTeoria extends Component {
         )
     }
 
+    //Diante da seleção de partes, atualiza a lista de itens selecionados e não selecionados
+    onFilterContent = ({partes, conteudoExpandido, onChange, selected }) => {
 
-    onFilterContent = partes => {
-        const { conteudoExpandido, onChange } = this.props;
-
+        //Obtém o conteúdo das partes selecionadas
         const conteudo = partes.map(selId => conteudoExpandido.filter(o => o.partes.indexOf(selId) != -1));
         const flat = [].concat.apply([], conteudo);
+        const uniqueFlat = flat.filter((i, pos) => flat.findIndex(ii => ii.id == i.id) == pos);
+
+        const idsSel = selected.map(s => s._id)
+        const _selected = uniqueFlat.filter(f => idsSel.indexOf(f._id) !== -1);
+        const _unselected = uniqueFlat.filter(f => idsSel.indexOf(f._id) === -1);
 
         onChange({
-            unselected: flat.filter((i, pos) => flat.findIndex(ii => ii.id == i.id) == pos)
+            unselected: _unselected,
+            selected: _selected
         })
     }
 

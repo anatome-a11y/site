@@ -33,11 +33,22 @@ class Roteiro extends Component {
         activeKey: 'geral',
         pecas: [],
         conteudoExpandido: [],
-        loading: false
+        loading: true
     }
 
     componentDidMount() {
         const { onOpenSnackbar, model } = this.props;
+
+        if(model){
+            this.setState({model: {
+                ...model, 
+                partes: [],
+                conteudo: {
+                    selected: [],
+                    unselected: []
+                }
+            }})
+        }        
 
         request('peca', { method: 'GET' })
             .then(r => {
@@ -53,7 +64,7 @@ class Roteiro extends Component {
                         ...model,
                         conteudo: {
                             selected: conteudoExpandido.filter(c => model.conteudos.indexOf(c._id) != -1),
-                            unselected: conteudoExpandido.filter(c => model.conteudos.indexOf(c._id) == -1)
+                            unselected: []
                         }
                     }} : {}
                     this.setState({
@@ -79,6 +90,7 @@ class Roteiro extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
+            .finally(() => this.setState({loading: false}))
     }
 
 
