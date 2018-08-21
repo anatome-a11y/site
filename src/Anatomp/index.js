@@ -15,7 +15,7 @@ const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
 const Item = List.Item;
 
-const _modelLocalizacao = {
+const _modelReferenciaRelativa = {
     pecaFisica: '',
     anterior: '',
     posterior: '',
@@ -34,11 +34,16 @@ const _modelPecaFisica = {
     descricao: ''
 }
 
+const _modelLocalizacao = {
+    id: uuidv4(),
+    numero: '',
+    referenciaRelativa: null,
+    pecaFisica: ''
+}
+
 const _modelMapa = {
     parte: null,
-    numero: '',
-    localizacao: [],
-    pecasFisicas:[]
+    localizacao: [{..._modelLocalizacao}],
 }
 
 
@@ -119,9 +124,9 @@ class Anatomp extends Component {
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="3 - Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
-                        <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} />
+                        <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} onAddPecaFisica={this.onAddPecaFisicaAoMapa} onRemovePecaFisica={this.onRemovePecaFisicaDoMapa} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar An@tom-P</Button>
+                            <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={true}>Salvar An@tom-P</Button>
                         </div>
                     </Panel>
                 </Collapse>
@@ -179,8 +184,8 @@ class Anatomp extends Component {
             ...pecasFisicas,
         ])
     }  
-    
-    onChangeMapa = (field, idx) => value => {
+
+    onAddPecaFisicaAoMapa = idx => () => {
         const { model } = this.state;
 
         this.setState({
@@ -188,7 +193,56 @@ class Anatomp extends Component {
                 ...model,
                 mapa: [
                     ...model.mapa.slice(0, idx),
-                    { ...model.mapa[idx], [field]: value },
+                    { 
+                        ...model.mapa[idx], 
+                        localizacao: [
+                            {..._modelLocalizacao, id: uuidv4()},
+                            ...model.mapa[idx].localizacao
+                        ] 
+                    },
+                    ...model.mapa.slice(idx + 1),
+                ]
+            }
+        })        
+    }
+
+    onRemovePecaFisicaDoMapa = (idx, idxLoc) => () => {
+        const { model } = this.state;
+
+        this.setState({
+            model: {
+                ...model,
+                mapa: [
+                    ...model.mapa.slice(0, idx),
+                    { 
+                        ...model.mapa[idx], 
+                        localizacao: [
+                            ...model.mapa[idx].localizacao.slice(0, idxLoc),
+                            ...model.mapa[idx].localizacao.slice(idxLoc+1),
+                        ] 
+                    },
+                    ...model.mapa.slice(idx + 1),
+                ]
+            }
+        })        
+    }    
+    
+    onChangeMapa = (field, idx, idxLoc) => value => {
+        const { model } = this.state;
+
+        this.setState({
+            model: {
+                ...model,
+                mapa: [
+                    ...model.mapa.slice(0, idx),
+                    { 
+                        ...model.mapa[idx], 
+                        localizacao: [
+                            ...model.mapa[idx].localizacao.slice(0, idxLoc),
+                            {...model.mapa[idx].localizacao[idxLoc], [field]: value},
+                            ...model.mapa[idx].localizacao.slice(idxLoc+1),
+                        ] 
+                    },
                     ...model.mapa.slice(idx + 1),
                 ]
             }

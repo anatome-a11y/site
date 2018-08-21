@@ -21,7 +21,7 @@ class FormMapa extends Component {
 
     render() {
         const { loading, open } = this.state;
-        const { onChangeMapa, mapa, pecasFisicas, onAddLocalizacao } = this.props;
+        const { onChangeMapa, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica } = this.props;
 
         return (
             <Fragment>
@@ -29,34 +29,47 @@ class FormMapa extends Component {
                     rowKey='id'
                     size="small"
                     bordered={true}
-                    locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
+                    locale={{ emptyText: 'Nenhum roteiro foi selecionado' }}
                     dataSource={mapa}
                     renderItem={(item, idx) => (
                         <Item key={item.id} actions={[
-                            <Tooltip title='Localização'><Button onClick={this.onOpen} icon='compass' shape='circle' /></Tooltip>
+                            <Tooltip title='Adicionar peça física'><Button onClick={onAddPecaFisica(idx)} icon='plus' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
-                                <div style={{ width: '30%', marginRight: 5 }}>{item.parte.nome}</div>
-                                <div style={{ width: '40%', marginRight: 5 }}>
-                                <Select
-                                        notFoundContent='Nenhuma peça física foi encontrada'
-                                        mode="multiple"
-                                        style={{ width: '100%' }}
-                                        placeholder="Peças físicas"
-                                        value={item.pecasFisicas}
-                                        optionFilterProp="children"
-                                        filterOption={filter}
-                                        onChange={onChangeMapa('pecasFisicas', idx)}
-                                    >
-                                        {pecasFisicas.map(({ nome, id }) => <Option value={id} key={id}>{nome}</Option>)}
-                                    </Select>                                
+                                <div style={{ width: '20%', marginRight: 5 }}>{item.parte.nome}</div>
+                                <div style={{ width: '80%'}}>
+                                    <List
+                                        rowKey='id'
+                                        size="small"
+                                        bordered={false}
+                                        locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
+                                        dataSource={item.localizacao}
+                                        renderItem={(itemLoc, idxLoc) => (
+                                            <Item key={itemLoc.id} actions={[
+                                                <Tooltip title='Localização Relativa'><Button onClick={this.onOpen} icon='compass' shape='circle' /></Tooltip>,
+                                                <Tooltip title='Excluir'><Button onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
+                                            ]}>
+                                                <div style={_style.item}>
+                                                    <div style={{ width: '70%', marginRight: 5 }}>
+                                                        <Select
+                                                            notFoundContent='Nenhuma peça física foi encontrada'
+                                                            style={{ width: '100%' }}
+                                                            placeholder="Peça física"
+                                                            value={itemLoc.pecaFisica}
+                                                            optionFilterProp="children"
+                                                            filterOption={filter}
+                                                            onChange={onChangeMapa('pecaFisica', idx, idxLoc)}
+                                                        >
+                                                            {pecasFisicas.map(({ nome, id }) => <Option value={id} key={id}>{nome}</Option>)}
+                                                        </Select>
+                                                    </div>
+                                                    <div style={{ width: '30%'}}>
+                                                        <Input type='number' value={itemLoc.numero} onChange={e => onChangeMapa('numero', idx, idxLoc)(e.target.value)} placeholder={`Nº da etiqueta`} />
+                                                    </div>
+                                                </div>
+                                            </Item>)}
+                                    />
                                 </div>
-                                <div style={{ width: '15%', marginRight: 5 }}>
-                                    <Input type='number' value={item.numero} onChange={e => onChangeMapa('numero', idx)(e.target.value)} placeholder={`Nº da etiqueta`} />
-                                </div>
-                                <div style={{ width: '15%' }}>
-                                {item.localizacao.map(l => <Tooltip key={l.pecaFisica.id} title={`Localização em ${l.pecaFisica.nome}`}><Button onClick={() => {}} icon='compass' shape='circle' /></Tooltip>)}
-                                </div>                                
                             </div>
                         </Item>)}
                 />
@@ -64,20 +77,20 @@ class FormMapa extends Component {
                     title='Localização'
                     visible={open}
                     okText='Salvar'
-                    onOk={() => {}}
+                    onOk={() => { }}
                     cancelText='Cancelar'
-                    onCancel={this.onClose}                    
+                    onCancel={this.onClose}
                 >
                     <div>Nesta modal fica o formulário de localização. Como uma parte pode estar (ou deve poder estar)  em mais de uma peça física, a localização é feita para cada peça física adicionada</div>
-                </Modal>                
+                </Modal>
             </Fragment>
         )
     }
 
 
-    onOpen = () => this.setState({open: true})
+    onOpen = () => this.setState({ open: true })
 
-    onClose = () => this.setState({open: false})
+    onClose = () => this.setState({ open: false })
 }
 
 
