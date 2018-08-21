@@ -143,7 +143,7 @@ class Inicio extends Component {
                         title={<CardTitle loading={loading === 'anatomp'}>3 - An@tom-P (Peças anatômicas interativas)</CardTitle>}
                         extra={
                             <div style={{ display: 'flex' }}>
-                                <Button disabled onClick={() => onChangeMenu({ key: 'anatomp' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar An@tom-P</Button>
+                                <Button onClick={() => onChangeMenu({ key: 'anatomp' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar An@tom-P</Button>
                                 <Helper title='Tour' contentQ={<p>An@tom-P</p>} />
                             </div>
                         }

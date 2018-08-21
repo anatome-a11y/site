@@ -5,6 +5,7 @@ import { Menu, Icon, message } from 'antd';
 import Inicio from './Inicio'
 import Peca from './Peca'
 import Roteiro from './Roteiro'
+import Anatomp from './Anatomp'
 
 
 const SubMenu = Menu.SubMenu;
@@ -22,7 +23,7 @@ const _initialClicked = {
 
 class App extends Component {
 	state = {
-		current: 'roteiro',
+		current: 'anatomp',
 		loading: false,
         clicked: {..._initialClicked}		
 	}
@@ -84,6 +85,11 @@ class App extends Component {
 				onSetAppState={this.onSetAppState}
 				model={clicked.res == 'roteiro' ? clicked.item : undefined}
 			/>;
+			case 'anatomp': return <Anatomp
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'anatomp' ? clicked.item : undefined}
+			/>;			
 		}
 	}
 
