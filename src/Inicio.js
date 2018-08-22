@@ -42,7 +42,10 @@ class Inicio extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar } = this.props;
+        const { onOpenSnackbar, onSetClicked } = this.props;
+
+        //Reinicializa item clicado
+        onSetClicked()();
 
         this.setState({ loading: true })
 
@@ -70,7 +73,7 @@ class Inicio extends Component {
     componentWillReceiveProps(next) {
         const { onChangeMenu, clicked } = this.props;
 
-        //Se o modo ou id mudou...
+        //Se o modo ou _id mudou...
         if (clicked.mode != next.clicked.mode || clicked.item._id != next.clicked.item._id) {
             if (next.clicked.mode == 'delete') {
                 this.setState({ open: true })

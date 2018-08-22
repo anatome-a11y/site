@@ -6,10 +6,10 @@ const post = (path, body, reject, resolve) => {
 		})
 	}else{
 		const uuidv4 = require('uuid/v4');
-		const id = uuidv4();		
+		const _id = uuidv4();		
 		const previous = localStorage.getItem(path);
 		const previousJS = previous == null ? [] : JSON.parse(previous);
-		const postData = [...previousJS, {...body, id}]
+		const postData = [...previousJS, {...body, _id}]
 		localStorage.setItem(path, JSON.stringify(postData))
 		resolve({
 			code: 200,
@@ -19,7 +19,7 @@ const post = (path, body, reject, resolve) => {
 }
 
 
-const put = (path, body, id, reject, resolve) => {
+const put = (path, body, _id, reject, resolve) => {
 	if(body == null){
 		reject({
 			code: 400,
@@ -28,8 +28,8 @@ const put = (path, body, id, reject, resolve) => {
 	}else{
 		const previous = localStorage.getItem(path);
 		const previousJS = JSON.parse(previous);
-		const idx = previousJS.findIndex(pj => pj.id == id);
-		const putData = [...previousJS.slice(0, idx), {...body, id}, ...previousJS.slice(idx+1)];
+		const idx = previousJS.findIndex(pj => pj._id == _id);
+		const putData = [...previousJS.slice(0, idx), {...body, _id}, ...previousJS.slice(idx+1)];
 		localStorage.setItem(path, JSON.stringify(putData))
 		resolve({
 			code: 200,
@@ -39,10 +39,10 @@ const put = (path, body, id, reject, resolve) => {
 }
 
 
-const del = (path, id, reject, resolve) => {
+const del = (path, _id, reject, resolve) => {
 	const previous = localStorage.getItem(path);
 	const previousJS = JSON.parse(previous);
-	const idx = previousJS.findIndex(pj => pj.id == id);	
+	const idx = previousJS.findIndex(pj => pj._id == _id);	
 	if(idx == -1){
 		reject({
 			code: 400,
@@ -58,7 +58,7 @@ const del = (path, id, reject, resolve) => {
 	}	
 }
 
-const get = (path, id, reject, resolve) => {
+const get = (path, _id, reject, resolve) => {
 	const getData = localStorage.getItem(path);
 	if(getData == null){
 		resolve({
@@ -68,7 +68,7 @@ const get = (path, id, reject, resolve) => {
 	}else{					
 		resolve({
 			code: 200,
-			data: id == null ? JSON.parse(getData) : JSON.parse(getData).find(j => j.id == id)
+			data: _id == null ? JSON.parse(getData) : JSON.parse(getData).find(j => j._id == _id)
 		});						
 	}	
 }
@@ -76,14 +76,14 @@ const get = (path, id, reject, resolve) => {
 
 
 
-const request = (path, method = 'GET', body = null, id =  null) => {
+const request = (path, method = 'GET', body = null, _id =  null) => {
 	console.log(path, method, body)
 	return new Promise((resolve, reject) => {
 		switch(method){
 			case 'POST': post(path, body, reject, resolve); break;
-			case 'PUT': put(path, body, id, reject, resolve); break;				
-			case 'DELETE': del(path, id, reject, resolve); break;				
-			case 'GET': get(path, id, reject, resolve); break;
+			case 'PUT': put(path, body, _id, reject, resolve); break;				
+			case 'DELETE': del(path, _id, reject, resolve); break;				
+			case 'GET': get(path, _id, reject, resolve); break;
 			default: reject({
 				code: 400,
 				data: 'Método HTTP inválido'

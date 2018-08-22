@@ -25,13 +25,13 @@ class FormPecasFisicas extends Component {
                 <div style={{ marginBottom: 10, textAlign: 'right' }}>
                     <Button style={{ marginRight: 5 }} onClick={onAddPecaFisica}><Icon type="plus" />Peça física</Button></div>
                 <List
-                    rowKey='id'
+                    rowKey='_id'
                     size="small"
                     bordered={true}
                     locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
                     dataSource={pecasFisicas}
                     renderItem={(item, idx) => (
-                        <Item key={item.id} actions={[
+                        <Item key={item._id} actions={[
                             <Tooltip title='Excluir'><Button onClick={this.onDelete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>

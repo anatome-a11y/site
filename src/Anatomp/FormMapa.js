@@ -26,26 +26,26 @@ class FormMapa extends Component {
         return (
             <Fragment>
                 <List
-                    rowKey='id'
+                    rowKey='_id'
                     size="small"
                     bordered={true}
                     locale={{ emptyText: 'Nenhum roteiro foi selecionado' }}
                     dataSource={mapa}
                     renderItem={(item, idx) => (
-                        <Item key={item.id} actions={[
+                        <Item key={item._id} actions={[
                             <Tooltip title='Adicionar peça física'><Button onClick={onAddPecaFisica(idx)} icon='plus' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
                                 <div style={{ width: '20%', marginRight: 5 }}>{item.parte.nome}</div>
                                 <div style={{ width: '80%'}}>
                                     <List
-                                        rowKey='id'
+                                        rowKey='_id'
                                         size="small"
                                         bordered={false}
                                         locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
                                         dataSource={item.localizacao}
                                         renderItem={(itemLoc, idxLoc) => (
-                                            <Item key={itemLoc.id} actions={[
+                                            <Item key={itemLoc._id} actions={[
                                                 <Tooltip title='Localização Relativa'><Button onClick={this.onOpen} icon='compass' shape='circle' /></Tooltip>,
                                                 <Tooltip title='Excluir'><Button onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
                                             ]}>
@@ -60,7 +60,7 @@ class FormMapa extends Component {
                                                             filterOption={filter}
                                                             onChange={onChangeMapa('pecaFisica', idx, idxLoc)}
                                                         >
-                                                            {pecasFisicas.map(({ nome, id }) => <Option value={id} key={id}>{nome}</Option>)}
+                                                            {pecasFisicas.map(({ nome, _id }) => <Option value={_id} key={_id}>{nome}</Option>)}
                                                         </Select>
                                                     </div>
                                                     <div style={{ width: '30%'}}>

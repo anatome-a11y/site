@@ -1,30 +1,30 @@
 export const listaSistema = [
-    { id: "1", name: 'Vários' },
-    { id: "2", name: 'Sistema esquelético (Sistema ósseo + Sistema articular)' },
-    { id: "3", name: 'Sistema muscular' },
-    { id: "4", name: 'Sistema digestivo' },
-    { id: "5", name: 'Sistema respiratório' },
-    { id: "6", name: 'Sistema urinário' },
-    { id: "7", name: 'Sistema genital' },
-    { id: "8", name: 'Sistema circulatório' },
-    { id: "9", name: 'Sistema linfático' },
-    { id: "10", name: 'Sistema nervoso' },
-    { id: "11", name: 'Sistema tegumentar' },
-    { id: "12", name: 'Sistema sensorial' },
+    { _id: "1", name: 'Vários' },
+    { _id: "2", name: 'Sistema esquelético (Sistema ósseo + Sistema articular)' },
+    { _id: "3", name: 'Sistema muscular' },
+    { _id: "4", name: 'Sistema digestivo' },
+    { _id: "5", name: 'Sistema respiratório' },
+    { _id: "6", name: 'Sistema urinário' },
+    { _id: "7", name: 'Sistema genital' },
+    { _id: "8", name: 'Sistema circulatório' },
+    { _id: "9", name: 'Sistema linfático' },
+    { _id: "10", name: 'Sistema nervoso' },
+    { _id: "11", name: 'Sistema tegumentar' },
+    { _id: "12", name: 'Sistema sensorial' },
 ]
 
 
 export const listaRegiao = [
-    { id: "1", name: 'Várias' },
-    { id: "2", name: 'Cabeça' },
-    { id: "3", name: 'Pescoço' },
-    { id: "4", name: 'Tronco' },
-    { id: "5", name: 'Membros superiores' },
-    { id: "6", name: 'Membros Inferiores' },
+    { _id: "1", name: 'Várias' },
+    { _id: "2", name: 'Cabeça' },
+    { _id: "3", name: 'Pescoço' },
+    { _id: "4", name: 'Tronco' },
+    { _id: "5", name: 'Membros superiores' },
+    { _id: "6", name: 'Membros Inferiores' },
 ]
 
 
 export const listaIdiomas = [
-    { id: "1", name: 'PT', code: 'pt' },
-    { id: "2", name: 'EN', code: 'en' },
+    { _id: "1", name: 'PT', code: 'pt' },
+    { _id: "2", name: 'EN', code: 'en' },
 ]

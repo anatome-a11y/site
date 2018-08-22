@@ -18,7 +18,7 @@ const Panel = Collapse.Panel;
 const Item = List.Item;
 
 const _modelConteudoTeorico = {
-    id: uuidv4(),
+    _id: uuidv4(),
     partes: [],
     midias: [],
     plural: '',
@@ -30,6 +30,7 @@ class Peca extends Component {
 
     state = {
         model: {
+            _id: null,
             nome: '',
             idioma: '',
             sistema: '',
@@ -50,7 +51,8 @@ class Peca extends Component {
         loading: false,
         clickUID: uuidv4(),
         pendencias: [],
-        open: false
+        open: false,
+        somentePratica: false
     }
 
     componentDidMount() {
@@ -62,36 +64,37 @@ class Peca extends Component {
 
 
     render() {
-        const { model, options, erros, activeKey, clickUID, loading, open, pendencias } = this.state;
+        const { model, options, erros, activeKey, clickUID, loading, open, pendencias, somentePratica } = this.state;
+        const _btnSalvar = <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>;
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="1 - Criação e edição de peça genérica" />} key='geral'>
-                        <FormPeca {...model} {...options} erros={erros} onChange={this.onChange} />
+                        <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="2 - Inclusão de conteúdo prático" />} key='partes'>
-                        <FormPartes onRemoveParte={this.onRemoveParte} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
+                        <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                         <div style={{ textAlign: 'right' }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
+                            {somentePratica ? _btnSalvar : <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>}
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="3 - Inclusão de conteúdo teórico (informações teóricas) às partes" />} key='teoria'>
-                        <FormTeoria {...model} erros={erros} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
+                    {!somentePratica && <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="3 - Inclusão de conteúdo teórico (informações teóricas) às partes" />} key='teoria'>
+                        <FormTeoria {...model} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button onClick={this.onCheckPendencias} size='large' style={{ marginRight: 3 }}>Verificar pendências</Button>
-                            <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>
+                            {_btnSalvar}
                         </div>
-                    </Panel>
+                    </Panel>}
                 </Collapse>
                 <Modal
                     title='Lista de pendências'
                     visible={open}
-                    okText='Fechar'
-                    onOk={this.onClose}
-                    cancelButtonProps={{style: {display: 'none'}}}
+                    cancelText='Fechar'
+                    onCancel={this.onClose}
+                    okButtonProps={{style: {display: 'none'}}}
                 >
                     <div>
                         {pendencias.length > 0 && <span style={{fontWeight: 'bold'}}>Partes não associadas a um conteúdo teórico:</span>}
@@ -107,18 +110,20 @@ class Peca extends Component {
         )
     }
 
+    onChangeSomentePratica = somentePratica => this.setState({somentePratica})
+
     onClose = () => this.setState({open: false})
 
     onCheckPendencias = () => {
         const { conteudoTeorico, partes } = this.state.model;
 
-        const pt = partes.map(p => p.id);
+        const pt = partes.map(p => p._id);
         const ctFlat = [].concat.apply([], conteudoTeorico.map(ct => ct.partes));
         const ctUnique = ctFlat.filter((item, pos) => ctFlat.indexOf(item) == pos);
 
         const ids = pt.filter(i => ctUnique.indexOf(i) < 0);
 
-        const pendencias = partes.filter(p => ids.indexOf(p.id) != -1);
+        const pendencias = partes.filter(p => ids.indexOf(p._id) != -1);
         console.log(pendencias)
 
         this.setState({ pendencias, open: true })
@@ -148,11 +153,11 @@ class Peca extends Component {
         })
     }
 
-    onRemoveParte = id => () => {
+    onRemoveParte = _id => () => {
         const { onOpenSnackbar } = this.props;
         const { model } = this.state;
 
-        const isUsed = model.conteudoTeorico.find(ct => ct.partes.indexOf(id) != -1)
+        const isUsed = model.conteudoTeorico.find(ct => ct.partes.indexOf(_id) != -1)
 
         if (isUsed) {
             onOpenSnackbar('Não é possível excluir partes associadas a algum conteúdo teórico', 'warning');
@@ -160,7 +165,7 @@ class Peca extends Component {
             this.setState({
                 model: {
                     ...model,
-                    partes: model.partes.filter(p => p.id != id),
+                    partes: model.partes.filter(p => p._id != _id),
                 }
             })
         }
@@ -189,17 +194,31 @@ class Peca extends Component {
 
         if (isNew) {
             this.onChange('conteudoTeorico')([
-                { ..._modelConteudoTeorico, id: uuidv4() },
+                { ..._modelConteudoTeorico, _id: uuidv4() },
                 ...conteudoTeorico,
             ])
         } else {
             this.onChange('conteudoTeorico')([
-                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], id: uuidv4() },
+                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], _id: uuidv4() },
                 ...conteudoTeorico,
             ])
         }
-
     }
+
+    onDeleteConteudoTeorico = idx => () => {
+        const { conteudoTeorico } = this.state.model;
+        
+        if(conteudoTeorico.length == 1){
+            this.onChange('conteudoTeorico')([
+                { ..._modelConteudoTeorico, _id: uuidv4() },
+            ])            
+        }else{
+            this.onChange('conteudoTeorico')([
+                ...conteudoTeorico.slice(0, idx),
+                ...conteudoTeorico.slice(idx+1),
+            ])            
+        }
+    }    
 
 
     onValidate = () => {
@@ -254,7 +273,7 @@ class Peca extends Component {
             }))
         }
 
-        const _request = model.hasOwnProperty('_id') ? request(`peca/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('peca', { method: 'POST', body: JSON.stringify(body) })
+        const _request = model._id != null ? request(`peca/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('peca', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })
 
         _request
             .then(ret => {

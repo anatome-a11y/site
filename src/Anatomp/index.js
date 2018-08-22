@@ -29,13 +29,13 @@ const _modelReferenciaRelativa = {
 
 
 const _modelPecaFisica = {
-    id: uuidv4(),
+    _id: uuidv4(),
     nome: '',
     descricao: ''
 }
 
 const _modelLocalizacao = {
-    id: uuidv4(),
+    _id: uuidv4(),
     numero: '',
     referenciaRelativa: null,
     pecaFisica: ''
@@ -120,7 +120,7 @@ class Anatomp extends Component {
                     <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="2 - Informações das peças físicas" />} key='pecaFisica'>
                         <FormPecasFisicas {...model} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
+                            <Button type='primary' size='large' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="3 - Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
@@ -134,17 +134,18 @@ class Anatomp extends Component {
         )
     }
 
-    onSelectRoteiro = id => {
-        const {model} = this.state;
+    onSelectRoteiro = _id => {
+        const {model, options} = this.state;
         const {onOpenSnackbar} = this.props;
 
-        this.setState({loading: true, model: {...model, roteiro: id}})
-        request(`roteiro/${id}/partes`)
+        this.setState({loading: true, model: {...model, roteiro: _id}})
+        request(`roteiro/${_id}/partes`)
         .then(r => {
             if(r.status == 200){
                 this.setState({
                     model: {
                         ...this.state.model,
+                        nome: options.listaRoteiros.find(r => r._id == _id).nome,
                         mapa: r.data.map(p => ({
                             ..._modelMapa,
                             parte: p
@@ -156,6 +157,7 @@ class Anatomp extends Component {
             }
         })
         .catch(e => {
+            console.error(e)
             onOpenSnackbar('Ocorreu um erro na busca de partes')
         })
         .finally(() => this.setState({loading: false}))
@@ -180,7 +182,7 @@ class Anatomp extends Component {
         const { pecasFisicas } = this.state.model;
 
         this.onChange('pecasFisicas')([
-            { ..._modelPecaFisica, id: uuidv4() },
+            { ..._modelPecaFisica, _id: uuidv4() },
             ...pecasFisicas,
         ])
     }  
@@ -196,7 +198,7 @@ class Anatomp extends Component {
                     { 
                         ...model.mapa[idx], 
                         localizacao: [
-                            {..._modelLocalizacao, id: uuidv4()},
+                            {..._modelLocalizacao, _id: uuidv4()},
                             ...model.mapa[idx].localizacao
                         ] 
                     },
@@ -257,11 +259,11 @@ class Anatomp extends Component {
 
     onChange = field => value => this.setState({ model: { ...this.state.model, [field]: value } })
 
-    onRemoveParte = id => () => {
+    onRemoveParte = _id => () => {
         const { onOpenSnackbar } = this.props;
         const { model } = this.state;
 
-        const isUsed = model.conteudoTeorico.find(ct => ct.partes.indexOf(id) != -1)
+        const isUsed = model.conteudoTeorico.find(ct => ct.partes.indexOf(_id) != -1)
 
         if (isUsed) {
             onOpenSnackbar('Não é possível excluir partes associadas a algum conteúdo teórico', 'warning');
@@ -269,7 +271,7 @@ class Anatomp extends Component {
             this.setState({
                 model: {
                     ...model,
-                    partes: model.partes.filter(p => p.id != id),
+                    partes: model.partes.filter(p => p._id != _id),
                 }
             })
         }

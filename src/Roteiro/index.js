@@ -10,12 +10,14 @@ import FormTeoria from './FormTeoria'
 
 import { request } from '../utils/data'
 
+const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
 
 class Roteiro extends Component {
 
     state = {
         model: {
+            _id: null,
             nome: '',
             curso: '',
             disciplina: '',
@@ -55,7 +57,7 @@ class Roteiro extends Component {
                 if (r.status == 200) {
                     const conteudoExpandido = [].concat.apply([], r.data.map(p => {
                         return p.conteudoTeorico.map(ct => {
-                            const partesOriginais = p.partes.filter(pt => ct.partes.indexOf(pt.id) != -1);
+                            const partesOriginais = p.partes.filter(pt => ct.partes.indexOf(pt._id) != -1);
                             return {...ct, frases: [ct.plural, ct.singular], partesOriginais}
                         })
                     }))
@@ -72,12 +74,12 @@ class Roteiro extends Component {
                         ..._model,                      
                         pecas: r.data.map(p => ({
                             title: p.nome,
-                            value: p.id,
-                            key: p.id,
+                            value: p._id,
+                            key: p._id,
                             children: p.partes.map(pp => ({
                                 title: pp.nome,
-                                value: pp.id,
-                                key: pp.id
+                                value: pp._id,
+                                key: pp._id
                             }))
                         }))
                     })
@@ -203,7 +205,7 @@ class Roteiro extends Component {
             conteudos: model.conteudo.selected.map(ct => (ct._id))
         }
 
-        const _request = model.hasOwnProperty('_id') ? request(`roteiro/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('roteiro', { method: 'POST', body: JSON.stringify(body) })
+        const _request = model._id != null ? request(`roteiro/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('roteiro', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })
 
         _request
             .then(ret => {

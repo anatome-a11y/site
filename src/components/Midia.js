@@ -6,10 +6,10 @@ import {filter} from '../utils/data'
 const Option = Select.Option;
 
 const _tags = [
-    { id: "1", nome: 'Texto' },
-    { id: "2", nome: 'Língua portuguesa' },
-    { id: "3", nome: 'Língua inglesa' },
-    { id: "4", nome: 'Libras' },
+    { _id: "1", nome: 'Texto' },
+    { _id: "2", nome: 'Língua portuguesa' },
+    { _id: "3", nome: 'Língua inglesa' },
+    { _id: "4", nome: 'Libras' },
 ]
 
 
@@ -53,7 +53,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                         ...midias.slice(idx+1),
                     ])}
                 >
-                    {_tags.map(t => <Option value={t.id} key={t.id}>{t.nome}</Option>)}
+                    {_tags.map(t => <Option value={t._id} key={t._id}>{t.nome}</Option>)}
                 </Select>                    
                 ) : (
                     <div style={{marginBottom: 10}}>
@@ -62,7 +62,13 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                     </div>
                 )}                
             </div>
-            <div style={{ textAlign: 'center' }}><Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button></div>
+            <div style={{ textAlign: 'center' }}>
+                <Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button>
+                {onChange && <Button onClick={() => onChange([
+                        ...midias.slice(0, idx),
+                        ...midias.slice(idx+1),
+                    ])}><Icon type="delete" />Excluir</Button>}
+            </div>
         </div>
     )
 }

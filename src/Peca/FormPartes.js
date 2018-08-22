@@ -26,12 +26,14 @@ class FormPartes extends Component {
     }
 
     render() {
-        const { partes, onChangeParte, onRemoveParte, erros, form } = this.props;
+        const { partes, onChangeParte, onRemoveParte, erros, somentePratica, form } = this.props;
         const { string, tokens } = this.state;
 
         const _erros = {
             partes: erros.campos.indexOf('partes'),
         }
+
+        const onBlur = somentePratica ? {onBlur: this.gerar} : {};
 
         return (
             <Fragment>
@@ -42,18 +44,18 @@ class FormPartes extends Component {
                         label='Partes da peça'
                         {...props}
                     >
-                        <TextArea autosize id='partesTextArea' placeholder="Partes que compõem a peça separadas por quebra de linha" value={string} onChange={this.onChange} />
+                        <TextArea {...onBlur} autosize id='partesTextArea' placeholder="Partes que compõem a peça separadas por quebra de linha" value={string} onChange={this.onChange} />
                     </FormItem>
                     <FormItem label='Partes identificadas' {...props}>
                         <Row>
                             {partes.map((p, idx) => {
                                 return (
-                                    <Col span={6} key={p.id} style={{ padding: 5, display: 'flex' }}>
+                                    <Col span={6} key={p._id} style={{ padding: 5, display: 'flex' }}>
                                         <Input 
                                             style={{height: 22}} 
                                             size='small' 
                                             value={p.nome} 
-                                            suffix={<Icon style={{marginTop: 4, cursor: 'pointer'}} type="close" onClick={onRemoveParte(p.id)} />}
+                                            suffix={<Icon style={{marginTop: 4, cursor: 'pointer'}} type="close" onClick={onRemoveParte(p._id)} />}
                                             onChange={e => onChangeParte(idx, e.target.value)} 
                                         />
                                     </Col>
@@ -89,7 +91,7 @@ class FormPartes extends Component {
         const { onChange, partes } = this.props;
         const { tokens } = this.state;
         this.setState({ tokens: [], string: '' })
-        const novas = tokens.map(nome => ({ id: uuidv4(), nome }));
+        const novas = tokens.map(nome => ({ _id: uuidv4(), nome }));
         onChange('partes')([...partes, ...novas])
     }
 }

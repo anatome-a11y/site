@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { Form, Input, Select } from 'antd';
+import { Form, Input, Select, Switch } from 'antd';
 import {filter} from '../utils/data'
 
 const Option = Select.Option;
@@ -12,7 +12,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, listaRegiao, listaIdiomas, onChange }) => {
+const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaSistema, listaRegiao, listaIdiomas, onChange, onChangeSomentePratica }) => {
 
     const _erros = {
         nome: erros.campos.indexOf('nome'),
@@ -45,7 +45,7 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
                     optionFilterProp="children"
                     filterOption={filter}
                 >
-                    {listaIdiomas.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
+                    {listaIdiomas.map(i => <Option key={i._id} value={i._id}>{i.name}</Option>)}
                 </Select>
             </FormItem>
             <FormItem
@@ -62,7 +62,7 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
                     optionFilterProp="children"
                     filterOption={filter}                
                 >
-                    {listaRegiao.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
+                    {listaRegiao.map(i => <Option key={i._id} value={i._id}>{i.name}</Option>)}
                 </Select>
             </FormItem>
             <FormItem
@@ -79,9 +79,17 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, form, listaSistema, li
                     optionFilterProp="children"
                     filterOption={filter}                  
                 >
-                    {listaSistema.map(i => <Option key={i.id} value={i.id}>{i.name}</Option>)}
+                    {listaSistema.map(i => <Option key={i._id} value={i._id}>{i.name}</Option>)}
                 </Select>
             </FormItem>
+            <FormItem
+                validateStatus={_erros.sistema != -1 ? 'error' : ''}
+                help={erros.msgs[_erros.sistema] || ''}
+                label="Somente conteúdo prático"
+                {...props}
+            >
+                <Switch checked={somentePratica} onChange={onChangeSomentePratica} />
+            </FormItem>            
         </Form>
     )
 }

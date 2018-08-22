@@ -69,7 +69,7 @@ class FormTeoria extends Component {
                     }
                     type='inner' title='Conteúdo selecionado' style={{ marginBottom: 40, marginTop: 40 }}>
                     <Table
-                        rowKey='id'
+                        rowKey='_id'
                         rowSelection={{ onChange: this.onUnSelect, selectedRowKeys: [] }}
                         columns={columns}
                         dataSource={selected}
@@ -90,7 +90,7 @@ class FormTeoria extends Component {
                     }
                     type='inner' title='Conteúdo não selecionado'>
                     <Table
-                        rowKey='id'
+                        rowKey='_id'
                         rowSelection={{ onChange: this.onSelect, selectedRowKeys: [] }}
                         columns={columns}
                         dataSource={unselected}
@@ -109,7 +109,7 @@ class FormTeoria extends Component {
         //Obtém o conteúdo das partes selecionadas
         const conteudo = partes.map(selId => conteudoExpandido.filter(o => o.partes.indexOf(selId) != -1));
         const flat = [].concat.apply([], conteudo);
-        const uniqueFlat = flat.filter((i, pos) => flat.findIndex(ii => ii.id == i.id) == pos);
+        const uniqueFlat = flat.filter((i, pos) => flat.findIndex(ii => ii._id == i._id) == pos);
 
         const idsSel = selected.map(s => s._id)
         const _selected = uniqueFlat.filter(f => idsSel.indexOf(f._id) !== -1);
@@ -124,22 +124,22 @@ class FormTeoria extends Component {
     onSelect = (selectedRowKeys, selectedRows) => {
         const { unselected, selected, onChange } = this.props;
 
-        const ids = selectedRows.map(s => s.id);
+        const ids = selectedRows.map(s => s._id);
 
         onChange({
-            selected: [...unselected.filter(u => ids.indexOf(u.id) != -1), ...selected],
-            unselected: unselected.filter(u => ids.indexOf(u.id) == -1)
+            selected: [...unselected.filter(u => ids.indexOf(u._id) != -1), ...selected],
+            unselected: unselected.filter(u => ids.indexOf(u._id) == -1)
         })
     }
 
     onUnSelect = (selectedRowKeys, selectedRows) => {
         const { unselected, selected, onChange } = this.props;
 
-        const ids = selectedRows.map(s => s.id);
+        const ids = selectedRows.map(s => s._id);
 
         onChange({
-            unselected: [...selected.filter(u => ids.indexOf(u.id) != -1), ...unselected],
-            selected: selected.filter(u => ids.indexOf(u.id) == -1)
+            unselected: [...selected.filter(u => ids.indexOf(u._id) != -1), ...unselected],
+            selected: selected.filter(u => ids.indexOf(u._id) == -1)
         })
     }
 }

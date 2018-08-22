@@ -23,14 +23,6 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros,  onChange
     return (
         <Form layout="horizontal">
             <FormItem
-                validateStatus={_erros.nome != -1 ? 'error' : ''}
-                help={erros.msgs[_erros.nome] || ''}
-                label='Nome da peça'
-                {...props}
-            >
-                <Input autoFocus placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
-            </FormItem>
-            <FormItem
                 validateStatus={_erros.roteiro != -1 ? 'error' : ''}
                 help={erros.msgs[_erros.roteiro] || ''}
                 label="Roteiro"
@@ -47,6 +39,14 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros,  onChange
                     {listaRoteiros.map((i, idx) => <Option idx={idx} key={i._id} value={i._id}>{i.nome}</Option>)}
                 </Select>
             </FormItem>
+            <FormItem
+                validateStatus={_erros.nome != -1 ? 'error' : ''}
+                help={erros.msgs[_erros.nome] || ''}
+                label='Nome da peça'
+                {...props}
+            >
+                <Input autoFocus placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
+            </FormItem>            
             <FormItem
                 validateStatus={_erros.instituicao != -1 ? 'error' : ''}
                 help={erros.msgs[_erros.instituicao] || ''}
