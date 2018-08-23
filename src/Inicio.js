@@ -104,11 +104,11 @@ class Inicio extends Component {
                     {_Title}
                     <Card
                         type="inner"
-                        title={<CardTitle loading={loading === 'peca'}>1 - Conteúdo digital da peça</CardTitle>}
+                        title={<CardTitle loading={loading === 'peca'}>Conteúdo digital da peça genérica</CardTitle>}
                         bodyStyle={{ padding: 0 }}
                         extra={
                             <div style={{ display: 'flex' }}>
-                                <Button onClick={() => onChangeMenu({ key: 'peca' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar peça</Button>
+                                <Button onClick={() => onChangeMenu({ key: 'peca' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar conteúdo digital</Button>
                                 <Helper title='Pecas' contentQ={<p>Ajuda</p>} />
                             </div>
                         }
@@ -124,7 +124,7 @@ class Inicio extends Component {
                         style={{ marginTop: 16 }}
                         bodyStyle={{ padding: 0 }}
                         type="inner"
-                        title={<CardTitle loading={loading === 'roteiro'}>2 - Roteiros de aprendizagem</CardTitle>}
+                        title={<CardTitle loading={loading === 'roteiro'}>Roteiros de aprendizagem</CardTitle>}
                         extra={
                             <div style={{ display: 'flex' }}>
                                 <Button onClick={() => onChangeMenu({ key: 'roteiro' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar roteiro</Button>
@@ -143,7 +143,7 @@ class Inicio extends Component {
                         style={{ marginTop: 16 }}
                         bodyStyle={{ padding: 0 }}
                         type="inner"
-                        title={<CardTitle loading={loading === 'anatomp'}>3 - An@tom-P (Peças anatômicas interativas)</CardTitle>}
+                        title={<CardTitle loading={loading === 'anatomp'}>An@tom-P (Peças anatômicas interativas)</CardTitle>}
                         extra={
                             <div style={{ display: 'flex' }}>
                                 <Button onClick={() => onChangeMenu({ key: 'anatomp' })} style={{ marginRight: 25 }}><Icon type='plus' />Criar An@tom-P</Button>

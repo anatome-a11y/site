@@ -69,19 +69,19 @@ class Peca extends Component {
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="1 - Criação e edição de peça genérica" />} key='geral'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="2 - Inclusão de conteúdo prático" />} key='partes'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                         <div style={{ textAlign: 'right' }}>
                             {somentePratica ? _btnSalvar : <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>}
                         </div>
                     </Panel>
-                    {!somentePratica && <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="3 - Inclusão de conteúdo teórico (informações teóricas) às partes" />} key='teoria'>
+                    {!somentePratica && <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
                         <FormTeoria {...model} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button onClick={this.onCheckPendencias} size='large' style={{ marginRight: 3 }}>Verificar pendências</Button>

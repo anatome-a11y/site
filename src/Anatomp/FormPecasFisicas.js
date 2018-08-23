@@ -18,7 +18,7 @@ class FormPecasFisicas extends Component {
 
     render() {
         const { loading } = this.state;
-        const { onChangePecaFisica, partes, onAddPecaFisica, pecasFisicas } = this.props;
+        const { onChangePecaFisica, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica } = this.props;
 
         return (
             <Fragment>
@@ -32,7 +32,7 @@ class FormPecasFisicas extends Component {
                     dataSource={pecasFisicas}
                     renderItem={(item, idx) => (
                         <Item key={item._id} actions={[
-                            <Tooltip title='Excluir'><Button onClick={this.onDelete(idx)} icon='delete' shape='circle' /></Tooltip>
+                            <Tooltip title='Excluir'><Button onClick={onDeletePecaFisica(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
                                 <div style={{ width: '40%', marginRight: 5 }}>
@@ -46,16 +46,6 @@ class FormPecasFisicas extends Component {
                 />
             </Fragment>
         )
-    }
-
-
-    onDelete = idx => () => {
-        const { onChange, pecasFisicas } = this.props;
-
-        onChange('pecasFisicas')([
-            ...pecasFisicas.slice(0, idx),
-            ...pecasFisicas.slice(idx + 1),
-        ])
     }
 }
 

@@ -16,7 +16,7 @@ const Panel = Collapse.Panel;
 const Item = List.Item;
 
 const _modelReferenciaRelativa = {
-    pecaFisica: '',
+    _id: uuidv4(),
     anterior: '',
     posterior: '',
     latDir: '',
@@ -37,7 +37,7 @@ const _modelPecaFisica = {
 const _modelLocalizacao = {
     _id: uuidv4(),
     numero: '',
-    referenciaRelativa: null,
+    referenciaRelativa: {..._modelReferenciaRelativa},
     pecaFisica: ''
 }
 
@@ -111,19 +111,19 @@ class Anatomp extends Component {
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="1 - Informações gerais da An@tom-P" />} key='geral'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral {...model} {...options} erros={erros} onChange={this.onChange} onSelectRoteiro={this.onSelectRoteiro} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="2 - Informações das peças físicas" />} key='pecaFisica'>
-                        <FormPecasFisicas {...model} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
+                    <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
+                        <FormPecasFisicas {...model} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onDeletePecaFisica={this.onDeletePecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="3 - Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
                         <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} onAddPecaFisica={this.onAddPecaFisicaAoMapa} onRemovePecaFisica={this.onRemovePecaFisicaDoMapa} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={true}>Salvar An@tom-P</Button>
@@ -148,7 +148,15 @@ class Anatomp extends Component {
                         nome: options.listaRoteiros.find(r => r._id == _id).nome,
                         mapa: r.data.map(p => ({
                             ..._modelMapa,
-                            parte: p
+                            parte: p,
+                            localizacao: [{
+                                ..._modelLocalizacao,
+                                _id: uuidv4(),
+                                referenciaRelativa: {
+                                    ..._modelReferenciaRelativa,
+                                    _id: uuidv4()
+                                }
+                            }]
                         }))
                     }
                 })
@@ -207,6 +215,21 @@ class Anatomp extends Component {
             }
         })        
     }
+
+    onDeletePecaFisica = idx => () => {
+        const { pecasFisicas } = this.state.model;
+        
+        if(pecasFisicas.length == 1){
+            this.onChange('pecasFisicas')([
+                { ..._modelPecaFisica, _id: uuidv4() },
+            ])            
+        }else{
+            this.onChange('pecasFisicas')([
+                ...pecasFisicas.slice(0, idx),
+                ...pecasFisicas.slice(idx+1),
+            ])            
+        }
+    }     
 
     onRemovePecaFisicaDoMapa = (idx, idxLoc) => () => {
         const { model } = this.state;

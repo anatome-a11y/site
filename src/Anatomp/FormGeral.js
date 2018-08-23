@@ -29,6 +29,7 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros,  onChange
                 {...props}
             >
                 <Select
+                    autoFocus
                     showSearch
                     value={roteiro}
                     onChange={onSelectRoteiro}
@@ -45,7 +46,7 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros,  onChange
                 label='Nome da peça'
                 {...props}
             >
-                <Input autoFocus placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
+                <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
             </FormItem>            
             <FormItem
                 validateStatus={_erros.instituicao != -1 ? 'error' : ''}

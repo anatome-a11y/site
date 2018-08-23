@@ -105,19 +105,19 @@ class Roteiro extends Component {
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Criação de roteiro" />} key='geral'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Roteiro de aprendizagem" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de partes" />} key='partes'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
                         <FormPecas pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de conteúdo teórico" />} key='teoria'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button loading={loading} disabled={loading} type='primary' onClick={this.onSave} size='large'>Salvar roteiro</Button>

@@ -23,7 +23,7 @@ const _initialClicked = {
 
 class App extends Component {
 	state = {
-		current: 'inicio',
+		current: 'anatomp',
 		loading: false,
         clicked: {..._initialClicked}		
 	}
