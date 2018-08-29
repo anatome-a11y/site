@@ -108,6 +108,7 @@ class Anatomp extends Component {
 
     render() {
         const { model, options, erros, activeKey, loading } = this.state;
+
         return (
             <div>
                 <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
@@ -126,7 +127,7 @@ class Anatomp extends Component {
                     <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
                         <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} onAddPecaFisica={this.onAddPecaFisicaAoMapa} onRemovePecaFisica={this.onRemovePecaFisicaDoMapa} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={true}>Salvar An@tom-P</Button>
+                            <Button loading={loading} type='primary' onClick={this.onSave} size='large'>Salvar An@tom-P</Button>
                         </div>
                     </Panel>
                 </Collapse>
@@ -143,6 +144,7 @@ class Anatomp extends Component {
         this.setState({
             model: {
                 ...this.state.model,
+                roteiro: _id, 
                 nome: roteiro.nome,
                 mapa: roteiro.partes.map(p => ({
                     ..._modelMapa,
@@ -309,8 +311,9 @@ class Anatomp extends Component {
 
 
     onValidate = () => {
-        const { nome, roteiro, instituicao, pecasFisicas } = this.state.model;
+        const { nome, roteiro, instituicao, pecasFisicas, mapa } = this.state.model;
         let campos = [], msgs = []
+        
 
         if (nome == '') {
             campos = [...campos, 'nome'];
@@ -328,9 +331,28 @@ class Anatomp extends Component {
         }
 
         if (pecasFisicas.length == 0) {
-            campos = [...campos, 'regiao'];
+            campos = [...campos, 'pecasFisicas'];
             msgs = [...msgs, 'Adicione ao menos um peça física'];
+        }else{
+            if(pecasFisicas.find(p => p.nome.trim() == "")){
+                campos = [...campos, 'pecasFisicas'];
+                msgs = [...msgs, 'Informe o nome de todas as peças físicas'];                
+            }
         }
+
+        const hasError = mapa.find(m => {
+
+            if(m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')){
+                return true
+            }
+
+            return false;
+        })
+
+        if (hasError) {
+            campos = [...campos, 'mapa'];
+            msgs = [...msgs, 'Preencha todos os campos obrigatórios'];
+        }        
 
         return { campos, msgs }
     }
@@ -349,25 +371,22 @@ class Anatomp extends Component {
         this.setState({ loading: true })
         const body = {
             ...model,
-            conteudoTeorico: model.conteudoTeorico.map(ct => ({
-                ...ct,
-                midias: ct.midias.map(({ original, ...resto }) => ({ ...resto }))
-            }))
+            mapa: model.mapa.map(m => ({...m, parte: m.parte._id}))
         }
 
-        const _request = model.hasOwnProperty('_id') ? request(`peca/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('peca', { method: 'POST', body: JSON.stringify(body) })
+        const _request = model.hasOwnProperty('_id') ? request(`anatomp/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('anatomp', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })
 
         _request
             .then(ret => {
                 if (ret.status == 200) {
-                    onOpenSnackbar(`O conteúdo digital da peça ${model.nome} foi salvo com sucesso!`, 'success')
+                    onOpenSnackbar(`O mapeamento ${model.nome} foi salvo com sucesso!`, 'success')
                     onSetAppState({ current: 'inicio' })
                 } else {
-                    throw 'Não foi possível salvar o conteúdo digital da peça.'
+                    throw ret.error
                 }
             })
             .catch(e => {
-                onOpenSnackbar('Não foi possível salvar a peça')
+                onOpenSnackbar('Não foi possível salvar o mapeamento do roteiro')
                 console.error(e)
             })
             .finally(() => {

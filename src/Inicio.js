@@ -155,7 +155,7 @@ class Inicio extends Component {
                             size="small"
                             locale={{ emptyText: loading === true ? <Spin /> : 'Nenhuma An@tom-P foi encontrada' }}
                             dataSource={anatomp}
-                            renderItem={item => (<Item actions={[<Crud onEdit={onSetClicked('anatomp', 'edit', item)} onDelete={onSetClicked('anatomp', 'delete', item)} />]} style={{ paddingLeft: 24 }}>{item}</Item>)}
+                            renderItem={item => (<Item actions={[<Crud onEdit={onSetClicked('anatomp', 'edit', item)} onDelete={onSetClicked('anatomp', 'delete', item)} />]} style={{ paddingLeft: 24 }}>{item.nome}</Item>)}
                         />
                     </Card>
                 </Card>
