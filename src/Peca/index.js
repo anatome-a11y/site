@@ -32,7 +32,7 @@ class Peca extends Component {
         model: {
             _id: null,
             nome: '',
-            idioma: '',
+            idioma: '1',
             sistema: '',
             regiao: '',
             partes: [],

@@ -29,8 +29,8 @@ class FormTeoria extends Component {
         return (
             <Fragment>
                 <div style={{ marginBottom: 10, textAlign: 'right' }}>
-                    <Button style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
-                    <Button onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
+                    <Button disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
+                    <Button disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
                 </div>
                 <List
                     rowKey='_id'

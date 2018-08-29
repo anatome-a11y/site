@@ -56,7 +56,6 @@ class FormTeoria extends Component {
     render() {
         const { selected, unselected } = this.props;
 
-
         return (
             <div className='table-no-border'>
                 <Card
@@ -107,7 +106,7 @@ class FormTeoria extends Component {
     onFilterContent = ({partes, conteudoExpandido, onChange, selected }) => {
 
         //Obtém o conteúdo das partes selecionadas
-        const conteudo = partes.map(selId => conteudoExpandido.filter(o => o.partes.indexOf(selId) != -1));
+        const conteudo = partes.map(selId => conteudoExpandido.filter(o => o.partes.map(pp => pp._id).indexOf(selId) != -1));
         const flat = [].concat.apply([], conteudo);
         const uniqueFlat = flat.filter((i, pos) => flat.findIndex(ii => ii._id == i._id) == pos);
 

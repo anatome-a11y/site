@@ -57,15 +57,17 @@ class Roteiro extends Component {
                 if (r.status == 200) {
                     const conteudoExpandido = [].concat.apply([], r.data.map(p => {
                         return p.conteudoTeorico.map(ct => {
-                            const partesOriginais = p.partes.filter(pt => ct.partes.indexOf(pt._id) != -1);
+                            const _idsPartes = ct.partes.map(pp => pp._id)
+                            const partesOriginais = p.partes.filter(pt => _idsPartes.indexOf(pt._id) != -1);
                             return {...ct, frases: [ct.plural, ct.singular], partesOriginais}
                         })
                     }))
 
+                    const _idsConteudos = model ? model.conteudos.map(c => c._id) : []
                     const _model = model ? {model: {
                         ...model,
                         conteudo: {
-                            selected: conteudoExpandido.filter(c => model.conteudos.indexOf(c._id) != -1),
+                            selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
                             unselected: []
                         }
                     }} : {}
@@ -99,8 +101,6 @@ class Roteiro extends Component {
     render() {
 
         const { model, erros, activeKey, pecas, conteudoExpandido, loading } = this.state;
-
-
         
         return (
             <div>
@@ -142,7 +142,9 @@ class Roteiro extends Component {
     }
 
 
-    onChange = field => value => this.setState({ model: { ...this.state.model, [field]: value } })
+    onChange = field => value => {
+        this.setState({ model: { ...this.state.model, [field]: value } })        
+    }
 
     onChangePanel = activeKey => {
         this.setState({ activeKey })

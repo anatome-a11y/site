@@ -138,37 +138,26 @@ class Anatomp extends Component {
         const {model, options} = this.state;
         const {onOpenSnackbar} = this.props;
 
-        this.setState({loading: true, model: {...model, roteiro: _id}})
-        request(`roteiro/${_id}/partes`)
-        .then(r => {
-            if(r.status == 200){
-                this.setState({
-                    model: {
-                        ...this.state.model,
-                        nome: options.listaRoteiros.find(r => r._id == _id).nome,
-                        mapa: r.data.map(p => ({
-                            ..._modelMapa,
-                            parte: p,
-                            localizacao: [{
-                                ..._modelLocalizacao,
-                                _id: uuidv4(),
-                                referenciaRelativa: {
-                                    ..._modelReferenciaRelativa,
-                                    _id: uuidv4()
-                                }
-                            }]
-                        }))
-                    }
-                })
-            }else{
-                throw r.error
+        const roteiro = options.listaRoteiros.find(r => r._id == _id)
+
+        this.setState({
+            model: {
+                ...this.state.model,
+                nome: roteiro.nome,
+                mapa: roteiro.partes.map(p => ({
+                    ..._modelMapa,
+                    parte: p,
+                    localizacao: [{
+                        ..._modelLocalizacao,
+                        _id: uuidv4(),
+                        referenciaRelativa: {
+                            ..._modelReferenciaRelativa,
+                            _id: uuidv4()
+                        }
+                    }]
+                }))
             }
         })
-        .catch(e => {
-            console.error(e)
-            onOpenSnackbar('Ocorreu um erro na busca de partes')
-        })
-        .finally(() => this.setState({loading: false}))
     }
 
     onChangePecaFisica = (field, idx) => value => {

@@ -6,11 +6,13 @@ import {filter} from '../utils/data'
 const Option = Select.Option;
 
 const _tags = [
-    { _id: "1", nome: 'Texto' },
-    { _id: "2", nome: 'Língua portuguesa' },
-    { _id: "3", nome: 'Língua inglesa' },
-    { _id: "4", nome: 'Libras' },
+    { _id: "1", nome: 'Áudio em Português' },
+    { _id: "2", nome: 'Legenda em Português' },
+    { _id: "3", nome: 'Vídeo em Libras' },
+    { _id: "4", nome: 'Janela de intérprete' },
+    { _id: "5", nome: 'Audiodescrição' },
 ]
+
 
 
 const getMediaIcon = mime => {
