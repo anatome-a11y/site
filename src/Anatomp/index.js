@@ -111,7 +111,7 @@ class Anatomp extends Component {
 
         return (
             <div>
-                <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
+                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral {...model} {...options} erros={erros} onChange={this.onChange} onSelectRoteiro={this.onSelectRoteiro} />
                         <div style={{ textAlign: 'right' }}>

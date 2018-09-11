@@ -58,7 +58,10 @@ class Peca extends Component {
     componentDidMount() {
         const { model } = this.props;
         if (model) {
-            this.setState({ model })
+            this.setState({ model: {
+                ...model, 
+                conteudoTeorico: model.conteudoTeorico.map(ct => ({...ct, partes: ct.partes.map(p => p._id)}))
+            }})
         }
     }
 
@@ -68,7 +71,7 @@ class Peca extends Component {
         const _btnSalvar = <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>;
         return (
             <div>
-                <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
+                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                         <div style={{ textAlign: 'right' }}>
@@ -261,6 +264,7 @@ class Peca extends Component {
 
         if (erros.campos.length > 0) {
             this.setState({ erros })
+            onOpenSnackbar('Verique os erros de validação!')
             return false;
         }
 

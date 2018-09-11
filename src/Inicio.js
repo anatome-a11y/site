@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Card, Input, List, Button, Tooltip, Spin, Icon, Modal } from 'antd';
-import { request } from './utils/data'
+import { request, norm } from './utils/data'
 
 import Helper from './components/Helper'
 
@@ -39,6 +39,11 @@ class Inicio extends Component {
         peca: [],
         roteiro: [],
         anatomp: [],
+        originais: {
+            peca: [],
+            roteiro: [],
+            anatomp: [],            
+        }
     }
 
     componentDidMount() {
@@ -59,6 +64,11 @@ class Inicio extends Component {
                     peca: peca.data,
                     roteiro: roteiro.data,
                     anatomp: anatomp.data,
+                    originais: {
+                        peca: peca.data,
+                        roteiro: roteiro.data,
+                        anatomp: anatomp.data,                        
+                    }
                 })
             })
             .catch(e => {
@@ -91,11 +101,11 @@ class Inicio extends Component {
 
         return (
             <Fragment>
-                <Card title={<CardTitle>Bem vindo ao An@tom-AT</CardTitle>} extra={
+                <Card className='shadow2' title={<CardTitle>Bem vindo ao An@tom-AT</CardTitle>} extra={
                     <div style={{ display: 'flex' }}>
                         <Search
                             placeholder="Filtrar conteúdo"
-                            onSearch={value => console.log(value)}
+                            onSearch={this.onFilter}
                             style={{ width: 200, marginRight: 5 }}
                         />
                         <Helper title='Tour' contentQ={<p>Ajuda</p>} />
@@ -103,6 +113,7 @@ class Inicio extends Component {
                 }>
                     {_Title}
                     <Card
+                        className='shadow1'
                         type="inner"
                         title={<CardTitle loading={loading === 'peca'}>Conteúdo digital da peça genérica</CardTitle>}
                         bodyStyle={{ padding: 0 }}
@@ -121,6 +132,7 @@ class Inicio extends Component {
                         />
                     </Card>
                     <Card
+                        className='shadow1'
                         style={{ marginTop: 16 }}
                         bodyStyle={{ padding: 0 }}
                         type="inner"
@@ -140,6 +152,7 @@ class Inicio extends Component {
                         />
                     </Card>
                     <Card
+                        className='shadow1'
                         style={{ marginTop: 16 }}
                         bodyStyle={{ padding: 0 }}
                         type="inner"
@@ -173,6 +186,21 @@ class Inicio extends Component {
                 </Modal>
             </Fragment>
         )
+    }
+
+
+    onFilter = val => {
+        const {peca, roteiro, anatomp} = this.state.originais;
+
+        const _peca = peca.filter(p => norm(p.nome).indexOf(norm(val)) != -1);
+        const _roteiro = roteiro.filter(p => norm(p.nome).indexOf(norm(val)) != -1);
+        const _anatomp = anatomp.filter(p => norm(p.nome).indexOf(norm(val)) != -1);
+
+        this.setState({
+            peca: _peca,
+            roteiro: _roteiro,
+            anatomp: _anatomp,
+        })
     }
 
     onDelete = () => {

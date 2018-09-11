@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
 import 'antd/dist/antd.css';
-import { Menu, Icon, message } from 'antd';
+import { Menu, Icon, message, Button, Divider } from 'antd';
 import Inicio from './Inicio'
 import Peca from './Peca'
 import Roteiro from './Roteiro'
@@ -25,30 +25,40 @@ class App extends Component {
 	state = {
 		current: 'inicio',
 		loading: false,
-        clicked: {..._initialClicked}		
+		clicked: { ..._initialClicked }
 	}
 
 
 	render() {
 		return (
 			<Fragment>
-				<div style={{ height: 20, backgroundColor: '#1890ff', color: '#fff', textAlign: 'right' }}>Acessibilidade...</div>
-				<Menu
-					onClick={this.onChangeMenu}
-					selectedKeys={[this.state.current]}
-					mode="horizontal"
-				>
-					<Item key="inicio"><Icon type="home" />Página inicial</Item>
-					<SubMenu style={{ float: 'right' }} title={<span><Icon type="user" />Thiago Goveia</span>}>
-						<MenuItemGroup title="Sua conta">
-							<Item key="setting:1">Preferências</Item>
-							<Item key="setting:2">Editar perfil</Item>
-						</MenuItemGroup>
-						<MenuItemGroup title="Sessão">
-							<Item key="setting:3">Sair</Item>
-						</MenuItemGroup>
-					</SubMenu>
-				</Menu>
+				<div className='shadow2'>
+					<div style={{ backgroundColor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #e8e8e8' }}>
+						<div>Acessibilidade</div>
+						<div>
+							<Button shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
+							<Divider type='vertical' />
+							<Button shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
+							<Button shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
+						</div>
+					</div>
+					<Menu
+						onClick={this.onChangeMenu}
+						selectedKeys={[this.state.current]}
+						mode="horizontal"
+					>
+						<Item key="inicio"><Icon type="home" />Página inicial</Item>
+						<SubMenu style={{ float: 'right' }} title={<span><Icon type="user" />Thiago Goveia</span>}>
+							<MenuItemGroup title="Sua conta">
+								<Item key="setting:1">Preferências</Item>
+								<Item key="setting:2">Editar perfil</Item>
+							</MenuItemGroup>
+							<MenuItemGroup title="Sessão">
+								<Item key="setting:3">Sair</Item>
+							</MenuItemGroup>
+						</SubMenu>
+					</Menu>
+				</div>
 				<div style={{ padding: 25 }}>
 					{this.getBody()}
 				</div>
@@ -56,7 +66,7 @@ class App extends Component {
 		)
 	}
 
-    onSetClicked = (res = '', mode = '', item = {_id: ''}) => () => this.setState({clicked: {res, mode, item}})  	
+	onSetClicked = (res = '', mode = '', item = { _id: '' }) => () => this.setState({ clicked: { res, mode, item } })
 
 	onChangeMenu = (e) => {
 		this.setState({ current: e.key });
@@ -89,7 +99,7 @@ class App extends Component {
 				onOpenSnackbar={this.onOpenSnackbar}
 				onSetAppState={this.onSetAppState}
 				model={clicked.res == 'anatomp' ? clicked.item : undefined}
-			/>;			
+			/>;
 		}
 	}
 

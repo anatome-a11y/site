@@ -66,6 +66,7 @@ class Roteiro extends Component {
                     const _idsConteudos = model ? model.conteudos.map(c => c._id) : []
                     const _model = model ? {model: {
                         ...model,
+                        partes: model.partes.map(p => p._id),
                         conteudo: {
                             selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
                             unselected: []
@@ -73,7 +74,7 @@ class Roteiro extends Component {
                     }} : {}
                     this.setState({
                         conteudoExpandido,  
-                        ..._model,                      
+                        ..._model,                                              
                         pecas: r.data.map(p => ({
                             title: p.nome,
                             value: p._id,
@@ -104,7 +105,7 @@ class Roteiro extends Component {
         
         return (
             <div>
-                <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
+                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Roteiro de aprendizagem" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
                         <div style={{ textAlign: 'right' }}>
@@ -191,12 +192,14 @@ class Roteiro extends Component {
     }    
     
     onSave = () => {
+        
         const { onOpenSnackbar, onSetAppState } = this.props;
         const { model } = this.state;
 
         const erros = this.onValidate();
 
         if (erros.campos.length > 0) {
+            onOpenSnackbar('Verifique os erros de validação!')
             this.setState({ erros })
             return false;
         }

@@ -3,9 +3,9 @@ export const headers = {
   'Content-Type': 'application/json'
 }
 
-export const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+export const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
-export const filter = (input, option) => norm(option.props.children).toLowerCase().indexOf(norm(input).toLowerCase()) >= 0
+export const filter = (input, option) => norm(option.props.children).indexOf(norm(input)) >= 0
 
 export const request = (path, options = {}) => fetch('https://frozen-thicket-97625.herokuapp.com/' + path, {headers, ...options}).then(r => r.json())
 
