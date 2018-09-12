@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 
 import { Form, Input, List, TreeSelect, Table, Tag, Card } from 'antd';
 import Midia from '../components/Midia'
+import {norm} from '../utils/data'
 
 import request from '../utils/request'
 
@@ -62,7 +63,7 @@ class FormTeoria extends Component {
                     extra={
                         <Search
                             placeholder="Filtrar conteúdo"
-                            onSearch={value => console.log(value)}
+                            onSearch={this.onFilter('selected')}
                             style={{ width: 200, marginRight: 5 }}
                         />
                     }
@@ -75,7 +76,7 @@ class FormTeoria extends Component {
                         pagination={false}
                         size='small'
                         bordered={false}
-                        locale={{ emptyText: 'Nenhum conteúdo selecionado' }}
+                        locale={{ emptyText: 'Nenhum conteúdo encontrado' }}
                     />
                 </Card>
 
@@ -83,7 +84,7 @@ class FormTeoria extends Component {
                     extra={
                         <Search
                             placeholder="Filtrar conteúdo"
-                            onSearch={value => console.log(value)}
+                            onSearch={this.onFilter('unselected')}
                             style={{ width: 200, marginRight: 5 }}
                         />
                     }
@@ -95,11 +96,29 @@ class FormTeoria extends Component {
                         dataSource={unselected}
                         pagination={false}
                         size='small'
-                        locale={{ emptyText: 'Nenhum conteúdo para selecionar' }}
+                        locale={{ emptyText: 'Nenhum conteúdo encontrado' }}
                     />
                 </Card>
             </div>
         )
+    }
+
+    onFilter = field => value => {
+        const {originais, onChange} = this.props;
+
+        const filtered = originais[field].filter(f => {
+            if(f.frases.find(fr => norm(fr).indexOf(norm(value)) != -1)){
+                return true
+            }
+
+            if(f.partesOriginais.find(p => norm(p.nome).indexOf(norm(value)) != -1)){
+                return true
+            }  
+            
+            return false
+        })
+
+        onChange({[field]: filtered})
     }
 
     //Diante da seleção de partes, atualiza a lista de itens selecionados e não selecionados
@@ -116,7 +135,11 @@ class FormTeoria extends Component {
 
         onChange({
             unselected: _unselected,
-            selected: _selected
+            selected: _selected,  
+            originais: {
+                unselected: _unselected,
+                selected: _selected,                  
+            }    
         })
     }
 
@@ -125,9 +148,16 @@ class FormTeoria extends Component {
 
         const ids = selectedRows.map(s => s._id);
 
+        const _selected = [...unselected.filter(u => ids.indexOf(u._id) != -1), ...selected];
+        const _unselected = unselected.filter(u => ids.indexOf(u._id) == -1);
+
         onChange({
-            selected: [...unselected.filter(u => ids.indexOf(u._id) != -1), ...selected],
-            unselected: unselected.filter(u => ids.indexOf(u._id) == -1)
+            selected: _selected,
+            unselected: _unselected,
+            originais: {
+                unselected: _unselected,
+                selected: _selected,                  
+            }             
         })
     }
 
@@ -136,9 +166,16 @@ class FormTeoria extends Component {
 
         const ids = selectedRows.map(s => s._id);
 
+        const _unselected = [...selected.filter(u => ids.indexOf(u._id) != -1), ...unselected];
+        const _selected = selected.filter(u => ids.indexOf(u._id) == -1)
+
         onChange({
-            unselected: [...selected.filter(u => ids.indexOf(u._id) != -1), ...unselected],
-            selected: selected.filter(u => ids.indexOf(u._id) == -1)
+            unselected: _unselected,
+            selected: _selected,
+            originais: {
+                unselected: _unselected,
+                selected: _selected,                  
+            }            
         })
     }
 }

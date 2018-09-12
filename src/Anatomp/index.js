@@ -73,16 +73,13 @@ class Anatomp extends Component {
         const { onOpenSnackbar, model } = this.props;
         const { options } = this.state;
 
-        // if(model){
-        //     this.setState({model: {
-        //         ...model, 
-        //         partes: [],
-        //         conteudo: {
-        //             selected: [],
-        //             unselected: []
-        //         }
-        //     }})
-        // }        
+        if(model){
+            this.setState({model: {
+                ...model,
+                roteiro: model.roteiro._id,
+                mapa: model.mapa.map(m => ({...m, localizacao: m.localizacao.map(l => ({...l, pecaFisica: l.pecaFisica._id}))}))
+            }})
+        }        
 
         request('roteiro', { method: 'GET' })
             .then(r => {

@@ -43,7 +43,7 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros,  onChange
             <FormItem
                 validateStatus={_erros.nome != -1 ? 'error' : ''}
                 help={erros.msgs[_erros.nome] || ''}
-                label='Nome da peça'
+                label='Nome da An@tom-P'
                 {...props}
             >
                 <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />

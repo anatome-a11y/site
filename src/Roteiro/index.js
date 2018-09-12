@@ -69,7 +69,11 @@ class Roteiro extends Component {
                         partes: model.partes.map(p => p._id),
                         conteudo: {
                             selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
-                            unselected: []
+                            unselected: [],
+                            originais: {
+                                selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
+                                unselected: [],
+                            }
                         }
                     }} : {}
                     this.setState({
