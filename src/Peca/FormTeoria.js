@@ -4,15 +4,14 @@ import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 
 
 import Midia from '../components/Midia'
 import { filter } from '../utils/data'
-import * as filestack from 'filestack-js';
 
 const uuidv4 = require('uuid/v4');
 
 const { Item } = List;
 const { Option } = Select;
 
-const client = filestack.init('AHygjPe34Q2GWp3UI9BrQz');
-
+const firebase = window.firebase;
+const firebaseRef = firebase.storage().ref();       
 
 class FormTeoria extends Component {
 
@@ -126,29 +125,36 @@ class FormTeoria extends Component {
     }
 
     onUpload = (idx, midias) => info => {
-        const { onChangeConteudoTeorico, onOpenS } = this.props;
+        const { onChangeConteudoTeorico, onOpenS, onOpenSnackbar } = this.props;
         if (info.file.status !== 'uploading') {
             //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
-                const { uid, type, name } = info.file;
+                const { uid, type } = info.file;
                 const token = {};
 
-                client.upload(info.file, {}, {}, token)
-                    .then(res => {
-                        this.setState({ loading: false });
-                        onChangeConteudoTeorico('midias', idx)([...midias, {
-                            _id: uuidv4(),
-                            type,
-                            name,
-                            tags: [],
-                            url: res.url,
-                            handle: res.handle,
-                            original: info.file
-                        }])
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    });
+                const name = (+new Date()) + '-' + info.file.name;
+                const metadata = { contentType: info.file.type };
+
+                const task = firebaseRef.child(name).put(info.file, metadata);
+
+                task
+                .then(snapshot => snapshot.ref.getDownloadURL())
+                .then(url => {
+                    this.setState({ loading: false });
+                    onChangeConteudoTeorico('midias', idx)([...midias, {
+                        _id: uuidv4(),
+                        type,
+                        name,
+                        tags: [],
+                        url,
+                        original: info.file
+                    }])
+                })                
+                .catch(err => {
+                    onOpenSnackbar(err.message)
+                    console.log(err)
+                });                
+
 
             } else {
                 onChangeConteudoTeorico('midias', idx)(midias.filter(f => f.uid != info.file.uid))
