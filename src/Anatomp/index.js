@@ -31,7 +31,8 @@ const _modelReferenciaRelativa = {
 const _modelPecaFisica = {
     _id: uuidv4(),
     nome: '',
-    descricao: ''
+    descricao: '',
+    pecaGenerica: ''
 }
 
 const _modelLocalizacao = {
@@ -60,34 +61,39 @@ class Anatomp extends Component {
         },
         options: {
             listaRoteiros: [],
+            listaPecasGenericas: []
         },
         erros: {
             msgs: [],
             campos: []
         },
         activeKey: 'geral',
-        loading: false,
+        loading: true,
     }
 
     componentDidMount() {
         const { onOpenSnackbar, model } = this.props;
         const { options } = this.state;
 
-        if(model){
-            this.setState({model: {
-                ...model,
-                roteiro: model.roteiro._id,
-                mapa: model.mapa.map(m => ({...m, localizacao: m.localizacao.map(l => ({...l, pecaFisica: l.pecaFisica._id}))}))
-            }})
-        }        
+        Promise.all([
+            request('roteiro', { method: 'GET' }),
+            request('peca', { method: 'GET' }),
+        ])
+            .then(([r, p]) => {
+                if (r.status == 200 && p.status == 200) {
+                    console.log(model)
+                    const _model = model ? {model: {
+                        ...model,
+                        roteiro: model.roteiro._id,
+                        mapa: model.mapa.map(m => ({...m, localizacao: m.localizacao.map(l => ({...l, pecaFisica: l.pecaFisica._id}))}))
+                    }} : {};
 
-        request('roteiro', { method: 'GET' })
-            .then(r => {
-                if (r.status == 200) {
-                    this.setState({                    
+                    this.setState({
+                        ..._model,                    
                         options: {
                             ...options,
-                            listaRoteiros: r.data
+                            listaRoteiros: r.data,
+                            listaPecasGenericas: p.data
                         }
                     })
                 } else {
@@ -116,7 +122,7 @@ class Anatomp extends Component {
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
-                        <FormPecasFisicas {...model} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onDeletePecaFisica={this.onDeletePecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
+                        <FormPecasFisicas {...model} {...options} isEdit={model.hasOwnProperty('_id')} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onDeletePecaFisica={this.onDeletePecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
                         <div style={{ textAlign: 'right', marginTop: 15 }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
                         </div>
@@ -263,7 +269,44 @@ class Anatomp extends Component {
     }        
 
     onChangePanel = activeKey => {
-        this.setState({ activeKey })
+        if(activeKey == 'mapeamento' && !this.state.model.hasOwnProperty('_id')){
+            const {mapa, pecasFisicas} = this.state.model;
+
+            const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
+            const pgUtilizadasUnicas = pgUtilizadas.filter(function(item, pos) {
+                return pgUtilizadas.indexOf(item) == pos;
+            })
+
+            const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
+                const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
+                return {...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG)}
+            });
+            
+            const _mapa = mapa.map(m => {
+                const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
+
+                if(pecaGenerica){
+                    return {
+                        ...m,
+                        localizacao: pecaGenerica.pecasFisicas.map(pf => ({
+                            ..._modelLocalizacao,
+                            pecaFisica: pf._id,
+                            _id: uuidv4(),
+                            referenciaRelativa: {
+                                ..._modelReferenciaRelativa,
+                                _id: uuidv4()
+                            }
+                        }))
+                    }
+                }else{
+                    return m
+                }
+            })  
+            
+            this.setState({ activeKey, model: {...this.state.model, mapa: _mapa} })
+        }else{
+            this.setState({ activeKey })
+        }        
     }
 
     checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined

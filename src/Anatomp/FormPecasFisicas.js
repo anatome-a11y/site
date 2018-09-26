@@ -1,10 +1,12 @@
 import React, { Component, Fragment } from 'react';
 
-import { List, Tooltip, Button, Input, Icon } from 'antd'
+import { List, Tooltip, Button, Input, Icon, Select } from 'antd'
+import {filter} from '../utils/data'
 
 const uuidv4 = require('uuid/v4');
 
 const { Item } = List;
+const { Option } = Select;
 
 
 
@@ -18,7 +20,7 @@ class FormPecasFisicas extends Component {
 
     render() {
         const { loading } = this.state;
-        const { onChangePecaFisica, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica } = this.props;
+        const { onChangePecaFisica, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas } = this.props;
 
         return (
             <Fragment>
@@ -35,10 +37,24 @@ class FormPecasFisicas extends Component {
                             <Tooltip title='Excluir'><Button onClick={onDeletePecaFisica(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
-                                <div style={{ width: '40%', marginRight: 5 }}>
+                                <div style={{ width: isEdit ? '40%' : '30%', marginRight: 5 }}>
                                     <Input value={item.nome} onChange={e => onChangePecaFisica('nome', idx)(e.target.value)} placeholder={`Nome da peça física`} />
                                 </div>
-                                <div style={_style.textos}>
+                                {!isEdit && <div style={{ width: '30%', marginRight: 5 }}>
+                                    <Select
+                                        showSearch
+                                        value={item.pecaGenerica}
+                                        onChange={onChangePecaFisica('pecaGenerica', idx)}
+                                        notFoundContent='Nada foi encontrado'
+                                        optionFilterProp="children"
+                                        filterOption={filter}
+                                        placeholder='Peça genérica'
+                                        style={{width: '100%'}}
+                                    >
+                                        {listaPecasGenericas.map(i => <Option key={i._id} value={i._id}>{i.nome}</Option>)}
+                                    </Select>
+                                </div>}
+                                <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: isEdit ? '60%' : '40%', marginRight: 5 }}>
                                     <Input value={item.descricao} onChange={e => onChangePecaFisica('descricao', idx)(e.target.value)} placeholder={`Descrição da peça física`} />
                                 </div>
                             </div>
@@ -56,8 +72,7 @@ const _style = {
         padding: 0,
         margin: 0,
         width: '100%'
-    },
-    textos: { display: 'flex', alignItems: 'center', flexDirection: 'column', width: '60%', marginRight: 5 }
+    }
 }
 
 export default FormPecasFisicas;
