@@ -6,6 +6,7 @@ import Inicio from './Inicio'
 import Peca from './Peca'
 import Roteiro from './Roteiro'
 import Anatomp from './Anatomp'
+import { injectGlobal } from 'styled-components';
 
 
 const SubMenu = Menu.SubMenu;
@@ -25,11 +26,14 @@ class App extends Component {
 	state = {
 		current: 'inicio',
 		loading: false,
-		clicked: { ..._initialClicked }
+		clicked: { ..._initialClicked },
+		zoom: 1
 	}
 
 
 	render() {
+		const {zoom} = this.state;
+
 		return (
 			<Fragment>
 				<div className='shadow2'>
@@ -38,8 +42,8 @@ class App extends Component {
 						<div>
 							<Button shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
 							<Divider type='vertical' />
-							<Button shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
-							<Button shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
+							<Button disabled={zoom == 1} onClick={this.onZoomOut} shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
+							<Button disabled={zoom == 2} onClick={this.onZoomIn} shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
 						</div>
 					</div>
 					<Menu
@@ -47,7 +51,7 @@ class App extends Component {
 						selectedKeys={[this.state.current]}
 						mode="horizontal"
 					>
-						<Item key="inicio"><Icon type="home" />Página inicial</Item>
+						<Item key="inicio" style={{fontSize: '1rem'}}><Icon type="home" />Página inicial</Item>
 						<SubMenu style={{ float: 'right' }} title={<span><Icon type="user" />Thiago Goveia</span>}>
 							<MenuItemGroup title="Sua conta">
 								<Item key="setting:1">Preferências</Item>
@@ -65,6 +69,34 @@ class App extends Component {
 			</Fragment>
 		)
 	}
+
+	onZoomIn = () => {
+		const {zoom} = this.state;		
+		zoom < 2 && this.setState({zoom: zoom + 0.2}, () => {
+			injectGlobal`
+			html * {
+				font-size: ${zoom + 0.2}rem !important
+			}
+			.randomico {
+				zoom: ${Math.random()};
+			}			
+			`			
+		})
+	}
+
+	onZoomOut = () => {
+		const {zoom} = this.state;
+		zoom > 1 && this.setState({zoom: zoom - 0.2}, () => {
+			injectGlobal`
+			html * {
+				font-size: ${zoom - 0.2}rem !important
+			}
+			.randomico {
+				zoom: ${Math.random()};
+			}			
+			`			
+		})
+	}	
 
 	onSetClicked = (res = '', mode = '', item = { _id: '' }) => () => this.setState({ clicked: { res, mode, item } })
 
