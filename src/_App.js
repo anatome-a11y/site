@@ -1,10 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import React, { Component, Fragment } from 'react';
 
 import 'antd/dist/antd.css';
 import { Menu, Icon, message, Button, Divider } from 'antd';
+import Inicio from './Inicio'
+import Peca from './Peca'
+import Roteiro from './Roteiro'
+import Anatomp from './Anatomp'
 import { injectGlobal } from 'styled-components';
 
 
@@ -12,20 +13,29 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const { Item } = Menu;
 
-class Root extends React.Component{
-    state = {
-        isLogged: true,
-        loading: false,
-        zoom: 1,
-        title: ''
-    }
+const _initialClicked = {
+	res: '',
+	mode: '',
+	item: {
+		_id: ''
+	}
+}
 
-    render(){
 
-        const {isLogged, zoom, loading, title} = this.state;
+class App extends Component {
+	state = {
+		current: 'inicio',
+		loading: false,
+		clicked: { ..._initialClicked },
+		zoom: 1
+	}
 
-        return (
-            <div>
+
+	render() {
+		const {zoom} = this.state;
+
+		return (
+			<Fragment>
 				<div className='shadow2'>
 					<div style={{ backgroundColor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #e8e8e8' }}>
 						<div>Acessibilidade</div>
@@ -53,11 +63,12 @@ class Root extends React.Component{
 						</SubMenu>
 					</Menu>
 				</div>
-                {/* <h1 style={{textAlign: 'center',marginBottom: 0,marginTop: 18,fontSize: '1.5rem'}}>{title}</h1> */}
-                {isLogged ? <App onOpenSnackbar={this.onOpenSnackbar} onSetAppState={this.onSetAppState} loading={loading} isLogged={isLogged} /> : null}                
-            </div>
-        )
-    }
+				<div style={{ padding: 25 }}>
+					{this.getBody()}
+				</div>
+			</Fragment>
+		)
+	}
 
 	onZoomIn = () => {
 		const {zoom} = this.state;		
@@ -85,14 +96,53 @@ class Root extends React.Component{
 			}			
 			`			
 		})
-    } 
+	}	
+
+	onSetClicked = (res = '', mode = '', item = { _id: '' }) => () => this.setState({ clicked: { res, mode, item } })
+
+	onChangeMenu = (e) => {
+		this.setState({ current: e.key });
+	}
+
+	onSetAppState = state => this.setState(state)
+
+	getBody = () => {
+		const { current, clicked } = this.state;
+
+		switch (current) {
+			case 'inicio': return <Inicio
+				clicked={clicked}
+				onChangeMenu={this.onChangeMenu}
+				onSetAppState={this.onSetAppState}
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetClicked={this.onSetClicked}
+			/>;
+			case 'peca': return <Peca
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'peca' ? clicked.item : undefined}
+			/>;
+			case 'roteiro': return <Roteiro
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'roteiro' ? clicked.item : undefined}
+			/>;
+			case 'anatomp': return <Anatomp
+				onOpenSnackbar={this.onOpenSnackbar}
+				onSetAppState={this.onSetAppState}
+				model={clicked.res == 'anatomp' ? clicked.item : undefined}
+			/>;
+		}
+	}
+
+	onCloseSnackbar = () => {
+		const { snackbar } = this.state;
+		this.setState({ snackbar: { ...snackbar, open: false } })
+	}
 
 	onOpenSnackbar = (msg, type = 'error') => {
 		message[type](msg);
-	};    
-    
-    onSetAppState = state => this.setState(state)
+	};
 }
 
-ReactDOM.render(<Root />, document.getElementById('root'));
-registerServiceWorker();
+export default App;
