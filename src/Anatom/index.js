@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Card, Input, List, Button, Tooltip, Spin, Icon, Modal, Table } from 'antd';
-import { withAppContext } from './context'
+import { withAppContext } from '../context'
 
-import { request, norm } from './utils/data'
+import { request, norm } from '../utils/data'
 
-import Helper from './components/Helper'
+import Helper from '../components/Helper'
 
 const ButtonGroup = Button.Group;
 const Search = Input.Search;

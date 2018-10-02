@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import {AppContext} from './context'
 
@@ -22,10 +22,10 @@ class App extends Component {
                 isLogged,
                 onOpenSnackbar
             }}>
-                <Router>
-                    <Route exact path="/" component={ListAnatom} />
-                    <Route exact path="/roteiro/cadastrar" component={FormAnatom} />
-                </Router>
+                    <Switch>
+                        <Route exact path="/" component={ListAnatom} />
+                        <Route exact path="/roteiro/cadastrar" component={FormAnatom} />
+                    </Switch>
             </AppContext.Provider>
         )
     }

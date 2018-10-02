@@ -19,13 +19,13 @@ class Roteiro extends Component {
         model: {
             _id: null,
             nome: '',
+            idioma: '',
             curso: '',
             disciplina: '',
             proposito: '',
             partes: [],
             conteudo: {
                 selected: [],
-                unselected: []
             }
         },
         erros: {
@@ -47,7 +47,8 @@ class Roteiro extends Component {
                 partes: [],
                 conteudo: {
                     selected: [],
-                    unselected: []
+                    original: [],
+                    filtrado: []
                 }
             }})
         }        
@@ -69,11 +70,8 @@ class Roteiro extends Component {
                         partes: model.partes.map(p => p._id),
                         conteudo: {
                             selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
-                            unselected: [],
-                            originais: {
-                                selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
-                                unselected: [],
-                            }
+                            original: conteudoExpandido,
+                            filtrado: conteudoExpandido,
                         }
                     }} : {}
                     this.setState({
@@ -110,7 +108,7 @@ class Roteiro extends Component {
         return (
             <div>
                 <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Roteiro de aprendizagem" />} key='geral'>
+                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
                         <div style={{ textAlign: 'right' }}>
                             <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>

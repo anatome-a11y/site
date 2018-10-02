@@ -12,6 +12,7 @@ import FormTeoria from './FormTeoria';
 
 
 import Header from '../components/Header'
+import { withAppContext } from '../context';
 
 const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
@@ -47,9 +48,7 @@ class Peca extends Component {
             msgs: [],
             campos: []
         },
-        activeKey: 'geral',
         loading: false,
-        clickUID: uuidv4(),
         pendencias: [],
         open: false,
         somentePratica: false
@@ -67,11 +66,11 @@ class Peca extends Component {
 
 
     render() {
-        const { model, options, erros, activeKey, clickUID, loading, open, pendencias, somentePratica } = this.state;
+        const { model, options, erros, loading, open, pendencias, somentePratica } = this.state;
         const _btnSalvar = <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>;
         return (
             <div>
-                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
+                <Collapse accordion activeKey={this.props.activeKey} onChange={this.props.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                         <div style={{ textAlign: 'right' }}>
@@ -79,7 +78,7 @@ class Peca extends Component {
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
-                        <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
+                        <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={this.props.clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                         <div style={{ textAlign: 'right' }}>
                             {somentePratica ? _btnSalvar : <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>}
                         </div>
@@ -132,10 +131,6 @@ class Peca extends Component {
         this.setState({ pendencias, open: true })
     }
 
-    onChangePanel = activeKey => {
-        const newState = activeKey == 'teoria' ? { clickUID: uuidv4() } : {};
-        this.setState({ activeKey, ...newState })
-    }
 
     checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
 
@@ -300,4 +295,4 @@ class Peca extends Component {
 }
 
 
-export default Peca
+export default withAppContext(Peca)

@@ -7,22 +7,25 @@ import 'antd/dist/antd.css';
 import { Menu, Icon, message, Button, Divider } from 'antd';
 import { injectGlobal } from 'styled-components';
 
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {withRouter} from 'react-router'
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const { Item } = Menu;
 
-class Root extends React.Component{
+class Content extends React.Component{
     state = {
         isLogged: true,
-        loading: false,
+        loading: true,
         zoom: 1,
         title: ''
     }
 
     render(){
 
-        const {isLogged, zoom, loading, title} = this.state;
+		const {isLogged, zoom, loading, title} = this.state;
+		const {history, location} = this.props;
 
         return (
             <div>
@@ -37,12 +40,12 @@ class Root extends React.Component{
 						</div>
 					</div>
 					<Menu
-						onClick={this.onChangeMenu}
-						selectedKeys={[this.state.current]}
+						onClick={() => history.push('/')}
 						mode="horizontal"
+						selectedKeys={location.pathname == '/'? ['inicio'] : []}
 					>
 						<Item key="inicio" style={{fontSize: '1rem'}}><Icon type="home" />Página inicial</Item>
-						<SubMenu style={{ float: 'right' }} title={<span><Icon type="user" />Thiago Goveia</span>}>
+						<SubMenu style={{ float: 'right' }} title={<span><Icon type="user" />Márcia V.</span>}>
 							<MenuItemGroup title="Sua conta">
 								<Item key="setting:1">Preferências</Item>
 								<Item key="setting:2">Editar perfil</Item>
@@ -93,6 +96,14 @@ class Root extends React.Component{
     
     onSetAppState = state => this.setState(state)
 }
+
+const RoutingContent = withRouter(Content)
+
+const Root = props => (
+	<Router>
+		<RoutingContent/>
+	</Router>
+)
 
 ReactDOM.render(<Root />, document.getElementById('root'));
 registerServiceWorker();
