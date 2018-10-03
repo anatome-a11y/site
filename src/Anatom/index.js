@@ -37,8 +37,8 @@ const columns = [
 const Crud = ({ onEdit, onDelete }) => {
     return (
         <ButtonGroup>
-            <Tooltip title='Editar'><Button onClick={onEdit} icon='edit' /></Tooltip>
-            <Tooltip title='Remover'><Button onClick={onDelete} icon='delete' /></Tooltip>
+            <Tooltip title='Editar'><Button type={'primary'} ghost onClick={onEdit} icon='edit' /></Tooltip>
+            <Tooltip title='Remover'><Button type={'primary'} ghost onClick={onDelete} icon='delete' /></Tooltip>
         </ButtonGroup>
     )
 }
@@ -89,7 +89,7 @@ class Main extends Component {
                 bodyStyle={{ padding: 0 }}
                 extra={
                     <div style={{ display: 'flex' }}>
-                        <Button onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Novo roteiro</Button>
+                        <Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Novo roteiro</Button>
                         <Helper title='Pecas' contentQ={<p>Ajuda</p>} />
                     </div>
                 }

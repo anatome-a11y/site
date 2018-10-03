@@ -28,6 +28,33 @@ const _modelConteudoTeorico = {
 
 class Peca extends Component {
 
+    buttons = {
+        submit: {
+            key: 'btn-submit',
+            type: 'primary',
+            children: 'Salvar',
+            onClick: () => this.onSave()
+        },
+        next: mode => ({
+            key: 'btn-next-'+mode,
+            type: 'primary',
+            children: 'Pŕoximo',
+            ghost: true,
+            onClick: () => this.onChangePanel(mode)
+        }),
+        cancelar: {
+            key: 'btn-cencelar',
+            children: 'Cancelar',
+            onClick: () => this.props.onClose(false)
+        },
+        pendencias: {
+            key: 'btn-verificar-pend',
+            children: 'Verificar pendências',   
+            type: 'primary',
+            ghost: true,                     
+            onClick: () => this.onCheckPendencias()
+        }
+    }
 
     state = {
         model: {
@@ -51,44 +78,80 @@ class Peca extends Component {
         loading: false,
         pendencias: [],
         open: false,
-        somentePratica: false
+        somentePratica: false,
+        clickUID: uuidv4(),
+        activeKey: 'geral'
     }
 
     componentDidMount() {
-        const { model } = this.props;
+        const { model, onSetButtons } = this.props;
         if (model) {
             this.setState({ model: {
                 ...model, 
                 conteudoTeorico: model.conteudoTeorico.map(ct => ({...ct, partes: ct.partes.map(p => p._id)}))
             }})
         }
+
+        onSetButtons([
+            {...this.buttons.cancelar},
+            {...this.buttons.next('partes')},
+            {...this.buttons.submit}
+        ])
+    }
+
+    componentWillUpdate(nextProps, nextState){
+        const {activeKey} = this.state;
+        const {onSetButtons} = this.props;
+
+        if(activeKey != nextState.activeKey){
+            if(nextState.activeKey == 'geral'){
+                onSetButtons([
+                    {...this.buttons.cancelar},
+                    {...this.buttons.next('partes')},
+                    {...this.buttons.submit}
+                ]) 
+            }else{
+                if(nextState.activeKey == 'partes'){
+                    if(nextState.somentePratica){
+                        onSetButtons([
+                            {...this.buttons.cancelar},
+                            {...this.buttons.pendencias},
+                            {...this.buttons.submit}
+                        ])                         
+                    }else{
+                        onSetButtons([
+                            {...this.buttons.cancelar},
+                            {...this.buttons.next('teoria')},
+                            {...this.buttons.submit}
+                        ])                         
+                    }
+                }else{
+                    onSetButtons([
+                        {...this.buttons.cancelar},
+                        {...this.buttons.pendencias},
+                        {...this.buttons.submit}
+                    ])                     
+                }
+            }
+           
+        }
+
     }
 
 
     render() {
-        const { model, options, erros, loading, open, pendencias, somentePratica } = this.state;
-        const _btnSalvar = <Button loading={loading} type='primary' onClick={this.onSave} size='large' disabled={loading}>Salvar peça</Button>;
+        const { model, options, erros, loading, open, pendencias, somentePratica, clickUID, activeKey } = this.state;
         return (
             <div>
-                <Collapse accordion activeKey={this.props.activeKey} onChange={this.props.onChangePanel} >
+                <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
-                        <div style={{ textAlign: 'right' }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
-                        </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
-                        <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={this.props.clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
-                        <div style={{ textAlign: 'right' }}>
-                            {somentePratica ? _btnSalvar : <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>}
-                        </div>
+                        <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                     </Panel>
                     {!somentePratica && <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
                         <FormTeoria {...model} onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
-                        <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button onClick={this.onCheckPendencias} size='large' style={{ marginRight: 3 }}>Verificar pendências</Button>
-                            {_btnSalvar}
-                        </div>
                     </Panel>}
                 </Collapse>
                 <Modal
@@ -112,6 +175,11 @@ class Peca extends Component {
         )
     }
 
+    onChangePanel = activeKey => {
+        const newState = activeKey == 'teoria' ? { clickUID: uuidv4() } : {};
+        this.setState({ activeKey, ...newState })
+    }      
+
     onChangeSomentePratica = somentePratica => this.setState({somentePratica})
 
     onClose = () => this.setState({open: false})
@@ -126,7 +194,6 @@ class Peca extends Component {
         const ids = pt.filter(i => ctUnique.indexOf(i) < 0);
 
         const pendencias = partes.filter(p => ids.indexOf(p._id) != -1);
-        console.log(pendencias)
 
         this.setState({ pendencias, open: true })
     }
@@ -192,13 +259,13 @@ class Peca extends Component {
 
         if (isNew) {
             this.onChange('conteudoTeorico')([
-                { ..._modelConteudoTeorico, _id: uuidv4() },
                 ...conteudoTeorico,
+                { ..._modelConteudoTeorico, _id: uuidv4() },                
             ])
         } else {
             this.onChange('conteudoTeorico')([
-                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], _id: uuidv4() },
                 ...conteudoTeorico,
+                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], _id: uuidv4() },                
             ])
         }
     }
@@ -252,7 +319,7 @@ class Peca extends Component {
     }
 
     onSave = () => {
-        const { onOpenSnackbar, onSetAppState } = this.props;
+        const { onOpenSnackbar, onSetAppState, onClose } = this.props;
         const { model } = this.state;
 
         const erros = this.onValidate();
@@ -279,6 +346,7 @@ class Peca extends Component {
                 if (ret.status == 200) {
                     onOpenSnackbar(`O conteúdo digital da peça ${model.nome} foi salvo com sucesso!`, 'success')
                     onSetAppState({ current: 'inicio' })
+                    onClose(true)
                 } else {
                     throw 'Não foi possível salvar o conteúdo digital da peça.'
                 }

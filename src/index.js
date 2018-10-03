@@ -33,10 +33,10 @@ class Content extends React.Component{
 					<div style={{ backgroundColor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #e8e8e8' }}>
 						<div>Acessibilidade</div>
 						<div>
-							<Button shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
+							<Button type='primary' ghost shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
 							<Divider type='vertical' />
-							<Button disabled={zoom == 1} onClick={this.onZoomOut} shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
-							<Button disabled={zoom == 2} onClick={this.onZoomIn} shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
+							<Button type='primary' ghost disabled={zoom == 1} onClick={this.onZoomOut} shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
+							<Button type='primary' ghost disabled={zoom == 2} onClick={this.onZoomIn} shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
 						</div>
 					</div>
 					<Menu

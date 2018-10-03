@@ -27,10 +27,6 @@ class FormTeoria extends Component {
 
         return (
             <Fragment>
-                <div style={{ marginBottom: 10, textAlign: 'right' }}>
-                    <Button disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
-                    <Button disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
-                </div>
                 <List
                     rowKey='_id'
                     size="small"
@@ -41,10 +37,10 @@ class FormTeoria extends Component {
                         <Item key={item._id} actions={[
                             <Upload showUploadList={false} onChange={this.onUpload(idx, item.midias)} beforeUpload={this.beforeUpload(item._id)}>
                                 <Tooltip title='Adicionar mídia'>
-                                    <Button shape='circle' icon='paper-clip' disabled={loading} />
+                                    <Button type='primary' ghost shape='circle' icon='paper-clip' disabled={loading} />
                                 </Tooltip>
                             </Upload>,
-                            <Tooltip title='Excluir'><Button onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
+                            <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
                                 <div style={{ width: '40%', marginRight: 5 }}>
@@ -72,6 +68,10 @@ class FormTeoria extends Component {
                             </div>
                         </Item>)}
                 />
+                <div style={{ marginTop: 10, textAlign: 'center' }}>
+                    <Button type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
+                    <Button type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
+                </div>                
                 <Modal
                     title={'Excluir conteúdo teórico'}
                     visible={open}

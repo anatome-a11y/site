@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { List, Tooltip, Button, Input, Icon, Select } from 'antd'
-import {filter} from '../utils/data'
+import { filter } from '../utils/data'
 
 const uuidv4 = require('uuid/v4');
 
@@ -24,8 +24,6 @@ class FormPecasFisicas extends Component {
 
         return (
             <Fragment>
-                <div style={{ marginBottom: 10, textAlign: 'right' }}>
-                    <Button style={{ marginRight: 5 }} onClick={onAddPecaFisica}><Icon type="plus" />Peça física</Button></div>
                 <List
                     rowKey='_id'
                     size="small"
@@ -34,7 +32,7 @@ class FormPecasFisicas extends Component {
                     dataSource={pecasFisicas}
                     renderItem={(item, idx) => (
                         <Item key={item._id} actions={[
-                            <Tooltip title='Excluir'><Button onClick={onDeletePecaFisica(idx)} icon='delete' shape='circle' /></Tooltip>
+                            <Tooltip title='Excluir'><Button type='primary' ghost onClick={onDeletePecaFisica(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
                             <div style={_style.item}>
                                 <div style={{ width: isEdit ? '40%' : '30%', marginRight: 5 }}>
@@ -49,7 +47,7 @@ class FormPecasFisicas extends Component {
                                         optionFilterProp="children"
                                         filterOption={filter}
                                         placeholder='Peça genérica'
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                     >
                                         {listaPecasGenericas.map(i => <Option key={i._id} value={i._id}>{i.nome}</Option>)}
                                     </Select>

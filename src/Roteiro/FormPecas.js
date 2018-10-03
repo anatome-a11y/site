@@ -13,14 +13,12 @@ class FormPecas extends Component {
 
     state = {
         visible: false,
-        clickUID: uuidv4(),
-        activeKey: 'geral'
+        buttons: []
     }
 
     render() {
         const { onChange, partes, pecas } = this.props;
-
-        const {clickUID, activeKey} = this.state;
+        const {buttons} = this.state;
 
         const treeProps = {
             treeData: pecas,
@@ -76,22 +74,22 @@ class FormPecas extends Component {
                     bodyStyle={{padding: 0}}
                     footer={null}
                 >
-                    <PecaGenerica clickUID={clickUID} activeKey={activeKey} />
+                    <PecaGenerica onClose={this.onCancel} onSetButtons={this.onSetButtons} />
+                    <div style={{textAlign: 'right', padding: 12}}>
+                        {buttons.map(b => <Button {...b} style={{marginLeft: 5}} />)}
+                    </div>
                 </Modal>
             </Form>
         )
     }
 
+    onSetButtons = buttons => this.setState({buttons})
+
     onOpen = () => this.setState({ visible: true })
 
     onSubmit = () => { }
 
-    onCancel = () => this.setState({ visible: false })
-
-    onChangePanel = activeKey => {
-        const newState = activeKey == 'teoria' ? { clickUID: uuidv4() } : {};
-        this.setState({ activeKey, ...newState })
-    }    
+    onCancel = () => this.setState({ visible: false })  
 }
 
 

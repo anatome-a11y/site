@@ -34,6 +34,7 @@ class Roteiro extends Component {
         },
         activeKey: 'geral',
         pecas: [],
+        pecasFlat: [],
         conteudoExpandido: [],
         loading: true
     }
@@ -76,7 +77,8 @@ class Roteiro extends Component {
                     }} : {}
                     this.setState({
                         conteudoExpandido,  
-                        ..._model,                                              
+                        ..._model,  
+                        pecasFlat: [].concat.apply([], r.data.map(p => p.partes)),                                         
                         pecas: r.data.map(p => ({
                             title: p.nome,
                             value: p._id,
@@ -101,6 +103,8 @@ class Roteiro extends Component {
     }
 
 
+
+
     render() {
 
         const { model, erros, activeKey, pecas, conteudoExpandido, loading } = this.state;
@@ -110,21 +114,22 @@ class Roteiro extends Component {
                 <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
-                        <div style={{ textAlign: 'right' }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
+                        <div style={{ textAlign: 'center' }}>
+                            <Button icon='arrow-right' type='primary' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
                         <FormPecas pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
-                        <div style={{ textAlign: 'right' }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
+                        <div style={{ textAlign: 'center' }}>
+                            <Button style={{marginRight: 5}} type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('geral')}>Anterior</Button>
+                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />
-                        <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button loading={loading} disabled={loading} type='primary' onClick={this.onSave} size='large'>Salvar roteiro</Button>
-                        </div>
+                        <div style={{ textAlign: 'center', marginTop: 10 }}>
+                            <Button  type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('partes')}>Anterior</Button>
+                        </div>                    
                     </Panel>
                 </Collapse>
             </div>
@@ -146,6 +151,9 @@ class Roteiro extends Component {
 
 
     onChange = field => value => {
+        if(field == 'partes'){
+            this.props.onChangePartes(this.state.pecasFlat.filter(p => value.indexOf(p._id) != -1))
+        }
         this.setState({ model: { ...this.state.model, [field]: value } })        
     }
 

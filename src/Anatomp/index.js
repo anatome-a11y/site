@@ -72,15 +72,16 @@ class Anatomp extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar, model } = this.props;
+        const { onOpenSnackbar, model, partesRoteiro } = this.props;
         const { options } = this.state;
 
+        this.onSelectRoteiro(partesRoteiro)
+
         Promise.all([
-            request('roteiro', { method: 'GET' }),
             request('peca', { method: 'GET' }),
         ])
-            .then(([r, p]) => {
-                if (r.status == 200 && p.status == 200) {
+            .then(([ p]) => {
+                if ( p.status == 200) {
                     console.log(model)
                     const _model = model ? {model: {
                         ...model,
@@ -92,12 +93,11 @@ class Anatomp extends Component {
                         ..._model,                    
                         options: {
                             ...options,
-                            listaRoteiros: r.data,
                             listaPecasGenericas: p.data
                         }
                     })
                 } else {
-                    throw r.error
+                    throw p.error
                 }
             })
             .catch(e => {
@@ -106,6 +106,12 @@ class Anatomp extends Component {
                 console.error(e)
             })
             .finally(() => this.setState({loading: false}))
+    }
+
+    componentWillReceiveProps(next){
+        if(JSON.stringify(this.props.partesRoteiro) != JSON.stringify(next.partesRoteiro)){
+            this.onSelectRoteiro(next.partesRoteiro)
+        }
     }
 
 
@@ -117,39 +123,35 @@ class Anatomp extends Component {
                 <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
                     <Panel header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral {...model} {...options} erros={erros} onChange={this.onChange} onSelectRoteiro={this.onSelectRoteiro} />
-                        <div style={{ textAlign: 'right' }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
+                        <div style={{ textAlign: 'center' }}>
+                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('pecaFisica')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
                         <FormPecasFisicas {...model} {...options} isEdit={model.hasOwnProperty('_id')} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onDeletePecaFisica={this.onDeletePecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
-                        <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button type='primary' size='large' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
+                        <div style={{ textAlign: 'center', marginTop: 15 }}>
+                            <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' icon='plus'>Peça física</Button>
+                            <Button style={{marginRight: 5}} type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('geral')}>Anterior</Button>
+                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
                         </div>
                     </Panel>
                     <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
                         <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} onAddPecaFisica={this.onAddPecaFisicaAoMapa} onRemovePecaFisica={this.onRemovePecaFisicaDoMapa} />
-                        <div style={{ textAlign: 'right', marginTop: 15 }}>
-                            <Button loading={loading} type='primary' onClick={this.onSave} size='large'>Salvar An@tom-P</Button>
-                        </div>
+                        <div style={{ textAlign: 'center', marginTop: 15 }}>
+                            <Button type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('pecaFisica')}>Anterior</Button>
+                        </div>                    
                     </Panel>
-                </Collapse>
+                </Collapse>               
             </div>
         )
     }
 
-    onSelectRoteiro = _id => {
-        const {model, options} = this.state;
-        const {onOpenSnackbar} = this.props;
-
-        const roteiro = options.listaRoteiros.find(r => r._id == _id)
+    onSelectRoteiro = partes => {
 
         this.setState({
             model: {
                 ...this.state.model,
-                roteiro: _id, 
-                nome: roteiro.nome,
-                mapa: roteiro.partes.map(p => ({
+                mapa: partes.map(p => ({
                     ..._modelMapa,
                     parte: p,
                     localizacao: [{
@@ -184,8 +186,8 @@ class Anatomp extends Component {
         const { pecasFisicas } = this.state.model;
 
         this.onChange('pecasFisicas')([
+            ...pecasFisicas,            
             { ..._modelPecaFisica, _id: uuidv4() },
-            ...pecasFisicas,
         ])
     }  
 
