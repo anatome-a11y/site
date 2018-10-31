@@ -33,6 +33,7 @@ class Peca extends Component {
             key: 'btn-submit',
             type: 'primary',
             children: 'Salvar',
+            size: 'large',
             onClick: () => this.onSave()
         },
         next: mode => ({
@@ -43,8 +44,9 @@ class Peca extends Component {
             onClick: () => this.onChangePanel(mode)
         }),
         cancelar: {
-            key: 'btn-cencelar',
+            key: 'btn-cancelar',
             children: 'Cancelar',
+            size: 'large',
             onClick: () => this.props.onClose(false)
         },
         pendencias: {
@@ -94,63 +96,23 @@ class Peca extends Component {
 
         onSetButtons([
             {...this.buttons.cancelar},
-            {...this.buttons.next('partes')},
             {...this.buttons.submit}
-        ])
-    }
-
-    componentWillUpdate(nextProps, nextState){
-        const {activeKey} = this.state;
-        const {onSetButtons} = this.props;
-
-        if(activeKey != nextState.activeKey){
-            if(nextState.activeKey == 'geral'){
-                onSetButtons([
-                    {...this.buttons.cancelar},
-                    {...this.buttons.next('partes')},
-                    {...this.buttons.submit}
-                ]) 
-            }else{
-                if(nextState.activeKey == 'partes'){
-                    if(nextState.somentePratica){
-                        onSetButtons([
-                            {...this.buttons.cancelar},
-                            {...this.buttons.pendencias},
-                            {...this.buttons.submit}
-                        ])                         
-                    }else{
-                        onSetButtons([
-                            {...this.buttons.cancelar},
-                            {...this.buttons.next('teoria')},
-                            {...this.buttons.submit}
-                        ])                         
-                    }
-                }else{
-                    onSetButtons([
-                        {...this.buttons.cancelar},
-                        {...this.buttons.pendencias},
-                        {...this.buttons.submit}
-                    ])                     
-                }
-            }
-           
-        }
-
+        ])        
     }
 
 
     render() {
-        const { model, options, erros, loading, open, pendencias, somentePratica, clickUID, activeKey } = this.state;
+        const { model, options, erros, loading, open, pendencias, somentePratica, clickUID } = this.state;
         return (
             <div>
-                <Collapse accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
+                <Collapse  bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} clickUID={clickUID} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                     </Panel>
-                    {!somentePratica && <Panel header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
+                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
                         <FormTeoria {...model} onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
                     </Panel>}
                 </Collapse>

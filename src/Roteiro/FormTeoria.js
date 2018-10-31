@@ -29,6 +29,7 @@ const columns = [
     {
         title: 'Mídias',
         dataIndex: 'midias',
+        width: 150,
         render: midias => {
             return midias.length > 0 ? midias.map((m, idx) => (
                 <Midia file={m} idx={idx} midias={midias} />
@@ -59,7 +60,7 @@ class FormTeoria extends Component {
 
         return (
             <div className='table-no-border'>
-                <div style={{textAlign: 'right', marginBottom: 10}}>
+                <div style={{textAlign: 'right', padding: 16}}>
                     <Search
                         placeholder="Filtrar conteúdo"
                         onSearch={this.onFilter('selected')}
@@ -67,13 +68,14 @@ class FormTeoria extends Component {
                     />
                 </div>
                 <Table
+                style={{margin: 20, marginTop: 0}}
                     rowKey='_id'
                     rowSelection={{ onChange: this.onSelect, selectedRowKeys: selected.map(s => s._id) }}
                     columns={columns}
                     dataSource={filtrado}
                     pagination={false}
                     size='small'
-                    locale={{ emptyText: 'Nenhum conteúdo encontrado' }}
+                    locale={{ emptyText: 'Não há conteúdo teórico para ser exibido' }}
                 />
             </div>
         )

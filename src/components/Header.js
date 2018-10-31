@@ -4,7 +4,7 @@ import Helper from './Helper'
 import { Spin } from 'antd';
 
 
-const Header = ({ title, contentQ, error, loading }) => {
+const Header = ({ title, contentQ, error, loading, extra = null }) => {
     return (
         <div style={{
             display: 'flex',
@@ -14,7 +14,10 @@ const Header = ({ title, contentQ, error, loading }) => {
             paddingRight: 24,
         }}>
             <div style={error ? {color: '#f5222d'} : undefined}>{title}{loading ? <Spin size='small' style={{marginLeft: 5}} /> : null}</div>
-            <Helper title={title} contentQ={contentQ} />
+            <div style={{ display: 'flex' }}>
+                {extra}
+                <Helper title={title} contentQ={contentQ} />
+            </div>            
         </div>
     )
 }

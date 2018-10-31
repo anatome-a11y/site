@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import {Button} from 'antd'
+import { Button } from 'antd'
 
 import _Roteiro from '../Roteiro'
 import _Mapeamento from '../Anatomp'
@@ -14,21 +14,32 @@ class Form extends Component {
 
 
     state = {
-        partesRoteiro: []
+        partesRoteiro: [],
+        mapearAgora: false
     }
-   
+
 
     render() {
-        const {partesRoteiro} = this.state;
+        const { partesRoteiro, mapearAgora } = this.state;
         return (
-            <div style={{padding: 24}}>
-                <h2 style={{textAlign: 'center'}}>Etapa 1: Roteiro de aprendizagem</h2>
-                <Roteiro onChangePartes={p => this.setState({partesRoteiro: p})} /> 
-                <h2 style={{textAlign: 'center', marginTop: 25}}>Etapa 2: Mapeamento das peças físicas</h2>
-                <Mapeamento partesRoteiro={partesRoteiro} />
-                <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
-                    <Button type='primary' icon='check' onClick={() => {}} size='large'>Salvar Roteiro mapeado</Button>
-                </div>                 
+            <div style={{ padding: 24 }}>
+                <Roteiro onChangePartes={p => this.setState({ partesRoteiro: p })} />
+                {
+                    mapearAgora ? (
+                        <div>                            
+                            <Mapeamento modo='assoc' partesRoteiro={partesRoteiro} />
+                            <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                            <Button style={{marginRight: 5}} type='primary' ghost icon='delete' onClick={() => this.setState({mapearAgora: false})} size='large'>Descartar mapeamento</Button>
+                                <Button type='primary' icon='check' onClick={() => { }} size='large'>Salvar roteiro mapeado</Button>
+                            </div>
+                        </div>
+                    ) : (
+                            <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                                <Button style={{marginRight: 5}} type='primary' ghost icon='check' onClick={() => { }} size='large'>Salvar roteiro digital</Button>
+                                <Button type='primary' icon='environment' onClick={() => this.setState({mapearAgora: true})} size='large'>Mapear agora</Button>
+                            </div>
+                        )
+                }
             </div>
         )
     }

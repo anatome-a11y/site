@@ -32,7 +32,6 @@ class Roteiro extends Component {
             msgs: [],
             campos: []
         },
-        activeKey: 'geral',
         pecas: [],
         pecasFlat: [],
         conteudoExpandido: [],
@@ -107,29 +106,20 @@ class Roteiro extends Component {
 
     render() {
 
-        const { model, erros, activeKey, pecas, conteudoExpandido, loading } = this.state;
+        const { model, erros, pecas, conteudoExpandido, loading } = this.state;
         
         return (
             <div>
-                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>Cadastro de roteiro digital</h2>  
+                <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
-                        <div style={{ textAlign: 'center' }}>
-                            <Button icon='arrow-right' type='primary' onClick={() => this.onChangePanel('partes')}>Próximo</Button>
-                        </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
                         <FormPecas pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
-                        <div style={{ textAlign: 'center' }}>
-                            <Button style={{marginRight: 5}} type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('geral')}>Anterior</Button>
-                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('teoria')}>Próximo</Button>
-                        </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
-                        <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />
-                        <div style={{ textAlign: 'center', marginTop: 10 }}>
-                            <Button  type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('partes')}>Anterior</Button>
-                        </div>                    
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
+                        <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
                     </Panel>
                 </Collapse>
             </div>
@@ -155,10 +145,6 @@ class Roteiro extends Component {
             this.props.onChangePartes(this.state.pecasFlat.filter(p => value.indexOf(p._id) != -1))
         }
         this.setState({ model: { ...this.state.model, [field]: value } })        
-    }
-
-    onChangePanel = activeKey => {
-        this.setState({ activeKey })
     }
 
     checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined

@@ -12,7 +12,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros, onChange, onSelectRoteiro }) => {
+const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onChange, onSelectRoteiro }) => {
 
     const _erros = {
         nome: erros.campos.indexOf('nome'),
@@ -20,10 +20,34 @@ const FormGeral = ({ nome, instituicao, roteiro, listaRoteiros, erros, onChange,
         instituicao: erros.campos.indexOf('instituicao'),
     }
 
+    const span = modo == 'assoc' ? 16 : 8;
+
     return (
-        <Form>
+        <Form layout="vertical">
             <Row gutter={16}>
-                <Col span={16}>
+                {modo !== 'assoc' && (
+                    <Col span={span}>
+                        <FormItem
+                            validateStatus={_erros.roteiro != -1 ? 'error' : ''}
+                            help={erros.msgs[_erros.roteiro] || ''}
+                            label="Roteiro"
+                        >
+                            <Select
+                                showSearch
+                                value={roteiro}
+                                onChange={(v, d) => {
+                                    onSelectRoteiro(d.props['data-partes'], {roteiro: v})
+                                }}
+                                notFoundContent='Nenhum roteiro foi encontrado'
+                                optionFilterProp="children"
+                                filterOption={filter}
+                            >
+                                {listaRoteiros.map(i => <Option data-partes={i.partes} key={i._id} value={i._id}>{i.nome}</Option>)}
+                            </Select>
+                        </FormItem>
+                    </Col>
+                )}
+                <Col span={span}>
                     <FormItem
                         validateStatus={_erros.nome != -1 ? 'error' : ''}
                         help={erros.msgs[_erros.nome] || ''}

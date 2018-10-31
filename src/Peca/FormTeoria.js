@@ -28,6 +28,7 @@ class FormTeoria extends Component {
         return (
             <Fragment>
                 <List
+                    style={{margin: 20}}
                     rowKey='_id'
                     size="small"
                     bordered={true}
@@ -68,9 +69,9 @@ class FormTeoria extends Component {
                             </div>
                         </Item>)}
                 />
-                <div style={{ marginTop: 10, textAlign: 'center' }}>
-                    <Button type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
-                    <Button type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
+                <div style={{ marginBottom: 20, marginRight: 16, textAlign: 'right' }}>
+                    <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
+                    <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
                 </div>                
                 <Modal
                     title={'Excluir conteúdo teórico'}

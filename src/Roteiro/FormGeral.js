@@ -37,6 +37,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             label="Idioma"
                         >
                             <Select
+                                autoFocus
                                 showSearch
                                 value={idioma}
                                 onChange={onChange('idioma')}
@@ -54,7 +55,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             help={erros.msgs[_erros.nome] || ''}
                             label='Nome do roteiro'
                         >
-                            <Input autoFocus placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
+                            <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
                         </FormItem>
                     </Col>
                     <Col span={6}>

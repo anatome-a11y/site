@@ -18,7 +18,7 @@ class FormPecas extends Component {
 
     render() {
         const { onChange, partes, pecas } = this.props;
-        const {buttons} = this.state;
+        const { buttons } = this.state;
 
         const treeProps = {
             treeData: pecas,
@@ -30,39 +30,16 @@ class FormPecas extends Component {
             }
         };
 
-        const treeSelectProps = {
-            treeData: pecas,
-            value: partes,
-            onChange: onChange('partes'),
-            notFoundContent: 'Nada foi encontrado',
-            treeCheckable: true,
-            searchPlaceholder: 'Partes já vinculadas a este roteiro',
-            style: {
-                width: '100%'
-            }
-        };
-
-
-
         return (
-            <Form>
-                <Row>
-                    <Col span={10}>
-                        <FormItem
-                            label='Selecione as partes anatômicas deste roteiro'
-                        >
-                            <Tree {...treeProps} />
-                            Ou <a onClick={this.onOpen}>clique aqui</a> para criar uma nova peça genérica.
+            <Form layout="vertical">
+                <FormItem
+                    label='Selecione as partes anatômicas deste roteiro'
+                >
+                    <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa' }}>
+                        <Tree {...treeProps} />
+                    </div>
+                    Ou <a onClick={this.onOpen}>clique aqui</a> para criar uma nova peça genérica.
                 </FormItem>
-                    </Col>
-                    <Col span={14}>
-                        <FormItem
-                            label='Partes Selecionadas'
-                        >
-                            <TreeSelect {...treeSelectProps} />
-                        </FormItem>
-                    </Col>
-                </Row>
                 <Modal
                     width='80%'
                     title="Nova peça genérica"
@@ -71,25 +48,27 @@ class FormPecas extends Component {
                     onCancel={this.onCancel}
                     okText='Salvar'
                     cancelText='Cancelar'
-                    bodyStyle={{padding: 0}}
+                    bodyStyle={{ padding: 0 }}
                     footer={null}
                 >
-                    <PecaGenerica onClose={this.onCancel} onSetButtons={this.onSetButtons} />
-                    <div style={{textAlign: 'right', padding: 12}}>
-                        {buttons.map(b => <Button {...b} style={{marginLeft: 5}} />)}
+                    <div style={{ padding: 16 }}>
+                        <PecaGenerica onClose={this.onCancel} onSetButtons={this.onSetButtons} />
+                        <div style={{ textAlign: 'right'}}>
+                            {buttons.map(b => <Button {...b} style={{ marginLeft: 5 }} />)}
+                        </div>
                     </div>
                 </Modal>
             </Form>
         )
     }
 
-    onSetButtons = buttons => this.setState({buttons})
+    onSetButtons = buttons => this.setState({ buttons })
 
     onOpen = () => this.setState({ visible: true })
 
     onSubmit = () => { }
 
-    onCancel = () => this.setState({ visible: false })  
+    onCancel = () => this.setState({ visible: false })
 }
 
 

@@ -24,7 +24,7 @@ const _modelReferenciaRelativa = {
     medDir: '',
     medEsq: '',
     superior: '',
-    inferior: '',    
+    inferior: '',
 }
 
 
@@ -38,13 +38,13 @@ const _modelPecaFisica = {
 const _modelLocalizacao = {
     _id: uuidv4(),
     numero: '',
-    referenciaRelativa: {..._modelReferenciaRelativa},
+    referenciaRelativa: { ..._modelReferenciaRelativa },
     pecaFisica: ''
 }
 
 const _modelMapa = {
     parte: null,
-    localizacao: [{..._modelLocalizacao}],
+    localizacao: [{ ..._modelLocalizacao }],
 }
 
 
@@ -56,7 +56,7 @@ class Anatomp extends Component {
             nome: '',
             roteiro: '',
             instituicao: '',
-            pecasFisicas: [{..._modelPecaFisica}],
+            pecasFisicas: [{ ..._modelPecaFisica }],
             mapa: []
         },
         options: {
@@ -67,7 +67,6 @@ class Anatomp extends Component {
             msgs: [],
             campos: []
         },
-        activeKey: 'geral',
         loading: true,
     }
 
@@ -79,20 +78,23 @@ class Anatomp extends Component {
 
         Promise.all([
             request('peca', { method: 'GET' }),
+            request('roteiro', { method: 'GET' }),
         ])
-            .then(([ p]) => {
-                if ( p.status == 200) {
-                    console.log(model)
-                    const _model = model ? {model: {
-                        ...model,
-                        roteiro: model.roteiro._id,
-                        mapa: model.mapa.map(m => ({...m, localizacao: m.localizacao.map(l => ({...l, pecaFisica: l.pecaFisica._id}))}))
-                    }} : {};
+            .then(([p, roteiros]) => {
+                if (p.status == 200) {
+                    const _model = model ? {
+                        model: {
+                            ...model,
+                            roteiro: model.roteiro._id,
+                            mapa: model.mapa.map(m => ({ ...m, localizacao: m.localizacao.map(l => ({ ...l, pecaFisica: l.pecaFisica._id })) }))
+                        }
+                    } : {};
 
                     this.setState({
-                        ..._model,                    
+                        ..._model,
                         options: {
                             ...options,
+                            listaRoteiros: roteiros.data,
                             listaPecasGenericas: p.data
                         }
                     })
@@ -105,52 +107,71 @@ class Anatomp extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
-            .finally(() => this.setState({loading: false}))
+            .finally(() => this.setState({ loading: false }))
     }
 
-    componentWillReceiveProps(next){
-        if(JSON.stringify(this.props.partesRoteiro) != JSON.stringify(next.partesRoteiro)){
+    componentWillReceiveProps(next) {
+        if (JSON.stringify(this.props.partesRoteiro) != JSON.stringify(next.partesRoteiro)) {
             this.onSelectRoteiro(next.partesRoteiro)
         }
     }
 
 
     render() {
-        const { model, options, erros, activeKey, loading } = this.state;
+        const { model, options, erros, loading } = this.state;
+
+        const title = this.props.modo == 'assoc' ? 'Associação de peça física' : 'Cadastro de mapeamento'
 
         return (
-            <div>
-                <Collapse className='shadow2' accordion activeKey={activeKey} onChange={this.onChangePanel} >
-                    <Panel header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
-                        <FormGeral {...model} {...options} erros={erros} onChange={this.onChange} onSelectRoteiro={this.onSelectRoteiro} />
-                        <div style={{ textAlign: 'center' }}>
-                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('pecaFisica')}>Próximo</Button>
+            <div style={{margin: 24}}>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{title}</h2>
+                <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
+                        <FormGeral
+                            {...model}
+                            {...options}
+                            erros={erros}
+                            onChange={this.onChange}
+                            modo={this.props.modo}
+                            onSelectRoteiro={this.onSelectRoteiro}
+                        />
+                    </Panel>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
+                        <FormPecasFisicas
+                            {...model}
+                            {...options}
+                            isEdit={model.hasOwnProperty('_id')}
+                            erros={erros}
+                            onChange={this.onChange}
+                            onAddPecaFisica={this.onAddPecaFisica}
+                            onDeletePecaFisica={this.onDeletePecaFisica}
+                            onChangePecaFisica={this.onChangePecaFisica}
+                        />
+                        <div style={{ textAlign: 'right', marginBottom: 20, marginRight: 16 }}>
+                            <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>Peça física</Button>
                         </div>
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
-                        <FormPecasFisicas {...model} {...options} isEdit={model.hasOwnProperty('_id')} erros={erros} onChange={this.onChange} onAddPecaFisica={this.onAddPecaFisica} onDeletePecaFisica={this.onDeletePecaFisica} onChangePecaFisica={this.onChangePecaFisica} />
-                        <div style={{ textAlign: 'center', marginTop: 15 }}>
-                            <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' icon='plus'>Peça física</Button>
-                            <Button style={{marginRight: 5}} type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('geral')}>Anterior</Button>
-                            <Button type='primary' icon='arrow-right' onClick={() => this.onChangePanel('mapeamento')}>Próximo</Button>
-                        </div>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
+                        <FormMapa
+                            {...model}
+                            erros={erros}
+                            onChange={this.onChange}
+                            onChangeMapa={this.onChangeMapa}
+                            onAddPecaFisica={this.onAddPecaFisicaAoMapa}
+                            onRemovePecaFisica={this.onRemovePecaFisicaDoMapa}
+                        />
                     </Panel>
-                    <Panel header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
-                        <FormMapa {...model} erros={erros} onChange={this.onChange} onChangeMapa={this.onChangeMapa} onAddPecaFisica={this.onAddPecaFisicaAoMapa} onRemovePecaFisica={this.onRemovePecaFisicaDoMapa} />
-                        <div style={{ textAlign: 'center', marginTop: 15 }}>
-                            <Button type='primary' ghost icon='arrow-left' onClick={() => this.onChangePanel('pecaFisica')}>Anterior</Button>
-                        </div>                    
-                    </Panel>
-                </Collapse>               
+                </Collapse>
             </div>
         )
     }
 
-    onSelectRoteiro = partes => {
+    onSelectRoteiro = (partes, model) => {
 
         this.setState({
             model: {
                 ...this.state.model,
+                ...model,
                 mapa: partes.map(p => ({
                     ..._modelMapa,
                     parte: p,
@@ -180,16 +201,16 @@ class Anatomp extends Component {
                 ]
             }
         })
-    }    
+    }
 
     onAddPecaFisica = () => {
         const { pecasFisicas } = this.state.model;
 
         this.onChange('pecasFisicas')([
-            ...pecasFisicas,            
+            ...pecasFisicas,
             { ..._modelPecaFisica, _id: uuidv4() },
         ])
-    }  
+    }
 
     onAddPecaFisicaAoMapa = idx => () => {
         const { model } = this.state;
@@ -199,33 +220,33 @@ class Anatomp extends Component {
                 ...model,
                 mapa: [
                     ...model.mapa.slice(0, idx),
-                    { 
-                        ...model.mapa[idx], 
+                    {
+                        ...model.mapa[idx],
                         localizacao: [
-                            {..._modelLocalizacao, _id: uuidv4()},
+                            { ..._modelLocalizacao, _id: uuidv4() },
                             ...model.mapa[idx].localizacao
-                        ] 
+                        ]
                     },
                     ...model.mapa.slice(idx + 1),
                 ]
             }
-        })        
+        })
     }
 
     onDeletePecaFisica = idx => () => {
         const { pecasFisicas } = this.state.model;
-        
-        if(pecasFisicas.length == 1){
+
+        if (pecasFisicas.length == 1) {
             this.onChange('pecasFisicas')([
                 { ..._modelPecaFisica, _id: uuidv4() },
-            ])            
-        }else{
+            ])
+        } else {
             this.onChange('pecasFisicas')([
                 ...pecasFisicas.slice(0, idx),
-                ...pecasFisicas.slice(idx+1),
-            ])            
+                ...pecasFisicas.slice(idx + 1),
+            ])
         }
-    }     
+    }
 
     onRemovePecaFisicaDoMapa = (idx, idxLoc) => () => {
         const { model } = this.state;
@@ -235,19 +256,19 @@ class Anatomp extends Component {
                 ...model,
                 mapa: [
                     ...model.mapa.slice(0, idx),
-                    { 
-                        ...model.mapa[idx], 
+                    {
+                        ...model.mapa[idx],
                         localizacao: [
                             ...model.mapa[idx].localizacao.slice(0, idxLoc),
-                            ...model.mapa[idx].localizacao.slice(idxLoc+1),
-                        ] 
+                            ...model.mapa[idx].localizacao.slice(idxLoc + 1),
+                        ]
                     },
                     ...model.mapa.slice(idx + 1),
                 ]
             }
-        })        
-    }    
-    
+        })
+    }
+
     onChangeMapa = (field, idx, idxLoc) => value => {
         const { model } = this.state;
 
@@ -256,60 +277,60 @@ class Anatomp extends Component {
                 ...model,
                 mapa: [
                     ...model.mapa.slice(0, idx),
-                    { 
-                        ...model.mapa[idx], 
+                    {
+                        ...model.mapa[idx],
                         localizacao: [
                             ...model.mapa[idx].localizacao.slice(0, idxLoc),
-                            {...model.mapa[idx].localizacao[idxLoc], [field]: value},
-                            ...model.mapa[idx].localizacao.slice(idxLoc+1),
-                        ] 
+                            { ...model.mapa[idx].localizacao[idxLoc], [field]: value },
+                            ...model.mapa[idx].localizacao.slice(idxLoc + 1),
+                        ]
                     },
                     ...model.mapa.slice(idx + 1),
                 ]
             }
         })
-    }        
-
-    onChangePanel = activeKey => {
-        if(activeKey == 'mapeamento' && !this.state.model.hasOwnProperty('_id')){
-            const {mapa, pecasFisicas} = this.state.model;
-
-            const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
-            const pgUtilizadasUnicas = pgUtilizadas.filter(function(item, pos) {
-                return pgUtilizadas.indexOf(item) == pos;
-            })
-
-            const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
-                const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
-                return {...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG)}
-            });
-            
-            const _mapa = mapa.map(m => {
-                const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
-
-                if(pecaGenerica){
-                    return {
-                        ...m,
-                        localizacao: pecaGenerica.pecasFisicas.map(pf => ({
-                            ..._modelLocalizacao,
-                            pecaFisica: pf._id,
-                            _id: uuidv4(),
-                            referenciaRelativa: {
-                                ..._modelReferenciaRelativa,
-                                _id: uuidv4()
-                            }
-                        }))
-                    }
-                }else{
-                    return m
-                }
-            })  
-            
-            this.setState({ activeKey, model: {...this.state.model, mapa: _mapa} })
-        }else{
-            this.setState({ activeKey })
-        }        
     }
+
+    // onChangePanel = activeKey => {
+    //     if(activeKey == 'mapeamento' && !this.state.model.hasOwnProperty('_id')){
+    //         const {mapa, pecasFisicas} = this.state.model;
+
+    //         const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
+    //         const pgUtilizadasUnicas = pgUtilizadas.filter(function(item, pos) {
+    //             return pgUtilizadas.indexOf(item) == pos;
+    //         })
+
+    //         const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
+    //             const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
+    //             return {partes: [], ...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG)}
+    //         });
+
+    //         const _mapa = mapa.map(m => {
+    //             const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
+
+    //             if(pecaGenerica){
+    //                 return {
+    //                     ...m,
+    //                     localizacao: pecaGenerica.pecasFisicas.map(pf => ({
+    //                         ..._modelLocalizacao,
+    //                         pecaFisica: pf._id,
+    //                         _id: uuidv4(),
+    //                         referenciaRelativa: {
+    //                             ..._modelReferenciaRelativa,
+    //                             _id: uuidv4()
+    //                         }
+    //                     }))
+    //                 }
+    //             }else{
+    //                 return m
+    //             }
+    //         })  
+
+    //         this.setState({ activeKey, model: {...this.state.model, mapa: _mapa} })
+    //     }else{
+    //         this.setState({ activeKey })
+    //     }        
+    // }
 
     checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
 
@@ -355,7 +376,7 @@ class Anatomp extends Component {
     onValidate = () => {
         const { nome, roteiro, instituicao, pecasFisicas, mapa } = this.state.model;
         let campos = [], msgs = []
-        
+
 
         if (nome == '') {
             campos = [...campos, 'nome'];
@@ -375,16 +396,16 @@ class Anatomp extends Component {
         if (pecasFisicas.length == 0) {
             campos = [...campos, 'pecasFisicas'];
             msgs = [...msgs, 'Adicione ao menos um peça física'];
-        }else{
-            if(pecasFisicas.find(p => p.nome.trim() == "")){
+        } else {
+            if (pecasFisicas.find(p => p.nome.trim() == "")) {
                 campos = [...campos, 'pecasFisicas'];
-                msgs = [...msgs, 'Informe o nome de todas as peças físicas'];                
+                msgs = [...msgs, 'Informe o nome de todas as peças físicas'];
             }
         }
 
         const hasError = mapa.find(m => {
 
-            if(m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')){
+            if (m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')) {
                 return true
             }
 
@@ -394,7 +415,7 @@ class Anatomp extends Component {
         if (hasError) {
             campos = [...campos, 'mapa'];
             msgs = [...msgs, 'Preencha todos os campos obrigatórios'];
-        }        
+        }
 
         return { campos, msgs }
     }
@@ -413,10 +434,10 @@ class Anatomp extends Component {
         this.setState({ loading: true })
         const body = {
             ...model,
-            mapa: model.mapa.map(m => ({...m, parte: m.parte._id}))
+            mapa: model.mapa.map(m => ({ ...m, parte: m.parte._id }))
         }
 
-        const _request = model.hasOwnProperty('_id') ? request(`anatomp/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('anatomp', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })
+        const _request = model.hasOwnProperty('_id') ? request(`anatomp/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('anatomp', { method: 'POST', body: JSON.stringify({ ...body, _id: uuidv4() }) })
 
         _request
             .then(ret => {
@@ -436,6 +457,11 @@ class Anatomp extends Component {
             })
     }
 
+}
+
+Anatomp.defaultProps = {
+    partesRoteiro: [],
+    modo: ''
 }
 
 

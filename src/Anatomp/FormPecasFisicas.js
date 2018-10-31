@@ -25,6 +25,7 @@ class FormPecasFisicas extends Component {
         return (
             <Fragment>
                 <List
+                    style={{margin: 20}}
                     rowKey='_id'
                     size="small"
                     bordered={true}

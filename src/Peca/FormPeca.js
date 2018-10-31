@@ -22,7 +22,7 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaS
     }
 
     return (
-        <Form layout="horizontal">
+        <Form layout="vertical">
             <Row gutter={16}>
                 <Col span={8}>
                     <FormItem

@@ -37,7 +37,7 @@ class FormPartes extends Component {
 
         return (
             <Fragment>
-                <Form layout="horizontal">
+                <Form layout="vertical">
                     <FormItem
                         validateStatus={_erros.partes != -1 ? 'error' : ''}
                         help={erros.msgs[_erros.partes] || ''}
