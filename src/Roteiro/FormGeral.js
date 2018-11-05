@@ -30,7 +30,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
         <div>
             <Form layout="vertical">
                 <Row gutter={16}>
-                    <Col span={4}>
+                    <Col span={3}>
                         <FormItem
                             validateStatus={_erros.idioma != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.idioma] || ''}
@@ -49,7 +49,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             </Select>
                         </FormItem>
                     </Col>
-                    <Col span={20}>
+                    <Col span={11}>
                         <FormItem
                             validateStatus={_erros.nome != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.nome] || ''}
@@ -58,7 +58,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
                         </FormItem>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <FormItem
                             validateStatus={_erros.curso != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.curso] || ''}
@@ -67,7 +67,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             <Input placeholder="Ex: " value={curso} onChange={e => onChange('curso')(e.target.value)} />
                         </FormItem>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <FormItem
                             validateStatus={_erros.disciplina != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.disciplina] || ''}
@@ -76,7 +76,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             <Input placeholder="Ex: " value={disciplina} onChange={e => onChange('disciplina')(e.target.value)} />
                         </FormItem>
                     </Col>
-                    <Col span={12}>
+                    {/* <Col span={12}>
                         <FormItem
                             validateStatus={_erros.proposito != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.proposito] || ''}
@@ -84,7 +84,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                         >
                             <Input placeholder="Ex: " value={proposito} onChange={e => onChange('proposito')(e.target.value)} />
                         </FormItem>
-                    </Col>
+                    </Col> */}
                 </Row>
 
 

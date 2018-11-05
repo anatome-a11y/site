@@ -53,8 +53,8 @@ class Anatomp extends Component {
 
     state = {
         model: {
-            nome: '',
-            roteiro: '',
+            nome: this.props.nome,
+            roteiro: this.props.roteiro,
             instituicao: '',
             pecasFisicas: [{ ..._modelPecaFisica }],
             mapa: []
@@ -63,11 +63,6 @@ class Anatomp extends Component {
             listaRoteiros: [],
             listaPecasGenericas: []
         },
-        erros: {
-            msgs: [],
-            campos: []
-        },
-        loading: true,
     }
 
     componentDidMount() {
@@ -75,6 +70,7 @@ class Anatomp extends Component {
         const { options } = this.state;
 
         this.onSelectRoteiro(partesRoteiro)
+        this.props.onSetAppState({ loading: true });
 
         Promise.all([
             request('peca', { method: 'GET' }),
@@ -107,7 +103,7 @@ class Anatomp extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
-            .finally(() => this.setState({ loading: false }))
+            .finally(() => this.props.onSetAppState({ loading: false }))
     }
 
     componentWillReceiveProps(next) {
@@ -116,15 +112,22 @@ class Anatomp extends Component {
         }
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        if ((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange) {
+            this.props.onChange(nextState.model)
+        }
+    }
+
 
     render() {
-        const { model, options, erros, loading } = this.state;
+        const { erros, loading } = this.props;
+        const { model, options } = this.state;
 
-        const title = this.props.modo == 'assoc' ? 'Associação de peça física' : 'Cadastro de mapeamento'
+        const title = this.props.modo == 'assoc' ? 'Associação de peça física' : (this.props.match.params.id ? 'Alteração de mapeamento' : 'Cadastro de mapeamento')
 
         return (
-            <div style={{margin: 24}}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{title}</h2>
+            <div style={{ padding: 24 }}>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: this.props.modo == 'assoc' ? 0 : 50 }}>{title}</h2>
                 <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral
@@ -332,7 +335,7 @@ class Anatomp extends Component {
     //     }        
     // }
 
-    checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
+    checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
 
     onChange = field => value => this.setState({ model: { ...this.state.model, [field]: value } })
 
@@ -372,96 +375,13 @@ class Anatomp extends Component {
         })
     }
 
-
-    onValidate = () => {
-        const { nome, roteiro, instituicao, pecasFisicas, mapa } = this.state.model;
-        let campos = [], msgs = []
-
-
-        if (nome == '') {
-            campos = [...campos, 'nome'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (roteiro == '') {
-            campos = [...campos, 'roteiro'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (instituicao == '') {
-            campos = [...campos, 'instituicao'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (pecasFisicas.length == 0) {
-            campos = [...campos, 'pecasFisicas'];
-            msgs = [...msgs, 'Adicione ao menos um peça física'];
-        } else {
-            if (pecasFisicas.find(p => p.nome.trim() == "")) {
-                campos = [...campos, 'pecasFisicas'];
-                msgs = [...msgs, 'Informe o nome de todas as peças físicas'];
-            }
-        }
-
-        const hasError = mapa.find(m => {
-
-            if (m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')) {
-                return true
-            }
-
-            return false;
-        })
-
-        if (hasError) {
-            campos = [...campos, 'mapa'];
-            msgs = [...msgs, 'Preencha todos os campos obrigatórios'];
-        }
-
-        return { campos, msgs }
-    }
-
-    onSave = () => {
-        const { onOpenSnackbar, onSetAppState } = this.props;
-        const { model } = this.state;
-
-        const erros = this.onValidate();
-
-        if (erros.campos.length > 0) {
-            this.setState({ erros })
-            return false;
-        }
-
-        this.setState({ loading: true })
-        const body = {
-            ...model,
-            mapa: model.mapa.map(m => ({ ...m, parte: m.parte._id }))
-        }
-
-        const _request = model.hasOwnProperty('_id') ? request(`anatomp/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('anatomp', { method: 'POST', body: JSON.stringify({ ...body, _id: uuidv4() }) })
-
-        _request
-            .then(ret => {
-                if (ret.status == 200) {
-                    onOpenSnackbar(`O mapeamento ${model.nome} foi salvo com sucesso!`, 'success')
-                    onSetAppState({ current: 'inicio' })
-                } else {
-                    throw ret.error
-                }
-            })
-            .catch(e => {
-                onOpenSnackbar('Não foi possível salvar o mapeamento do roteiro')
-                console.error(e)
-            })
-            .finally(() => {
-                this.setState({ loading: false })
-            })
-    }
-
 }
 
 Anatomp.defaultProps = {
     partesRoteiro: [],
-    modo: ''
+    modo: '',
+    nome: '',
+    roteiro: ''
 }
 
 

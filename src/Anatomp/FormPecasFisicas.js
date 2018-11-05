@@ -42,12 +42,12 @@ class FormPecasFisicas extends Component {
                                 {!isEdit && <div style={{ width: '30%', marginRight: 5 }}>
                                     <Select
                                         showSearch
-                                        value={item.pecaGenerica}
+                                        value={item.pecaGenerica == "" ? undefined : item.pecaGenerica}
                                         onChange={onChangePecaFisica('pecaGenerica', idx)}
                                         notFoundContent='Nada foi encontrado'
                                         optionFilterProp="children"
                                         filterOption={filter}
-                                        placeholder='Peça genérica'
+                                        placeholder='Peça genérica associada'
                                         style={{ width: '100%' }}
                                     >
                                         {listaPecasGenericas.map(i => <Option key={i._id} value={i._id}>{i.nome}</Option>)}

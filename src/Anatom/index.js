@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-import { Card, Input, List, Button, Tooltip, Spin, Icon, Collapse, Table } from 'antd';
+import { Input, List, Button, Tooltip, Spin, Icon, Collapse, Table } from 'antd';
 import { withAppContext } from '../context'
 
 import { request, norm } from '../utils/data'
 import Header from '../components/Header'
 
-import Helper from '../components/Helper'
-
 const ButtonGroup = Button.Group;
 const Search = Input.Search;
-const Item = List.Item;
 const Panel = Collapse.Panel;
 
 const colsAnatomp = [
@@ -78,26 +75,7 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar, onSetAppState } = this.props;
-
-        Promise.all([request('anatomp'), request('roteiro')])
-            .then(([anatomp, roteiros]) => {
-                this.setState({
-                    anatomp: anatomp.data,
-                    roteiros: roteiros.data,
-                    originais: {
-                        anatomp: anatomp.data,
-                        roteiros: roteiros.data,
-                    }
-                })
-            })
-            .catch(e => {
-                console.error(e);
-                onOpenSnackbar('Falha ao obter as informações do servidor')
-            })
-            .finally(() => {
-                onSetAppState({ loading: false })
-            })
+        this.onGetData();
     }
 
     render() {
@@ -107,7 +85,7 @@ class Main extends Component {
         return (
             <div style={{padding: 24}}>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Editar peças</Button>
+                    <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Editar peças genéricas</Button>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['roteiro_digital', 'roteiro_com_peca']} >
                     <Panel className='anatome-panel' header={
@@ -133,7 +111,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push('/roteiro/editar/' + item._id)} onDelete={() => alert()} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push('/roteiro/editar/' + item._id)} onDelete={this.onDelete('roteiro', item._id)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -176,6 +154,51 @@ class Main extends Component {
             </div>
         )
     }
+
+    onGetData = () => {
+        const { onOpenSnackbar, onSetAppState } = this.props;
+
+        Promise.all([request('anatomp'), request('roteiro')])
+            .then(([anatomp, roteiros]) => {
+                this.setState({
+                    anatomp: anatomp.data,
+                    roteiros: roteiros.data,
+                    originais: {
+                        anatomp: anatomp.data,
+                        roteiros: roteiros.data,
+                    }
+                })
+            })
+            .catch(e => {
+                console.error(e);
+                onOpenSnackbar('Falha ao obter as informações do servidor')
+            })
+            .finally(() => {
+                onSetAppState({ loading: false })
+            })        
+    }
+
+
+    onDelete = (model, id) => () => {
+        this.props.onSetAppState({loading: true})
+        this.props.onOpenSnackbar('Aguarde...', 'loading');
+
+        const nome = model == 'roteiro' ? 'Roteiro' : 'Mapeamento';
+
+        request(model+'/'+id, {method: 'DELETE'})
+        .then(ret => {
+            if(ret.status == 200){
+                this.props.onOpenSnackbar(nome+' excluído com sucesso!', 'success');
+                this.onGetData();
+            }
+        })
+        .catch(e => {
+            console.error(e)            
+            this.props.onOpenSnackbar('Não foi possível excluir o '+nome.toLowerCase()+' selecionado');
+        })
+        .finally(() => this.props.onSetAppState({loading: false}))
+    }
+
 
     onFilterAnatomp = val => {
         const list = this.state.originais.anatomp;

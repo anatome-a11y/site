@@ -17,7 +17,7 @@ class FormPecas extends Component {
     }
 
     render() {
-        const { onChange, partes, pecas } = this.props;
+        const { onChange, partes, pecas, erros } = this.props;
         const { buttons } = this.state;
 
         const treeProps = {
@@ -28,11 +28,17 @@ class FormPecas extends Component {
             style: {
                 width: '100%'
             }
-        };
+        }; 
+        
+        const _erros = {
+            partes: erros.campos.indexOf('partes'),
+        }        
 
         return (
             <Form layout="vertical">
                 <FormItem
+                    validateStatus={_erros.partes != -1 ? 'error' : ''}
+                    help={erros.msgs[_erros.partes] || ''}
                     label='Selecione as partes anatômicas deste roteiro'
                 >
                     <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa' }}>
@@ -52,7 +58,7 @@ class FormPecas extends Component {
                     footer={null}
                 >
                     <div style={{ padding: 16 }}>
-                        <PecaGenerica onClose={this.onCancel} onSetButtons={this.onSetButtons} />
+                        <PecaGenerica modo='assoc' onClose={this.onCancel} onSetButtons={this.onSetButtons} />
                         <div style={{ textAlign: 'right'}}>
                             {buttons.map(b => <Button {...b} style={{ marginLeft: 5 }} />)}
                         </div>

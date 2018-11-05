@@ -56,28 +56,41 @@ class FormTeoria extends Component {
 
 
     render() {
-        const { selected, original, filtrado } = this.props;
+        const { selected, original, filtrado, erros } = this.props;
+
+        const _erros = {
+            conteudo: erros.campos.indexOf('conteudo'),
+        }
+
 
         return (
-            <div className='table-no-border'>
-                <div style={{textAlign: 'right', padding: 16}}>
-                    <Search
-                        placeholder="Filtrar conteúdo"
-                        onSearch={this.onFilter('selected')}
-                        style={{ width: 200, marginRight: 5 }}
-                    />
-                </div>
-                <Table
-                style={{margin: 20, marginTop: 0}}
-                    rowKey='_id'
-                    rowSelection={{ onChange: this.onSelect, selectedRowKeys: selected.map(s => s._id) }}
-                    columns={columns}
-                    dataSource={filtrado}
-                    pagination={false}
-                    size='small'
-                    locale={{ emptyText: 'Não há conteúdo teórico para ser exibido' }}
-                />
-            </div>
+            <Form layout="vertical">
+                <FormItem
+                    validateStatus={_erros.conteudo != -1 ? 'error' : ''}
+                    help={erros.msgs[_erros.conteudo] || ''}
+                    label='Selecione os conteúdos teóricos que estarão presentes no roteiro.'
+                >
+                    <div className='table-no-border'>
+                        <div style={{ textAlign: 'right' }}>
+                            <Search
+                                placeholder="Filtrar conteúdo"
+                                onSearch={this.onFilter('selected')}
+                                style={{ width: 200, marginRight: 5 }}
+                            />
+                        </div>
+                        <Table
+                            style={{ marginTop: 10 }}
+                            rowKey='_id'
+                            rowSelection={{ onChange: this.onSelect, selectedRowKeys: selected.map(s => s._id) }}
+                            columns={columns}
+                            dataSource={filtrado}
+                            pagination={false}
+                            size='small'
+                            locale={{ emptyText: 'Não há conteúdo teórico para ser exibido' }}
+                        />
+                    </div>
+                </FormItem>
+            </Form>
         )
     }
 

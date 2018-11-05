@@ -19,12 +19,16 @@ class Content extends React.Component{
         isLogged: true,
         loading: true,
         zoom: 16,
-        title: ''
+		title: '',
+        erros: {
+            campos: [],
+            msgs: []
+        }		
     }
 
     render(){
 
-		const {isLogged, zoom, loading, title} = this.state;
+		const {isLogged, zoom, loading, erros} = this.state;
 		const {history, location} = this.props;
 
         return (
@@ -57,7 +61,7 @@ class Content extends React.Component{
 					</Menu>
 				</div>
                 {/* <h1 style={{textAlign: 'center',marginBottom: 0,marginTop: 18,fontSize: '1.5rem'}}>{title}</h1> */}
-                {isLogged ? <App onOpenSnackbar={this.onOpenSnackbar} onSetAppState={this.onSetAppState} loading={loading} isLogged={isLogged} /> : null}                
+                {isLogged ? <App history={history} erros={erros} onOpenSnackbar={this.onOpenSnackbar} onSetAppState={this.onSetAppState} loading={loading} isLogged={isLogged} /> : null}                
             </div>
         )
     }

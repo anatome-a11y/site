@@ -94,17 +94,25 @@ class Peca extends Component {
             }})
         }
 
-        onSetButtons([
-            {...this.buttons.cancelar},
-            {...this.buttons.submit}
-        ])        
+        if(onSetButtons){
+            onSetButtons([
+                {...this.buttons.cancelar},
+                {...this.buttons.submit}
+            ]) 
+        }       
     }
 
 
     render() {
         const { model, options, erros, loading, open, pendencias, somentePratica, clickUID } = this.state;
+
+        const title = this.props.modo == 'assoc' ? false : (this.props.match.params.id ? 'Alteração de peça genérica' : 'Cadastro de peça genérica')
         return (
-            <div>
+            <div style={{padding: title ? 24 : 0}}>
+                {title && <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{title}</h2>}  
+                {title && <div style={{ textAlign: 'right', marginBottom: 5 }}>
+                    <Button style={{marginRight: 5}} onClick={() => this.props.history.push('/pecas')} size='small' type='primary' ghost>Voltar para peças</Button>
+                </div> }                     
                 <Collapse  bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />

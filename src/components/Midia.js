@@ -2,6 +2,8 @@ import React, { Component, Fragment } from 'react';
 
 import { List, Popover, Tooltip, Button, Select, Input, Icon, Upload, Tag } from 'antd'
 
+import {Maybe} from '../utils/data'
+
 import {filter} from '../utils/data'
 const Option = Select.Option;
 
@@ -60,7 +62,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                 ) : (
                     <div style={{marginBottom: 10}}>
                         <div>Tags: </div>
-                        {file.tags.map(t => <Tag key={t}>{_tags[t].nome}</Tag>)}
+                        {file.tags.map(t => {Maybe(_tags[t]).maybe(null, tt => <Tag key={t}>{tt.nome}</Tag>)})}
                     </div>
                 )}                
             </div>

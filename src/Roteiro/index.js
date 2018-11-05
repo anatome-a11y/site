@@ -9,8 +9,6 @@ import FormPecas from './FormPecas'
 import FormTeoria from './FormTeoria'
 
 import { request } from '../utils/data'
-
-const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
 
 class Roteiro extends Component {
@@ -19,23 +17,17 @@ class Roteiro extends Component {
         model: {
             _id: null,
             nome: '',
-            idioma: '',
+            idioma: '1',
             curso: '',
             disciplina: '',
-            proposito: '',
             partes: [],
             conteudo: {
                 selected: [],
             }
         },
-        erros: {
-            msgs: [],
-            campos: []
-        },
         pecas: [],
         pecasFlat: [],
         conteudoExpandido: [],
-        loading: true
     }
 
     componentDidMount() {
@@ -51,8 +43,9 @@ class Roteiro extends Component {
                     filtrado: []
                 }
             }})
-        }        
+        }     
 
+        this.props.onSetAppState({loading: true})
         request('peca', { method: 'GET' })
             .then(r => {
                 if (r.status == 200) {
@@ -98,21 +91,26 @@ class Roteiro extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
-            .finally(() => this.setState({loading: false}))
+            .finally(() => this.props.onSetAppState({loading: false}))
     }
 
 
+    componentWillUpdate(nextProps, nextState){
+        if((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange){
+            this.props.onChange(nextState.model)
+        }
+    }
 
 
     render() {
-
-        const { model, erros, pecas, conteudoExpandido, loading } = this.state;
+        const {erros, loading} = this.props;
+        const { model, pecas, conteudoExpandido } = this.state;
         
         return (
-            <div>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>Cadastro de roteiro digital</h2>  
+            <div style={{padding: 24}}>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
                 <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina', 'proposito'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
@@ -147,85 +145,8 @@ class Roteiro extends Component {
         this.setState({ model: { ...this.state.model, [field]: value } })        
     }
 
-    checkError = campos => this.state.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
-
-
-    onValidate = () => {
-        const { nome, curso, disciplina, proposito, conteudo, partes } = this.state.model;
-        let campos = [], msgs = []
-
-        if (nome == '') {
-            campos = [...campos, 'nome'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (curso == '') {
-            campos = [...campos, 'curso'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (disciplina == '') {
-            campos = [...campos, 'disciplina'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (proposito == '') {
-            campos = [...campos, 'proposito'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (partes.length == 0) {
-            campos = [...campos, 'partes'];
-            msgs = [...msgs, 'Inclua ao menos uma parte no roteiro'];
-        }        
-
-        if (conteudo.selected.length == 0) {
-            campos = [...campos, 'conteudo'];
-            msgs = [...msgs, 'Inclua ao menos um conteúdo no roteiro'];
-        }
-
-        return { campos, msgs }
-    }    
-    
-    onSave = () => {
-        
-        const { onOpenSnackbar, onSetAppState } = this.props;
-        const { model } = this.state;
-
-        const erros = this.onValidate();
-
-        if (erros.campos.length > 0) {
-            onOpenSnackbar('Verifique os erros de validação!')
-            this.setState({ erros })
-            return false;
-        }
-
-        this.setState({ loading: true })
-        const body = {
-            ...model,
-            conteudos: model.conteudo.selected.map(ct => (ct._id))
-        }
-
-        const _request = model._id != null ? request(`roteiro/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('roteiro', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })
-
-        _request
-            .then(ret => {
-                if (ret.status == 200) {
-                    onOpenSnackbar(`O roteiro ${model.nome} foi salvo com sucesso!`, 'success')
-                    onSetAppState({ current: 'inicio' })
-                } else {
-                    throw ret.error
-                }
-            })
-            .catch(e => {
-                const msg = typeof e === 'string' ? e : 'Não foi possível salvar este roteiro'
-                onOpenSnackbar(msg)
-                console.error(e)
-            })
-            .finally(() => {
-                this.setState({ loading: false })
-            })
-    }    
+    checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
+   
 }
 
 export default Roteiro
