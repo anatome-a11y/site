@@ -45,6 +45,69 @@ class Roteiro extends Component {
             }})
         }     
 
+        this.onGetData(false)
+    }
+
+
+    componentWillUpdate(nextProps, nextState){
+        if((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange){
+            this.props.onChange(nextState.model)
+        }
+    }
+
+
+    render() {
+        const {erros, loading} = this.props;
+        const { model, pecas, conteudoExpandido } = this.state;
+        
+        return (
+            <div style={{padding: 24}}>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
+                <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
+                        <FormGeral erros={erros} onChange={this.onChange} {...model} />
+                    </Panel>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
+                        <FormPecas onUpdatePecas={this.onGetData} pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
+                    </Panel>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
+                        <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
+                    </Panel>
+                </Collapse>
+            </div>
+        )
+    }
+
+    onChangeConteudoRoteiro = state => {
+        const {model} = this.state;
+        this.setState({
+            model: {
+                ...model,
+                conteudo: {
+                    ...model.conteudo,
+                    ...state
+                }
+            }
+        })
+    }
+
+
+    onChange = field => value => {
+        if(field == 'partes'){
+            this.props.onChangePartes(this.state.pecasFlat.filter(p => value.indexOf(p._id) != -1))
+        }
+        this.setState({ model: { ...this.state.model, [field]: value } })        
+    }
+
+    checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
+
+    onGetData = (isAddPeca = true) => {
+        const { onOpenSnackbar, model, onAddPeca } = this.props;
+
+        if(isAddPeca && onAddPeca){
+            this.props.onAddPeca()
+        }
+
         this.props.onSetAppState({loading: true})
         request('peca', { method: 'GET' })
             .then(r => {
@@ -91,62 +154,13 @@ class Roteiro extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
-            .finally(() => this.props.onSetAppState({loading: false}))
+            .finally(() => this.props.onSetAppState({loading: false}))        
     }
-
-
-    componentWillUpdate(nextProps, nextState){
-        if((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange){
-            this.props.onChange(nextState.model)
-        }
-    }
-
-
-    render() {
-        const {erros, loading} = this.props;
-        const { model, pecas, conteudoExpandido } = this.state;
-        
-        return (
-            <div style={{padding: 24}}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
-                <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
-                        <FormGeral erros={erros} onChange={this.onChange} {...model} />
-                    </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
-                        <FormPecas pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
-                    </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
-                        <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
-                    </Panel>
-                </Collapse>
-            </div>
-        )
-    }
-
-    onChangeConteudoRoteiro = state => {
-        const {model} = this.state;
-        this.setState({
-            model: {
-                ...model,
-                conteudo: {
-                    ...model.conteudo,
-                    ...state
-                }
-            }
-        })
-    }
-
-
-    onChange = field => value => {
-        if(field == 'partes'){
-            this.props.onChangePartes(this.state.pecasFlat.filter(p => value.indexOf(p._id) != -1))
-        }
-        this.setState({ model: { ...this.state.model, [field]: value } })        
-    }
-
-    checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
    
+}
+
+Roteiro.defaultProps = {
+    onAddPeca: false
 }
 
 export default Roteiro

@@ -20,9 +20,6 @@ class FormPartes extends Component {
     }
 
     componentWillReceiveProps(next) {
-        if (next.clickUID != this.props.clickUID) {
-            this.gerar()
-        }
     }
 
     render() {
@@ -33,8 +30,6 @@ class FormPartes extends Component {
             partes: erros.campos.indexOf('partes'),
         }
 
-        const onBlur = somentePratica ? {onBlur: this.gerar} : {};
-
         return (
             <Fragment>
                 <Form layout="vertical">
@@ -44,7 +39,7 @@ class FormPartes extends Component {
                         label='Partes da peça'
                         {...props}
                     >
-                        <TextArea {...onBlur} autosize id='partesTextArea' placeholder="Partes que compõem a peça separadas por quebra de linha" value={string} onChange={this.onChange} />
+                        <TextArea onBlur={this.gerar} autosize id='partesTextArea' placeholder="Partes que compõem a peça separadas por quebra de linha" value={string} onChange={this.onChange} />
                     </FormItem>
                     <FormItem label='Partes identificadas' {...props}>
                         <Row>

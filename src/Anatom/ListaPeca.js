@@ -114,7 +114,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push('/peca/editar/' + item._id)} onDelete={() => alert()} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/peca/editar/' + item._id, state: {model: item}})} onDelete={() => alert()} />,
                                 }
                             ]}
                             pagination={{ style: { textAlign: 'center', width: '100%' } }}

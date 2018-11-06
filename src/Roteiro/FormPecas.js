@@ -17,7 +17,7 @@ class FormPecas extends Component {
     }
 
     render() {
-        const { onChange, partes, pecas, erros } = this.props;
+        const { onChange, partes, pecas, erros,  } = this.props;
         const { buttons } = this.state;
 
         const treeProps = {
@@ -47,18 +47,19 @@ class FormPecas extends Component {
                     Ou <a onClick={this.onOpen}>clique aqui</a> para criar uma nova peça genérica.
                 </FormItem>
                 <Modal
+                    destroyOnClose={true}
                     width='80%'
                     title="Nova peça genérica"
                     visible={this.state.visible}
                     onOk={this.onSubmit}
-                    onCancel={this.onCancel}
+                    onCancel={this.onCancel(false)}
                     okText='Salvar'
                     cancelText='Cancelar'
                     bodyStyle={{ padding: 0 }}
                     footer={null}
                 >
                     <div style={{ padding: 16 }}>
-                        <PecaGenerica modo='assoc' onClose={this.onCancel} onSetButtons={this.onSetButtons} />
+                        <PecaGenerica modo='assoc' onClose={this.onCancel(true)} onSetButtons={this.onSetButtons} />
                         <div style={{ textAlign: 'right'}}>
                             {buttons.map(b => <Button {...b} style={{ marginLeft: 5 }} />)}
                         </div>
@@ -74,7 +75,12 @@ class FormPecas extends Component {
 
     onSubmit = () => { }
 
-    onCancel = () => this.setState({ visible: false })
+    onCancel = update => () => {
+        this.setState({ visible: false })
+        if(update){
+            this.props.onUpdatePecas();
+        }
+    }
 }
 
 

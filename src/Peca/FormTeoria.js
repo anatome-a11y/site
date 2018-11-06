@@ -11,7 +11,48 @@ const { Item } = List;
 const { Option } = Select;
 
 const firebase = window.firebase;
-const firebaseRef = firebase.storage().ref();       
+const firebaseRef = firebase.storage().ref();
+
+
+
+class FormItemTeoria extends Component {
+    render() {
+        const {item, idx, onChange, partes, loading} = this.props;
+        return (
+            <div style={_style.item}>
+                <div style={{ width: '40%', marginRight: 5 }}>
+                    <Select
+                        notFoundContent='Nenhuma parte foi encontrada'
+                        mode="multiple"
+                        style={{ width: '100%' }}
+                        placeholder="Partes da peça"
+                        value={item.partes}
+                        optionFilterProp="children"
+                        filterOption={filter}
+                        onChange={onChange('partes', idx)}
+                    >
+                        {partes.map(({ nome, _id }) => <Option value={_id} key={_id}>{nome}</Option>)}
+                    </Select>
+                </div>
+                <div style={_style.textos}>
+                    {item.partes.length > 1 && <Input onBlur={this.onBlur(idx, item)} style={{ marginBottom: 10 }} value={item.plural} onChange={e => onChange('plural', idx)(e.target.value)} placeholder={`Conteúdo teórico - Plural`} />}
+                    <Input value={item.singular} onChange={e => onChange('singular', idx)(e.target.value)} placeholder={`Conteúdo teórico - Singular`} />
+                </div>
+                <div style={{ alignSelf: 'center' }}>
+                    {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
+                    {loading == item._id ? <Spin /> : null}
+                </div>
+            </div>
+        )
+    }
+
+    onBlur = (idx, item) => e => {
+        const val = item.plural.charAt(0).toLowerCase() + item.plural.slice(1)      
+        this.props.onChange('singular', idx)('É um dos ' + val);        
+    }
+}
+
+
 
 class FormTeoria extends Component {
 
@@ -28,7 +69,7 @@ class FormTeoria extends Component {
         return (
             <Fragment>
                 <List
-                    style={{margin: 20}}
+                    style={{ margin: 20 }}
                     rowKey='_id'
                     size="small"
                     bordered={true}
@@ -43,36 +84,13 @@ class FormTeoria extends Component {
                             </Upload>,
                             <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
-                            <div style={_style.item}>
-                                <div style={{ width: '40%', marginRight: 5 }}>
-                                    <Select
-                                        notFoundContent='Nenhuma parte foi encontrada'
-                                        mode="multiple"
-                                        style={{ width: '100%' }}
-                                        placeholder="Partes da peça"
-                                        value={item.partes}
-                                        optionFilterProp="children"
-                                        filterOption={filter}
-                                        onChange={onChangeConteudoTeorico('partes', idx)}
-                                    >
-                                        {partes.map(({ nome, _id }) => <Option value={_id} key={_id}>{nome}</Option>)}
-                                    </Select>
-                                </div>
-                                <div style={_style.textos}>
-                                    {item.partes.length > 1 && <Input style={{ marginBottom: 10 }} value={item.plural} onChange={e => onChangeConteudoTeorico('plural', idx)(e.target.value)} placeholder={`Conteúdo teórico - Plural`} />}
-                                    <Input value={item.singular} onChange={e => onChangeConteudoTeorico('singular', idx)(e.target.value)} placeholder={`Conteúdo teórico - Singular`} />
-                                </div>
-                                <div style={{ alignSelf: 'center' }}>
-                                    {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChangeConteudoTeorico('midias', idx)} /></Fragment>)}
-                                    {loading == item._id ? <Spin /> : null}
-                                </div>
-                            </div>
+                            <FormItemTeoria partes={partes} loading={loading} item={item} idx={idx} onChange={onChangeConteudoTeorico} />
                         </Item>)}
                 />
                 <div style={{ marginBottom: 20, marginRight: 16, textAlign: 'right' }}>
                     <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
                     <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
-                </div>                
+                </div>
                 <Modal
                     title={'Excluir conteúdo teórico'}
                     visible={open}
@@ -104,7 +122,7 @@ class FormTeoria extends Component {
                     </ul>
                 </div>
             )
-        }else{
+        } else {
             return null
         }
     }
@@ -115,7 +133,7 @@ class FormTeoria extends Component {
     onClose = () => this.setState({ open: false, toDelete: '' })
 
     onDelete = () => {
-        const {toDelete} = this.state;
+        const { toDelete } = this.state;
         this.onClose();
         this.props.onDeleteConteudoTeorico(toDelete)()
     }
@@ -139,22 +157,22 @@ class FormTeoria extends Component {
                 const task = firebaseRef.child(name).put(info.file, metadata);
 
                 task
-                .then(snapshot => snapshot.ref.getDownloadURL())
-                .then(url => {
-                    this.setState({ loading: false });
-                    onChangeConteudoTeorico('midias', idx)([...midias, {
-                        _id: uuidv4(),
-                        type,
-                        name,
-                        tags: [],
-                        url,
-                        original: info.file
-                    }])
-                })                
-                .catch(err => {
-                    onOpenSnackbar(err.message)
-                    console.log(err)
-                });                
+                    .then(snapshot => snapshot.ref.getDownloadURL())
+                    .then(url => {
+                        this.setState({ loading: false });
+                        onChangeConteudoTeorico('midias', idx)([...midias, {
+                            _id: uuidv4(),
+                            type,
+                            name,
+                            tags: [],
+                            url,
+                            original: info.file
+                        }])
+                    })
+                    .catch(err => {
+                        onOpenSnackbar(err.message)
+                        console.log(err)
+                    });
 
 
             } else {

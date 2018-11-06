@@ -77,7 +77,7 @@ class Anatomp extends Component {
             request('roteiro', { method: 'GET' }),
         ])
             .then(([p, roteiros]) => {
-                if (p.status == 200) {
+                if (p.status == 200 && roteiros.status == 200) {
                     const _model = model ? {
                         model: {
                             ...model,
@@ -106,9 +106,15 @@ class Anatomp extends Component {
             .finally(() => this.props.onSetAppState({ loading: false }))
     }
 
+   
+
     componentWillReceiveProps(next) {
         if (JSON.stringify(this.props.partesRoteiro) != JSON.stringify(next.partesRoteiro)) {
             this.onSelectRoteiro(next.partesRoteiro)
+        }
+
+        if(this.props.sinalPeca != next.sinalPeca){
+            this.onGetPecas()
         }
     }
 
@@ -149,6 +155,7 @@ class Anatomp extends Component {
                             onAddPecaFisica={this.onAddPecaFisica}
                             onDeletePecaFisica={this.onDeletePecaFisica}
                             onChangePecaFisica={this.onChangePecaFisica}
+                            onBlurPecaFisica={this.onBlurPecaFisica}
                         />
                         <div style={{ textAlign: 'right', marginBottom: 20, marginRight: 16 }}>
                             <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>Peça física</Button>
@@ -168,6 +175,32 @@ class Anatomp extends Component {
             </div>
         )
     }
+
+    onGetPecas() {
+        const { onOpenSnackbar } = this.props;
+        const { options } = this.state;
+
+        request('peca', { method: 'GET' })
+            .then(p => {
+                if (p.status == 200) {
+
+                    this.setState({
+                        options: {
+                            ...options,
+                            listaPecasGenericas: p.data
+                        }
+                    })
+                } else {
+                    throw p.error
+                }
+            })
+            .catch(e => {
+                const msg = typeof e === 'string' ? e : 'Falha ao obter os dados da peça';
+                onOpenSnackbar(msg)
+                console.error(e)
+            })
+            .finally(() => this.props.onSetAppState({ loading: false }))
+    }     
 
     onSelectRoteiro = (partes, model) => {
 
@@ -294,46 +327,44 @@ class Anatomp extends Component {
         })
     }
 
-    // onChangePanel = activeKey => {
-    //     if(activeKey == 'mapeamento' && !this.state.model.hasOwnProperty('_id')){
-    //         const {mapa, pecasFisicas} = this.state.model;
+    onBlurPecaFisica = () => {
+        if(!this.state.model.hasOwnProperty('_id')){
+            const {mapa, pecasFisicas} = this.state.model;
 
-    //         const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
-    //         const pgUtilizadasUnicas = pgUtilizadas.filter(function(item, pos) {
-    //             return pgUtilizadas.indexOf(item) == pos;
-    //         })
+            const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
+            const pgUtilizadasUnicas = pgUtilizadas.filter(function(item, pos) {
+                return pgUtilizadas.indexOf(item) == pos;
+            })
 
-    //         const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
-    //             const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
-    //             return {partes: [], ...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG)}
-    //         });
+            const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
+                const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
+                return {partes: [], ...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG)}
+            });
 
-    //         const _mapa = mapa.map(m => {
-    //             const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
+            const _mapa = mapa.map(m => {
+                const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
 
-    //             if(pecaGenerica){
-    //                 return {
-    //                     ...m,
-    //                     localizacao: pecaGenerica.pecasFisicas.map(pf => ({
-    //                         ..._modelLocalizacao,
-    //                         pecaFisica: pf._id,
-    //                         _id: uuidv4(),
-    //                         referenciaRelativa: {
-    //                             ..._modelReferenciaRelativa,
-    //                             _id: uuidv4()
-    //                         }
-    //                     }))
-    //                 }
-    //             }else{
-    //                 return m
-    //             }
-    //         })  
+                if(pecaGenerica){
+                    return {
+                        ...m,
+                        localizacao: pecaGenerica.pecasFisicas.map(pf => ({
+                            ..._modelLocalizacao,
+                            pecaFisica: pf._id,
+                            _id: uuidv4(),
+                            referenciaRelativa: {
+                                ..._modelReferenciaRelativa,
+                                _id: uuidv4()
+                            }
+                        }))
+                    }
+                }else{
+                    return m
+                }
+            })  
 
-    //         this.setState({ activeKey, model: {...this.state.model, mapa: _mapa} })
-    //     }else{
-    //         this.setState({ activeKey })
-    //     }        
-    // }
+            this.setState({ model: {...this.state.model, mapa: _mapa} })
+        }        
+    }
 
     checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
 
@@ -381,7 +412,8 @@ Anatomp.defaultProps = {
     partesRoteiro: [],
     modo: '',
     nome: '',
-    roteiro: ''
+    roteiro: '',
+    sinalPeca: ''
 }
 
 

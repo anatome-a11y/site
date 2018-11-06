@@ -24,19 +24,20 @@ class Form extends Component {
         mapearAgora: false,
         modelMapeamento: null,
         modelRoteiro: null,
+        sinalPeca: ''
     }
 
 
     render() {
-        const { partesRoteiro, mapearAgora } = this.state;
+        const { partesRoteiro, mapearAgora, sinalPeca } = this.state;
         const { erros } = this.props;
         return (
             <div>
-                <Roteiro erros={erros} onChange={modelRoteiro => this.setState({ modelRoteiro })} onChangePartes={p => this.setState({ partesRoteiro: p })} />
+                <Roteiro onAddPeca={this.onAddPeca} erros={erros} onChange={modelRoteiro => this.setState({ modelRoteiro })} onChangePartes={p => this.setState({ partesRoteiro: p })} />
                 {
                     mapearAgora ? (
                         <div>
-                            <Mapeamento roteiro={this._idRoteiro} nome={this.state.modelRoteiro.nome} erros={erros} onChange={modelMapeamento => this.setState({ modelMapeamento })} modo='assoc' partesRoteiro={partesRoteiro} />
+                            <Mapeamento sinalPeca={sinalPeca} roteiro={this._idRoteiro} nome={this.state.modelRoteiro.nome} erros={erros} onChange={modelMapeamento => this.setState({ modelMapeamento })} modo='assoc' partesRoteiro={partesRoteiro} />
                             <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
                                 <Button style={{ marginRight: 5 }} type='primary' ghost icon='delete' onClick={() => this.setState({ mapearAgora: false, modelMapeamento: null })} size='large'>Descartar mapeamento</Button>
                                 <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar roteiro mapeado</Button>
@@ -52,6 +53,8 @@ class Form extends Component {
             </div>
         )
     }
+
+    onAddPeca = () => this.setState({sinalPeca: uuidv4()})
 
 
     onSubmitRoteiro = () => {

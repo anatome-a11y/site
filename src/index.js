@@ -39,8 +39,8 @@ class Content extends React.Component{
 						<div>
 							<Button type='primary' ghost shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
 							<Divider type='vertical' />
-							<Button type='primary' ghost disabled={zoom == 16} onClick={this.onZoomOut} shape='circle' icon='minus' style={{ margin: '4px 4px' }} />
-							<Button type='primary' ghost disabled={zoom == 25} onClick={this.onZoomIn} shape='circle' icon='plus' style={{ margin: '4px 4px' }} />
+							<Button type='primary' ghost disabled={zoom == 16} onClick={this.onZoomOut} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A-</Button>
+							<Button type='primary' ghost disabled={zoom == 25} onClick={this.onZoomIn} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A+</Button>
 						</div>
 					</div>
 					<Menu
