@@ -5,6 +5,8 @@ import { withAppContext } from '../context'
 import { request, norm } from '../utils/data'
 import Header from '../components/Header'
 
+import { listaIdiomas } from '../utils/mock'
+
 const ButtonGroup = Button.Group;
 const Search = Input.Search;
 const Panel = Collapse.Panel;
@@ -49,6 +51,11 @@ const colsRoteiro = [
         dataIndex: 'curso',
         key: 'curso',
     },
+    {
+        title: 'Idioma',
+        dataIndex: 'idioma.name',
+        key: 'idioma.name',
+    },    
 
 ]
 
@@ -111,7 +118,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push('/roteiro/editar/' + item._id)} onDelete={this.onDelete('roteiro', item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/roteiro/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete('roteiro', item._id)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -142,7 +149,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push('/mapeamento/editar/' + item._id)} onDelete={() => alert()} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/mapeamento/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete('anatomp', item._id)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -160,12 +167,17 @@ class Main extends Component {
 
         Promise.all([request('anatomp'), request('roteiro')])
             .then(([anatomp, roteiros]) => {
+
+                const rots = roteiros.data.map(d => ({
+                    ...d,
+                    idioma: listaIdiomas.find(s => s._id == d.idioma),
+                }));
                 this.setState({
                     anatomp: anatomp.data,
-                    roteiros: roteiros.data,
+                    roteiros: rots,
                     originais: {
                         anatomp: anatomp.data,
-                        roteiros: roteiros.data,
+                        roteiros: rots,
                     }
                 })
             })
@@ -190,11 +202,13 @@ class Main extends Component {
             if(ret.status == 200){
                 this.props.onOpenSnackbar(nome+' excluído com sucesso!', 'success');
                 this.onGetData();
+            }else{
+                throw ret.error
             }
         })
         .catch(e => {
-            console.error(e)            
-            this.props.onOpenSnackbar('Não foi possível excluir o '+nome.toLowerCase()+' selecionado');
+            const msg = typeof e == 'string' ? e : 'Não foi possível excluir o '+nome.toLowerCase()+' selecionado';          
+            this.props.onOpenSnackbar(msg);
         })
         .finally(() => this.props.onSetAppState({loading: false}))
     }

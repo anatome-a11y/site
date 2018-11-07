@@ -43,6 +43,11 @@ export const onValidate = model => {
     if (hasError) {
         campos = [...campos, 'mapa'];
         msgs = [...msgs, 'Preencha todos os campos obrigatórios'];
+    }else{
+        if(mapa.length == 0){
+            campos = [...campos, 'mapa'];
+            msgs = [...msgs, 'Inclua partes anatômicas para serem mapeadas'];            
+        }
     }
 
     return { campos, msgs }

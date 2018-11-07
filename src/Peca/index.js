@@ -18,13 +18,13 @@ const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
 const Item = List.Item;
 
-const _modelConteudoTeorico = {
+const getModelConteudoTeorico = () => ({
     _id: uuidv4(),
     partes: [],
     midias: [],
     plural: '',
     singular: ''
-}
+})
 
 class Peca extends Component {
 
@@ -55,11 +55,11 @@ class Peca extends Component {
         model: {
             _id: null,
             nome: '',
-            idioma: '1',
             sistema: '1',
             regiao: '1',
             partes: [],
-            conteudoTeorico: [{ ..._modelConteudoTeorico }]
+            conteudoTeorico: [{ ...getModelConteudoTeorico() }],
+            generalidades: []
         },
         options: {
             listaSistema,
@@ -84,7 +84,6 @@ class Peca extends Component {
                 ...model, 
                 regiao: model.regiao._id,
                 sistema: model.sistema._id,
-                idioma: model.idioma._id,
                 conteudoTeorico: model.conteudoTeorico.map(ct => ({...ct, partes: ct.partes.map(p => p._id)}))
             }})
         }
@@ -112,7 +111,7 @@ class Peca extends Component {
                     <Button style={{marginRight: 5}} onClick={() => this.props.history.push('/pecas')} size='small' type='primary' ghost>Voltar para a lista de peças</Button>
                 </div> }                     
                 <Collapse  bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'idioma', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
                         <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
@@ -227,12 +226,12 @@ class Peca extends Component {
         if (isNew) {
             this.onChange('conteudoTeorico')([
                 ...conteudoTeorico,
-                { ..._modelConteudoTeorico, _id: uuidv4() },                
+                { ...getModelConteudoTeorico(), _id: uuidv4() },                
             ])
         } else {
             this.onChange('conteudoTeorico')([
                 ...conteudoTeorico,
-                { ..._modelConteudoTeorico, partes: [...conteudoTeorico[0].partes], _id: uuidv4() },                
+                { ...getModelConteudoTeorico(), partes: [...conteudoTeorico[0].partes], _id: uuidv4() },                
             ])
         }
     }
@@ -242,7 +241,7 @@ class Peca extends Component {
         
         if(conteudoTeorico.length == 1){
             this.onChange('conteudoTeorico')([
-                { ..._modelConteudoTeorico, _id: uuidv4() },
+                { ...getModelConteudoTeorico(), _id: uuidv4() },
             ])            
         }else{
             this.onChange('conteudoTeorico')([
@@ -254,16 +253,11 @@ class Peca extends Component {
 
 
     onValidate = () => {
-        const { nome, idioma, sistema, regiao, partes } = this.state.model;
+        const { nome, sistema, regiao, partes } = this.state.model;
         let campos = [], msgs = []
 
         if (nome == '') {
             campos = [...campos, 'nome'];
-            msgs = [...msgs, 'Campo obrigatório'];
-        }
-
-        if (idioma == '') {
-            campos = [...campos, 'idioma'];
             msgs = [...msgs, 'Campo obrigatório'];
         }
 

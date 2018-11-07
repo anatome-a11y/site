@@ -8,7 +8,10 @@ import FormGeral from './FormGeral'
 import FormPecas from './FormPecas'
 import FormTeoria from './FormTeoria'
 
-import { request } from '../utils/data'
+import { request, Maybe } from '../utils/data'
+import { withAppContext } from '../context';
+
+
 const Panel = Collapse.Panel;
 
 class Roteiro extends Component {
@@ -21,6 +24,7 @@ class Roteiro extends Component {
             curso: '',
             disciplina: '',
             partes: [],
+            generalidades: [],
             conteudo: {
                 selected: [],
             }
@@ -31,11 +35,12 @@ class Roteiro extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar, model } = this.props;
+        const model = Maybe(this.props.history).bind(h => h.location).bind(l => l.state).maybe(false, s => s.model);
 
         if(model){
             this.setState({model: {
                 ...model, 
+                idioma: model.idioma._id,
                 partes: [],
                 conteudo: {
                     selected: [],
@@ -64,7 +69,7 @@ class Roteiro extends Component {
             <div style={{padding: 24}}>
                 <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
                 <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['idioma', 'nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
@@ -102,7 +107,8 @@ class Roteiro extends Component {
     checkError = campos => this.props.erros.campos.find(c => campos.indexOf(c) != -1) != undefined
 
     onGetData = (isAddPeca = true) => {
-        const { onOpenSnackbar, model, onAddPeca } = this.props;
+        const { onOpenSnackbar, onAddPeca, history } = this.props;
+        const model = Maybe(history).bind(h => h.location).bind(l => l.state).maybe(false, s => s.model);        
 
         if(isAddPeca && onAddPeca){
             this.props.onAddPeca()
@@ -124,6 +130,7 @@ class Roteiro extends Component {
                     const _model = model ? {model: {
                         ...model,
                         partes: model.partes.map(p => p._id),
+                        idioma: model.idioma._id,
                         conteudo: {
                             selected: conteudoExpandido.filter(c => _idsConteudos.indexOf(c._id) != -1),
                             original: conteudoExpandido,
@@ -163,4 +170,4 @@ Roteiro.defaultProps = {
     onAddPeca: false
 }
 
-export default Roteiro
+export default withAppContext(Roteiro)

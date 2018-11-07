@@ -3,8 +3,13 @@ const uuidv4 = require('uuid/v4');
 
 
 export const onValidate = model => {
-    const { nome, curso, disciplina, conteudo, partes } = model;
+    const { nome, curso, disciplina, conteudo, partes, idioma } = model;
     let campos = [], msgs = []
+
+    if (idioma == '') {
+        campos = [...campos, 'idioma'];
+        msgs = [...msgs, 'Campo obrigatório'];
+    }
 
     if (nome == '') {
         campos = [...campos, 'nome'];

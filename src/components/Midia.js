@@ -62,7 +62,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                 ) : (
                     <div style={{marginBottom: 10}}>
                         <div>Tags: </div>
-                        {file.tags.map(t => {Maybe(_tags[t]).maybe(null, tt => <Tag key={t}>{tt.nome}</Tag>)})}
+                        {file.tags.length > 0 ? file.tags.map(t => {Maybe(_tags[t]).maybe('Indefinida', tt => <Tag key={t}>{tt.nome}</Tag>)}) : 'Nenhuma'}
                     </div>
                 )}                
             </div>

@@ -2,11 +2,13 @@ import React, { Component, Fragment } from 'react';
 
 import { Collapse, Button, Modal, List, Icon } from 'antd';
 
-import { request } from '../utils/data'
+import { request, Maybe } from '../utils/data'
 
 import FormGeral from './FormGeral'
 import FormPecasFisicas from './FormPecasFisicas';
 import FormMapa from './FormMapa';
+
+import { withAppContext } from '../context';
 
 
 import Header from '../components/Header'
@@ -57,7 +59,8 @@ class Anatomp extends Component {
             roteiro: this.props.roteiro,
             instituicao: '',
             pecasFisicas: [{ ..._modelPecaFisica }],
-            mapa: []
+            mapa: [],
+            generalidades: []
         },
         options: {
             listaRoteiros: [],
@@ -66,11 +69,17 @@ class Anatomp extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar, model, partesRoteiro } = this.props;
+        const { onOpenSnackbar, partesRoteiro, onChange, onSetAppState, history } = this.props;
         const { options } = this.state;
 
+        const model = Maybe(history).bind(h => h.location).bind(l => l.state).maybe(false, s => s.model);
+
+        if(onChange){
+            onChange(this.state.model)
+        }
+
         this.onSelectRoteiro(partesRoteiro)
-        this.props.onSetAppState({ loading: true });
+        onSetAppState({ loading: true });
 
         Promise.all([
             request('peca', { method: 'GET' }),
@@ -103,7 +112,7 @@ class Anatomp extends Component {
                 onOpenSnackbar(msg)
                 console.error(e)
             })
-            .finally(() => this.props.onSetAppState({ loading: false }))
+            .finally(() => onSetAppState({ loading: false }))
     }
 
    
@@ -126,14 +135,14 @@ class Anatomp extends Component {
 
 
     render() {
-        const { erros, loading } = this.props;
+        const { erros, loading, modo, match } = this.props;
         const { model, options } = this.state;
 
-        const title = this.props.modo == 'assoc' ? 'Associação de peça física' : (this.props.match.params.id ? 'Alteração de mapeamento' : 'Cadastro de mapeamento')
+        const title = modo == 'assoc' ? 'Associação de peça física' : (match.params.id ? 'Alteração de mapeamento' : 'Cadastro de mapeamento')
 
         return (
             <div style={{ padding: 24 }}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: this.props.modo == 'assoc' ? 0 : 50 }}>{title}</h2>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: modo == 'assoc' ? 0 : 50 }}>{title}</h2>
                 <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral
@@ -141,7 +150,7 @@ class Anatomp extends Component {
                             {...options}
                             erros={erros}
                             onChange={this.onChange}
-                            modo={this.props.modo}
+                            modo={modo}
                             onSelectRoteiro={this.onSelectRoteiro}
                         />
                     </Panel>
@@ -417,4 +426,4 @@ Anatomp.defaultProps = {
 }
 
 
-export default Anatomp
+export default withAppContext(Anatomp)

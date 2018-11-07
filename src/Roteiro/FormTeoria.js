@@ -65,19 +65,19 @@ class FormTeoria extends Component {
 
         return (
             <Form layout="vertical">
+                <div style={{ textAlign: 'right' }}>
+                    <Search
+                        placeholder="Filtrar conteúdo"
+                        onSearch={this.onFilter('selected')}
+                        style={{ width: 200, marginRight: 5 }}
+                    />
+                </div>
                 <FormItem
                     validateStatus={_erros.conteudo != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.conteudo] || ''}
                     label='Selecione os conteúdos teóricos que estarão presentes no roteiro.'
                 >
                     <div className='table-no-border'>
-                        <div style={{ textAlign: 'right' }}>
-                            <Search
-                                placeholder="Filtrar conteúdo"
-                                onSearch={this.onFilter('selected')}
-                                style={{ width: 200, marginRight: 5 }}
-                            />
-                        </div>
                         <Table
                             style={{ marginTop: 10 }}
                             rowKey='_id'

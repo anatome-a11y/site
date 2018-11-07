@@ -3,7 +3,7 @@ import { Card, Input, List, Button, Tooltip, Spin, Icon, Collapse, Table } from 
 import { withAppContext } from '../context'
 
 import { request, norm, Maybe } from '../utils/data'
-import { listaIdiomas, listaRegiao, listaSistema } from '../utils/mock'
+import {  listaRegiao, listaSistema } from '../utils/mock'
 
 import Header from '../components/Header'
 
@@ -27,12 +27,6 @@ const colsPeca = [
         dataIndex: 'regiao.name',
         key: 'regiao.name',
     },
-    {
-        title: 'Idioma',
-        dataIndex: 'idioma.name',
-        key: 'idioma.name',
-    },
-
 ]
 
 const Crud = ({ onEdit, onDelete }) => {
@@ -54,31 +48,7 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        const { onOpenSnackbar, onSetAppState } = this.props;
-
-        request('peca')
-            .then(_pecas => {
-                const pecas = _pecas.data.map(d => ({
-                    ...d, 
-                    sistema: listaSistema.find(s => s._id == d.sistema),
-                    idioma: listaIdiomas.find(s => s._id == d.idioma),
-                    regiao: listaRegiao.find(s => s._id == d.regiao),
-                }))
-
-                this.setState({
-                    pecas,
-                    originais: {
-                        pecas,
-                    }
-                })
-            })
-            .catch(e => {
-                console.error(e);
-                onOpenSnackbar('Falha ao obter as informações do servidor')
-            })
-            .finally(() => {
-                onSetAppState({ loading: false })
-            })
+        this.onGetData();
     }
 
     render() {
@@ -114,7 +84,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/peca/editar/' + item._id, state: {model: item}})} onDelete={() => alert()} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/peca/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete(item._id)} />,
                                 }
                             ]}
                             pagination={{ style: { textAlign: 'center', width: '100%' } }}
@@ -147,6 +117,55 @@ class Main extends Component {
             [attr]: _list,
         })
     }
+
+
+    onGetData = () => {
+        const { onOpenSnackbar, onSetAppState } = this.props;
+
+        request('peca')
+            .then(_pecas => {
+                const pecas = _pecas.data.map(d => ({
+                    ...d, 
+                    sistema: listaSistema.find(s => s._id == d.sistema),
+                    regiao: listaRegiao.find(s => s._id == d.regiao),
+                }))
+
+                this.setState({
+                    pecas,
+                    originais: {
+                        pecas,
+                    }
+                })
+            })
+            .catch(e => {
+                console.error(e);
+                onOpenSnackbar('Falha ao obter as informações do servidor')
+            })
+            .finally(() => {
+                onSetAppState({ loading: false })
+            })        
+    }
+
+    onDelete = id => () => {
+        this.props.onSetAppState({loading: true})
+        this.props.onOpenSnackbar('Aguarde...', 'loading');
+
+
+        request('peca/'+id, {method: 'DELETE'})
+        .then(ret => {
+            if(ret.status == 200){
+                this.props.onOpenSnackbar('Peça excluída com sucesso!', 'success');
+                this.onGetData();
+            }else{
+                throw ret.error
+            }
+        })
+        .catch(e => {
+            const msg = typeof e == 'string' ? e : 'Não foi possível excluir a peça selecionada';          
+            this.props.onOpenSnackbar(msg);
+        })
+        .finally(() => this.props.onSetAppState({loading: false}))
+    }    
 
 }
 
