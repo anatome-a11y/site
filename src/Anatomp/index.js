@@ -9,25 +9,20 @@ import FormPecasFisicas from './FormPecasFisicas';
 import FormMapa from './FormMapa';
 
 import { withAppContext } from '../context';
+import Header from '../components/Header';
 
-
-import Header from '../components/Header'
+import { onSave as onSaveAnatomp } from '../Anatomp/utils';
 
 const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
 const Item = List.Item;
 
-const _modelReferenciaRelativa = {
+const getModelReferenciaRelativa = () => ({
     _id: uuidv4(),
-    anterior: '',
-    posterior: '',
-    latDir: '',
-    latEsq: '',
-    medDir: '',
-    medEsq: '',
-    superior: '',
-    inferior: '',
-}
+    referenciaParaReferenciado: '',
+    referenciadoParaReferencia: '',
+    referencia: ''
+})
 
 
 const _modelPecaFisica = {
@@ -37,16 +32,16 @@ const _modelPecaFisica = {
     pecaGenerica: ''
 }
 
-const _modelLocalizacao = {
+const getModelLocalizacao = () => ({
     _id: uuidv4(),
     numero: '',
-    referenciaRelativa: { ..._modelReferenciaRelativa },
+    referenciaRelativa: getModelReferenciaRelativa(),
     pecaFisica: ''
-}
+})
 
 const _modelMapa = {
     parte: null,
-    localizacao: [{ ..._modelLocalizacao }],
+    localizacao: [getModelLocalizacao()],
 }
 
 
@@ -58,7 +53,7 @@ class Anatomp extends Component {
             nome: this.props.nome,
             roteiro: this.props.roteiro,
             instituicao: '',
-            pecasFisicas: [{ ..._modelPecaFisica }],
+            pecasFisicas: [{ ..._modelPecaFisica, _id: uuidv4() }],
             mapa: [],
             generalidades: []
         },
@@ -134,6 +129,11 @@ class Anatomp extends Component {
     }
 
 
+    componentWillUnmount(){
+        this.props.onSetAppState({erros: {campos: [], msgs: []}})
+    }
+
+
     render() {
         const { erros, loading, modo, match } = this.props;
         const { model, options } = this.state;
@@ -143,6 +143,9 @@ class Anatomp extends Component {
         return (
             <div style={{ padding: 24 }}>
                 <h2 className='section' style={{ textAlign: 'center', marginTop: modo == 'assoc' ? 0 : 50 }}>{title}</h2>
+                {modo != 'assoc' && <div style={{ textAlign: 'right', marginBottom: 5 }}>
+                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para roteiros</Button>
+                </div>  }              
                 <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
                         <FormGeral
@@ -151,6 +154,8 @@ class Anatomp extends Component {
                             erros={erros}
                             onChange={this.onChange}
                             modo={modo}
+                            onOpenSnackbar={this.props.onOpenSnackbar}
+                            isEdit={Maybe(match).bind(m => m.params).bind(p => p.id).maybe(false, i => true)}
                             onSelectRoteiro={this.onSelectRoteiro}
                         />
                     </Panel>
@@ -181,9 +186,24 @@ class Anatomp extends Component {
                         />
                     </Panel>
                 </Collapse>
+                {
+                    modo != 'assoc' && (
+                        <div style={{textAlign: 'center'}}>
+                            <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
+                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar mapeamento</Button>
+                        </div>
+                    )
+                }                
             </div>
         )
     }
+
+    onSubmit = () => {
+        onSaveAnatomp(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.model, ret => {
+            this.props.onOpenSnackbar(`O mapeamento ${this.state.model.nome} foi salvo com sucesso!`, 'success');
+            this.props.onPush('/')
+        })
+    }    
 
     onGetPecas() {
         const { onOpenSnackbar } = this.props;
@@ -221,12 +241,8 @@ class Anatomp extends Component {
                     ..._modelMapa,
                     parte: p,
                     localizacao: [{
-                        ..._modelLocalizacao,
-                        _id: uuidv4(),
-                        referenciaRelativa: {
-                            ..._modelReferenciaRelativa,
-                            _id: uuidv4()
-                        }
+                        ...getModelLocalizacao(),
+                        referenciaRelativa: getModelReferenciaRelativa()
                     }]
                 }))
             }
@@ -268,7 +284,7 @@ class Anatomp extends Component {
                     {
                         ...model.mapa[idx],
                         localizacao: [
-                            { ..._modelLocalizacao, _id: uuidv4() },
+                            getModelLocalizacao(),
                             ...model.mapa[idx].localizacao
                         ]
                     },
@@ -357,13 +373,9 @@ class Anatomp extends Component {
                     return {
                         ...m,
                         localizacao: pecaGenerica.pecasFisicas.map(pf => ({
-                            ..._modelLocalizacao,
+                            ...getModelLocalizacao(),
                             pecaFisica: pf._id,
-                            _id: uuidv4(),
-                            referenciaRelativa: {
-                                ..._modelReferenciaRelativa,
-                                _id: uuidv4()
-                            }
+                            referenciaRelativa: getModelReferenciaRelativa()
                         }))
                     }
                 }else{

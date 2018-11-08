@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { List, Tooltip, Button, Input, Form, Select, Modal, InputNumber } from 'antd'
+import { List, Tooltip, Button, Checkbox, Form, Select, Modal, InputNumber } from 'antd'
 import { filter } from '../utils/data'
 
 import FormLocalizacao from './FormLocalizacao'
@@ -32,6 +32,8 @@ class FormMapa extends Component {
             mapa: erros.campos.indexOf('mapa'),
         }
 
+        console.log(mapa)
+
         return (
             <Form style={{ margin: 20 }}>
                 <FormItem
@@ -60,7 +62,7 @@ class FormMapa extends Component {
                                             dataSource={item.localizacao}
                                             renderItem={(itemLoc, idxLoc) => (
                                                 <Item key={itemLoc._id} actions={[
-                                                    <Tooltip title='Localização Relativa'><Button type='primary' ghost onClick={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc)} icon='compass' shape='circle' /></Tooltip>,
+                                                    <Checkbox checked={itemLoc.referenciaRelativa.referencia != ''} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc)}>Loc. Relativa</Checkbox>,
                                                     <Tooltip title='Excluir'><Button type='primary' ghost onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
                                                 ]}>
                                                     <div style={_style.item}>
@@ -88,14 +90,15 @@ class FormMapa extends Component {
                             </Item>)}
                     />
                     <Modal
-                        title='Localização'
+                        destroyOnClose={true}
+                        title='Localização Relativa'
                         visible={open}
                         okText='Salvar'
-                        onOk={this.onAppyChangeRefRel}
+                        onOk={() => this.onAppyChangeRefRel(this.state.toEditRefRel)}
                         cancelText='Cancelar'
                         onCancel={this.onClose}
                     >
-                        <FormLocalizacao {...toEditRefRel} onChange={this.onChangeRefRel} />
+                        <FormLocalizacao {...toEditRefRel} onChange={this.onChangeRefRel} partes={mapa.map(i => i.parte)} />
                     </Modal>
                 </FormItem>
             </Form>
@@ -118,10 +121,7 @@ class FormMapa extends Component {
     }
 
 
-    onAppyChangeRefRel = () => {
-        const { toEditRefRel } = this.state;
-        const { idx, idxLoc, model } = toEditRefRel;
-
+    onAppyChangeRefRel = ({ idx, idxLoc, model }) => {
         this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({ ...model });
         this.setState({
             open: false,
@@ -133,12 +133,15 @@ class FormMapa extends Component {
         })
     }
 
-    onOpenRefRel = (model, idx, idxLoc) => () => {
-
-        this.setState({
-            open: true,
-            toEditRefRel: { model, idx, idxLoc }
-        })
+    onOpenRefRel = (model, idx, idxLoc) => e => {
+        if(e.target.checked){
+            this.setState({
+                open: true,
+                toEditRefRel: { model, idx, idxLoc }
+            })            
+        }else{
+            this.onAppyChangeRefRel({ idx, idxLoc, model: {...model, referencia: ''} })
+        }
     }
 
 

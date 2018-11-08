@@ -36,12 +36,14 @@ class Form extends Component {
                         <div>
                             <Mapeamento sinalPeca={sinalPeca} roteiro={this._idRoteiro} nome={this.state.modelRoteiro.nome} onChange={modelMapeamento => this.setState({ modelMapeamento })} modo='assoc' partesRoteiro={partesRoteiro} />
                             <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                                <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
                                 <Button style={{ marginRight: 5 }} type='primary' ghost icon='delete' onClick={() => this.setState({ mapearAgora: false, modelMapeamento: null })} size='large'>Descartar mapeamento</Button>
                                 <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar roteiro mapeado</Button>
                             </div>
                         </div>
                     ) : (
                             <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                                <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
                                 <Button style={{ marginRight: 5 }} type='primary' ghost icon='check' onClick={this.onSubmitRoteiro} size='large'>Salvar roteiro digital</Button>
                                 <Button type='primary' icon='environment' onClick={() => this.setState({ mapearAgora: true })} size='large'>Mapear agora</Button>
                             </div>

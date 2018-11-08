@@ -5,6 +5,7 @@ import { Form, Input, Select, Row, Col } from 'antd';
 import { listaIdiomas } from '../utils/mock';
 
 import { filter } from '../utils/data'
+import Generalidades from '../components/Generalidades'
 
 const Option = Select.Option;
 
@@ -16,7 +17,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma }) => {
+const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma, generalidades, onOpenSnackbar }) => {
 
     const _erros = {
         idioma: erros.campos.indexOf('idioma'),
@@ -74,6 +75,11 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             label='Disciplina'
                         >
                             <Input placeholder="Ex: " value={disciplina} onChange={e => onChange('disciplina')(e.target.value)} />
+                        </FormItem>
+                    </Col>
+                    <Col span={24}>
+                        <FormItem label="Informe as generalidades do roteiro">
+                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
                         </FormItem>
                     </Col>
                     {/* <Col span={12}>

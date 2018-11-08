@@ -3,6 +3,9 @@ import React, { Component, Fragment } from 'react';
 import { Form, Input, Select, Row, Col } from 'antd';
 import { filter } from '../utils/data'
 
+import Generalidades from '../components/Generalidades'
+
+
 const Option = Select.Option;
 
 const FormItem = Form.Item;
@@ -12,7 +15,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onChange, onSelectRoteiro }) => {
+const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onChange, onSelectRoteiro, isEdit, generalidades, onOpenSnackbar }) => {
 
     const _erros = {
         nome: erros.campos.indexOf('nome'),
@@ -33,10 +36,11 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                             label="Roteiro"
                         >
                             <Select
+                                disabled={isEdit}
                                 showSearch
                                 value={roteiro}
-                                onChange={(v, d) => {
-                                    onSelectRoteiro(d.props['data-partes'], {roteiro: v})
+                                onSelect={(v, d) => {                                    
+                                    onSelectRoteiro(d.props['data-partes'], {roteiro: v, nome: d.props.children});
                                 }}
                                 notFoundContent='Nenhum roteiro foi encontrado'
                                 optionFilterProp="children"
@@ -65,6 +69,11 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                         <Input placeholder="Ex: " value={instituicao} onChange={e => onChange('instituicao')(e.target.value)} />
                     </FormItem>
                 </Col>
+                <Col span={24}>
+                        <FormItem label="Informe as generalidades do mapeamento">
+                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
+                        </FormItem>
+                    </Col>                
             </Row>
         </Form>
     )

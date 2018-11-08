@@ -26,6 +26,7 @@ const getModelConteudoTeorico = () => ({
     singular: ''
 })
 
+
 class Peca extends Component {
 
     buttons = {
@@ -58,8 +59,9 @@ class Peca extends Component {
             sistema: '1',
             regiao: '1',
             partes: [],
-            conteudoTeorico: [{ ...getModelConteudoTeorico() }],
+            conteudoTeorico: [getModelConteudoTeorico()],
             generalidades: []
+            
         },
         options: {
             listaSistema,
@@ -112,7 +114,7 @@ class Peca extends Component {
                 </div> }                     
                 <Collapse  bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
-                        <FormPeca {...model} {...options} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
+                        <FormPeca {...model} {...options} onOpenSnackbar={this.props.onOpenSnackbar} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
@@ -122,6 +124,7 @@ class Peca extends Component {
                     </Panel>}
                 </Collapse>
                 {title && <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/pecas')} size='large'>Voltar</Button>
                     <Button type='primary' icon='check' onClick={this.onSave} size='large'>Salvar peça genérica</Button>
                 </div>}                
                 <Modal
@@ -182,7 +185,7 @@ class Peca extends Component {
                 ]
             }
         })
-    }
+    }   
 
     onRemoveParte = _id => () => {
         const { onOpenSnackbar } = this.props;
@@ -235,21 +238,20 @@ class Peca extends Component {
             ])
         }
     }
+   
 
     onDeleteConteudoTeorico = idx => () => {
         const { conteudoTeorico } = this.state.model;
         
         if(conteudoTeorico.length == 1){
-            this.onChange('conteudoTeorico')([
-                { ...getModelConteudoTeorico(), _id: uuidv4() },
-            ])            
+            this.onChange('conteudoTeorico')([getModelConteudoTeorico()])            
         }else{
             this.onChange('conteudoTeorico')([
                 ...conteudoTeorico.slice(0, idx),
                 ...conteudoTeorico.slice(idx+1),
             ])            
         }
-    }    
+    } 
 
 
     onValidate = () => {

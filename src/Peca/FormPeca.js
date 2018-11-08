@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 
 import { Form, Input, Select, Checkbox, Row, Col } from 'antd';
 import { filter } from '../utils/data'
+import Generalidades from '../components/Generalidades'
 
 const Option = Select.Option;
 
@@ -12,7 +13,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaSistema, listaRegiao, listaIdiomas, onChange, onChangeSomentePratica }) => {
+const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaSistema, listaRegiao, onOpenSnackbar, onChange, onChangeSomentePratica, generalidades }) => {
 
     const _erros = {
         nome: erros.campos.indexOf('nome'),
@@ -69,7 +70,12 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaS
                         </Select>
                     </FormItem>
                 </Col>
-                <Col span={12}>
+                <Col span={24}>
+                    <FormItem label="Informe as generalidades da peça genérica">
+                        <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
+                    </FormItem>
+                </Col>                
+                <Col span={24}>
                     <FormItem>
                         <Checkbox checked={somentePratica} onChange={e => onChangeSomentePratica(e.target.checked)}>Somente conteúdo prático</Checkbox>
                     </FormItem>

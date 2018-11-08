@@ -128,7 +128,7 @@ class Main extends Component {
                     ...d, 
                     sistema: listaSistema.find(s => s._id == d.sistema),
                     regiao: listaRegiao.find(s => s._id == d.regiao),
-                }))
+                }));
 
                 this.setState({
                     pecas,

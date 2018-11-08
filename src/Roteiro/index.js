@@ -11,6 +11,8 @@ import FormTeoria from './FormTeoria'
 import { request, Maybe } from '../utils/data'
 import { withAppContext } from '../context';
 
+import { onSave as onSaveRoteiro } from '../Roteiro/utils';
+
 
 const Panel = Collapse.Panel;
 
@@ -27,7 +29,8 @@ class Roteiro extends Component {
             generalidades: [],
             conteudo: {
                 selected: [],
-            }
+            },
+            generalidades: []
         },
         pecas: [],
         pecasFlat: [],
@@ -60,6 +63,10 @@ class Roteiro extends Component {
         }
     }
 
+    componentWillUnmount(){
+        this.props.onSetAppState({erros: {campos: [], msgs: []}})
+    }    
+
 
     render() {
         const {erros, loading} = this.props;
@@ -68,9 +75,12 @@ class Roteiro extends Component {
         return (
             <div style={{padding: 24}}>
                 <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
+                <div style={{ textAlign: 'right', marginBottom: 5 }}>
+                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para roteiros</Button>
+                </div>                
                 <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['idioma', 'nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
-                        <FormGeral erros={erros} onChange={this.onChange} {...model} />
+                        <FormGeral onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
                         <FormPecas onUpdatePecas={this.onGetData} pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
@@ -79,8 +89,23 @@ class Roteiro extends Component {
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
                     </Panel>
                 </Collapse>
+                {
+                    this.props.match && (
+                        <div style={{textAlign: 'center'}}>
+                            <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
+                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar roteiro</Button>
+                        </div>
+                    )
+                }
             </div>
         )
+    }
+
+    onSubmit = () => {
+        onSaveRoteiro(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.model, ret => {
+            this.props.onOpenSnackbar(`O roteiro ${this.state.model.nome} foi salvo com sucesso!`, 'success');            
+            this.props.onPush('/')
+        })
     }
 
     onChangeConteudoRoteiro = state => {
@@ -98,7 +123,7 @@ class Roteiro extends Component {
 
 
     onChange = field => value => {
-        if(field == 'partes'){
+        if(field == 'partes' && !this.props.match){
             this.props.onChangePartes(this.state.pecasFlat.filter(p => value.indexOf(p._id) != -1))
         }
         this.setState({ model: { ...this.state.model, [field]: value } })        
