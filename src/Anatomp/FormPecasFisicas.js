@@ -3,6 +3,9 @@ import React, { Component, Fragment } from 'react';
 import { List, Tooltip, Button, Input, Icon, Select, Form } from 'antd'
 import { filter } from '../utils/data'
 
+
+import Label from '../components/Label'
+
 const uuidv4 = require('uuid/v4');
 
 const { Item } = List;
@@ -37,8 +40,8 @@ class FormPecasFisicas extends Component {
                 <FormItem
                     validateStatus={_erros.pecasFisicas != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.pecasFisicas] || ''}
-                    label="Informe o nome das peças físicas e suas peças genéricas correspondentes"
                 >
+                    <Label>Inclua as informações sobre as peças físicas que terão os elementos anatômicos etiquetados e serão disponibilizadas aos estudantes para aprenderem o conteúdo deste roteiro usando o APP Anatome</Label>
                     <List                        
                         rowKey='_id'
                         size="small"

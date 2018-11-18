@@ -58,7 +58,7 @@ class Main extends Component {
         return (
             <div style={{padding: 24}}>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button onClick={() => history.push('/')} size='small' type='primary' ghost>Voltar para roteiros</Button>
+                    <Button onClick={() => history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['pecas']} >
                     <Panel className='anatome-panel' header={

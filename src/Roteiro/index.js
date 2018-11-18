@@ -74,9 +74,9 @@ class Roteiro extends Component {
         
         return (
             <div style={{padding: 24}}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração de roteiro digital' : 'Cadastro de roteiro digital'}</h2>  
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração do conteúdo do roteiro' : 'Cadastro de conteúdo do roteiro'}</h2>  
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para roteiros</Button>
+                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>                
                 <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['idioma', 'nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>

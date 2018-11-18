@@ -44,7 +44,7 @@ class Form extends Component {
                     ) : (
                             <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
                                 <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
-                                <Button style={{ marginRight: 5 }} type='primary' ghost icon='check' onClick={this.onSubmitRoteiro} size='large'>Salvar roteiro digital</Button>
+                                <Button style={{ marginRight: 5 }} type='primary' ghost icon='check' onClick={this.onSubmitRoteiro} size='large'>Salvar conteúdo do roteiro</Button>
                                 <Button type='primary' icon='environment' onClick={() => this.setState({ mapearAgora: true })} size='large'>Mapear agora</Button>
                             </div>
                         )

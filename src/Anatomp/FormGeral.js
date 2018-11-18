@@ -33,7 +33,7 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                         <FormItem
                             validateStatus={_erros.roteiro != -1 ? 'error' : ''}
                             help={erros.msgs[_erros.roteiro] || ''}
-                            label="Roteiro"
+                            label="Selecione o conteúdo de um roteiro"
                         >
                             <Select
                                 disabled={isEdit}

@@ -92,15 +92,15 @@ class Main extends Component {
         return (
             <div style={{padding: 24}}>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Editar peças genéricas</Button>
+                    <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Ir para conteúdos das peças</Button>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['roteiro_digital', 'roteiro_com_peca']} >
                     <Panel className='anatome-panel' header={
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
-                            title="Roteiros digitais"
-                            extra={<Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar</Button>}
+                            title="Conteúdos dos roteiros"
+                            extra={<Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar roteiro</Button>}
                         />}
                         key='roteiro_digital'>
                         <div style={{ margin: 10, textAlign: 'right' }}>
@@ -111,7 +111,7 @@ class Main extends Component {
                             />
                         </div>
                         <Table
-                            locale={{ emptyText: loading ? <Spin /> : 'Nenhum roteiro digital foi encontrado' }}
+                            locale={{ emptyText: loading ? <Spin /> : 'Nenhum conteúdo de roteiro foi encontrado para esta busca' }}
                             columns={[
                                 ...colsRoteiro,
                                 {
@@ -130,8 +130,8 @@ class Main extends Component {
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
-                            title="Roteiros com peças físicas"
-                            extra={<Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar</Button>}
+                            title="Roteiros mapeados"
+                            extra={<Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Mapear roteiro</Button>}
                         />}
                         key='roteiro_com_peca'>
                     <div style={{ margin: 10, textAlign: 'right' }}>

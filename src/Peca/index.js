@@ -113,7 +113,7 @@ class Peca extends Component {
                     <Button style={{marginRight: 5}} onClick={() => this.props.history.push('/pecas')} size='small' type='primary' ghost>Voltar para a lista de peças</Button>
                 </div> }                     
                 <Collapse  bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo digital da peça genérica" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo da peça" />} key='geral'>
                         <FormPeca {...model} {...options} onOpenSnackbar={this.props.onOpenSnackbar} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
@@ -307,7 +307,7 @@ class Peca extends Component {
         _request
             .then(ret => {
                 if (ret.status == 200) {
-                    onOpenSnackbar(`O conteúdo digital da peça ${model.nome} foi salvo com sucesso!`, 'success')
+                    onOpenSnackbar(`O conteúdo da peça ${model.nome} foi salvo com sucesso!`, 'success')
                     onSetAppState({ current: 'inicio' })
                     if(onClose){
                         onClose(true)
@@ -316,7 +316,7 @@ class Peca extends Component {
                     }
                     
                 } else {
-                    throw 'Não foi possível salvar o conteúdo digital da peça.'
+                    throw 'Não foi possível salvar o conteúdo da peça.'
                 }
             })
             .catch(e => {

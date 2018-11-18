@@ -1,6 +1,8 @@
 export const listaSistema = [
     { _id: "1", name: 'Vários' },
-    { _id: "2", name: 'Sistema esquelético (Sistema ósseo + Sistema articular)' },
+    { _id: "13", name: 'Sistema ósseo' },
+    { _id: "14", name: 'Sistema articular' },      
+    { _id: "2", name: 'Sistema esquelético (Sistema ósseo + Sistema articular)' },  
     { _id: "3", name: 'Sistema muscular' },
     { _id: "4", name: 'Sistema digestivo' },
     { _id: "5", name: 'Sistema respiratório' },
@@ -19,8 +21,10 @@ export const listaRegiao = [
     { _id: "2", name: 'Cabeça' },
     { _id: "3", name: 'Pescoço' },
     { _id: "4", name: 'Tronco' },
+    { _id: "7", name: 'Cintura escapular' },
     { _id: "5", name: 'Membros superiores' },
-    { _id: "6", name: 'Membros Inferiores' },
+    { _id: "8", name: 'Cintura pélvica' },
+    { _id: "6", name: 'Membros inferiores' },
 ]
 
 

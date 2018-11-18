@@ -3,6 +3,8 @@ import React, { Component, Fragment } from 'react';
 import { List, Tooltip, Button, Checkbox, Form, Select, Modal, InputNumber } from 'antd'
 import { filter } from '../utils/data'
 
+import Label from '../components/Label'
+
 import FormLocalizacao from './FormLocalizacao'
 
 const uuidv4 = require('uuid/v4');
@@ -39,8 +41,8 @@ class FormMapa extends Component {
                 <FormItem
                     validateStatus={_erros.mapa != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.mapa] || ''}
-                    label="Informe a localização das partes anatômicas nas peças físicas"
                 >
+                    <Label>Associe ao nome de cada parte anatômica o número da seta (ou etiqueta) que indica a sua localização na peça física</Label>
                     <List                        
                         rowKey='_id'
                         size="small"

@@ -144,10 +144,10 @@ class Anatomp extends Component {
             <div style={{ padding: 24 }}>
                 <h2 className='section' style={{ textAlign: 'center', marginTop: modo == 'assoc' ? 0 : 50 }}>{title}</h2>
                 {modo != 'assoc' && <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para roteiros</Button>
+                    <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>  }              
                 <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="An@tom-P (Peças anatômicas interativas)" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="Informações gerais do roteiro mapeado" />} key='geral'>
                         <FormGeral
                             {...model}
                             {...options}
@@ -175,7 +175,7 @@ class Anatomp extends Component {
                             <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>Peça física</Button>
                         </div>
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Mapeamento do conteúdo digital para as peças físicas" />} key='mapeamento'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Associação entre o nome e a localização da parte na peça" />} key='mapeamento'>
                         <FormMapa
                             {...model}
                             erros={erros}
