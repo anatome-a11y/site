@@ -105,7 +105,7 @@ class Peca extends Component {
         const { model, options, erros, open, pendencias, somentePratica } = this.state;
         const {loading} = this.props;
 
-        const title = this.props.modo == 'assoc' ? false : (this.props.match.params.id ? 'Alteração de peça genérica' : 'Cadastro de peça genérica')
+        const title = this.props.modo == 'assoc' ? false : (this.props.match.params.id ? 'Alteração do conteúdo da peça' : 'Cadastro de conteúdo da peça')
         return (
             <div style={{padding: title ? 24 : 0}}>
                 {title && <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{title}</h2>}  
@@ -116,7 +116,7 @@ class Peca extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo da peça" />} key='geral'>
                         <FormPeca {...model} {...options} onOpenSnackbar={this.props.onOpenSnackbar} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças genéricas que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                     </Panel>
                     {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
@@ -125,7 +125,7 @@ class Peca extends Component {
                 </Collapse>
                 {title && <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
                 <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/pecas')} size='large'>Voltar</Button>
-                    <Button type='primary' icon='check' onClick={this.onSave} size='large'>Salvar peça genérica</Button>
+                    <Button type='primary' icon='check' onClick={this.onSave} size='large'>Salvar conteúdo da peça</Button>
                 </div>}                
                 <Modal
                     title='Lista de pendências'
@@ -292,7 +292,7 @@ class Peca extends Component {
             onOpenSnackbar('Verique os erros de validação!')
             return false;
         }
-        onOpenSnackbar('Salvando peça genérica... Aguarde...', 'loading')
+        onOpenSnackbar('Salvando conteúdo da peça... Aguarde...', 'loading')
         onSetAppState({ loading: true })
         const body = {
             ...model,

@@ -64,7 +64,7 @@ class FormPecasFisicas extends Component {
                                             notFoundContent='Nada foi encontrado'
                                             optionFilterProp="children"
                                             filterOption={filter}
-                                            placeholder='Peça genérica associada'
+                                            placeholder='Conteúdo da peça correspondente'
                                             style={{ width: '100%' }}
                                             onBlur={onBlurPecaFisica}
                                         >

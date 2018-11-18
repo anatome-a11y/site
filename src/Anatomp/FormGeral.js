@@ -70,7 +70,7 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                     </FormItem>
                 </Col>
                 <Col span={24}>
-                        <FormItem label="Informe as generalidades do mapeamento">
+                        <FormItem label="Informe as generalidades do roteiro setado">
                             <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
                         </FormItem>
                     </Col>                

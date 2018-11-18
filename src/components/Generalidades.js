@@ -21,11 +21,11 @@ const getModelGeneralidade = () => ({
 
 class FormItemGeneralidade extends Component {
     render() {
-        const {item, idx, onChange, loading} = this.props;
+        const {item, idx, onChange, loading, onEnter} = this.props;
         return (
             <div style={_style.item}>
                 <div style={_style.textos}>
-                    <Input value={item.texto} onChange={e => onChange('texto', idx)(e.target.value)} placeholder={`Generalidade`} />
+                    <Input onPressEnter={onEnter} value={item.texto} onChange={e => onChange('texto', idx)(e.target.value)} placeholder={`Generalidade`} />
                 </div>
                 <div style={{ alignSelf: 'center' }}>
                     {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
@@ -82,7 +82,7 @@ class Generalidades extends Component {
                             </Upload>,
                             <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
-                            <FormItemGeneralidade loading={loading} item={item} idx={idx} onChange={this.onChange} />
+                            <FormItemGeneralidade onEnter={this.onAdd} loading={loading} item={item} idx={idx} onChange={this.onChange} />
                         </Item>)}
                 />
                 <div style={{ marginTop: 5, textAlign: 'right' }}>

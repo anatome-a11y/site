@@ -13,7 +13,7 @@ const Panel = Collapse.Panel;
 
 const colsPeca = [
     {
-        title: 'Peça genérica',
+        title: 'Peça',
         dataIndex: 'nome',
         key: 'nome',
     },
@@ -65,8 +65,8 @@ class Main extends Component {
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
-                            title="Peças genéricas"
-                            extra={<Button type='primary' onClick={() => history.push('/peca/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar</Button>}
+                            title="Conteúdos das peças"
+                            extra={<Button type='primary' onClick={() => history.push('/peca/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar peça</Button>}
                         />}
                         key='pecas'>
                         <div style={{ margin: 10, textAlign: 'right' }}>
@@ -77,7 +77,7 @@ class Main extends Component {
                             />
                         </div>
                         <Table
-                            locale={{ emptyText: loading ? <Spin /> : 'Nenhuma peça genérica foi encontrada' }}
+                            locale={{ emptyText: loading ? <Spin /> : 'Nenhum conteúdo da peça foi encontrado' }}
                             columns={[
                                 ...colsPeca,
                                 {

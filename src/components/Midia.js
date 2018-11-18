@@ -8,6 +8,7 @@ import {filter} from '../utils/data'
 const Option = Select.Option;
 
 const _tags = [
+    //Tags de 1 a 10: Pessoas com defiiencia auditiva
     { _id: "1", nome: 'Áudio em Português' },
     { _id: "2", nome: 'Legenda em Português' },
     { _id: "3", nome: 'Vídeo em Libras' },

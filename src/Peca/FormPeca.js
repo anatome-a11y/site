@@ -71,7 +71,7 @@ const FormPeca = ({ nome, idioma, regiao, sistema, erros, somentePratica, listaS
                     </FormItem>
                 </Col>
                 <Col span={24}>
-                    <FormItem label="Informe as generalidades da peça genérica">
+                    <FormItem label="Informe as generalidades do conteúdo da peça">
                         <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
                     </FormItem>
                 </Col>                

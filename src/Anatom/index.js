@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, List, Button, Tooltip, Spin, Icon, Collapse, Table } from 'antd';
+import { Input, List, Button, Tooltip, Spin, Icon, Collapse, Table, Popover } from 'antd';
 import { withAppContext } from '../context'
 
 import { request, norm } from '../utils/data'
@@ -55,7 +55,7 @@ const colsRoteiro = [
         title: 'Idioma',
         dataIndex: 'idioma.name',
         key: 'idioma.name',
-    },    
+    },
 
 ]
 
@@ -90,17 +90,39 @@ class Main extends Component {
         const { anatomp, roteiros } = this.state;
 
         return (
-            <div style={{padding: 24}}>
+            <div style={{ padding: 24 }}>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
-                    <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Ir para conteúdos das peças</Button>
+                    <Popover content={
+                        <div>
+                            <ul>
+                                <li>Listar conteúdos cadastrados;</li>
+                                <li>Cadastrar conteúdo de nova peça;</li>
+                                <li>Ou Editar conteúdo das peças.</li>
+                            </ul>
+                        </div>
+                    }>
+                        <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Ir para conteúdos das peças</Button>
+                    </Popover>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['roteiro_digital', 'roteiro_com_peca']} >
                     <Panel className='anatome-panel' header={
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
-                            title="Conteúdos dos roteiros"
-                            extra={<Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar roteiro</Button>}
+                            title={
+                                <Popover placement='right' content={
+                                    <div style={{ width: 300, textAlign: 'center' }}>Lista de p</div>
+                                }>
+                                    Conteúdos dos roteiros
+                                </Popover>
+                            }
+                            extra={
+                                <Popover content={
+                                    <div style={{ width: 300, textAlign: 'center' }}>Cadastrar conteúdo de novo roteiro</div>
+                                }>
+                                    <Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar roteiro</Button>
+                                </Popover>
+                            }
                         />}
                         key='roteiro_digital'>
                         <div style={{ margin: 10, textAlign: 'right' }}>
@@ -118,7 +140,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/roteiro/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete('roteiro', item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/roteiro/editar/' + item._id, state: { model: item } })} onDelete={this.onDelete('roteiro', item._id)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -130,11 +152,23 @@ class Main extends Component {
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
-                            title="Roteiros mapeados"
-                            extra={<Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Mapear roteiro</Button>}
+                            title={
+                                <Popover placement='right' content={
+                                    <div style={{ width: 300, textAlign: 'center' }}>Roteiros prontos para os estudantes usarem no APP Anatome</div>
+                                }>
+                                    Roteiros setados
+                                </Popover>
+                            }
+                            extra={
+                                <Popover content={
+                                    <div style={{ width: 300, textAlign: 'center' }}>Associar o nome das partes anatômicas do roteiro à sua localização nas peças</div>
+                                }>
+                                    <Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Setar localização</Button>
+                                </Popover>
+                            }
                         />}
                         key='roteiro_com_peca'>
-                    <div style={{ margin: 10, textAlign: 'right' }}>
+                        <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
                                 placeholder="Filtrar"
                                 onSearch={this.onFilterAnatomp}
@@ -149,7 +183,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/mapeamento/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete('anatomp', item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/mapeamento/editar/' + item._id, state: { model: item } })} onDelete={this.onDelete('anatomp', item._id)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -187,30 +221,30 @@ class Main extends Component {
             })
             .finally(() => {
                 onSetAppState({ loading: false })
-            })        
+            })
     }
 
 
     onDelete = (model, id) => () => {
-        this.props.onSetAppState({loading: true})
+        this.props.onSetAppState({ loading: true })
         this.props.onOpenSnackbar('Aguarde...', 'loading');
 
-        const nome = model == 'roteiro' ? 'Roteiro' : 'Mapeamento';
+        const nome = model == 'roteiro' ? 'Conteúdo do roteiro' : 'Roteiro setado';
 
-        request(model+'/'+id, {method: 'DELETE'})
-        .then(ret => {
-            if(ret.status == 200){
-                this.props.onOpenSnackbar(nome+' excluído com sucesso!', 'success');
-                this.onGetData();
-            }else{
-                throw ret.error
-            }
-        })
-        .catch(e => {
-            const msg = typeof e == 'string' ? e : 'Não foi possível excluir o '+nome.toLowerCase()+' selecionado';          
-            this.props.onOpenSnackbar(msg);
-        })
-        .finally(() => this.props.onSetAppState({loading: false}))
+        request(model + '/' + id, { method: 'DELETE' })
+            .then(ret => {
+                if (ret.status == 200) {
+                    this.props.onOpenSnackbar(nome + ' excluído com sucesso!', 'success');
+                    this.onGetData();
+                } else {
+                    throw ret.error
+                }
+            })
+            .catch(e => {
+                const msg = typeof e == 'string' ? e : 'Não foi possível excluir o ' + nome.toLowerCase() + ' selecionado';
+                this.props.onOpenSnackbar(msg);
+            })
+            .finally(() => this.props.onSetAppState({ loading: false }))
     }
 
 
@@ -218,7 +252,7 @@ class Main extends Component {
         const list = this.state.originais.anatomp;
 
         const _val = norm(val);
-                
+
         const _list = list.filter(p => {
             return (
                 norm(p.nome).indexOf(_val) != -1 ||
@@ -228,14 +262,14 @@ class Main extends Component {
             )
         });
 
-        this.setState({anatomp: _list})
+        this.setState({ anatomp: _list })
     }
 
     onFilterRoteiro = val => {
         const list = this.state.originais.roteiros;
 
         const _val = norm(val);
-                
+
         const _list = list.filter(p => {
             return (
                 norm(p.nome).indexOf(_val) != -1 ||
@@ -244,8 +278,8 @@ class Main extends Component {
             )
         });
 
-        this.setState({roteiros: _list})
-    }    
+        this.setState({ roteiros: _list })
+    }
 
 }
 

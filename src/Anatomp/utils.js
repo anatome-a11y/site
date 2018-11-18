@@ -46,7 +46,7 @@ export const onValidate = model => {
     }else{
         if(mapa.length == 0){
             campos = [...campos, 'mapa'];
-            msgs = [...msgs, 'Inclua partes anatômicas para serem mapeadas'];            
+            msgs = [...msgs, 'Inclua as partes anatômicas para serem setadas'];            
         }
     }
 
@@ -62,7 +62,7 @@ export const onSave = (onOpenSnackbar, onSetAppState, model, cb = false) => {
         return false;
     }
 
-    onOpenSnackbar('Aguarde... Salvando mapeamento...', 'loading');
+    onOpenSnackbar('Aguarde... Salvando roteiro setado...', 'loading');
     onSetAppState({ loading: true })
     const body = {
         ...model,

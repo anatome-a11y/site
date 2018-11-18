@@ -44,12 +44,12 @@ class FormPecas extends Component {
                     <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa' }}>
                         <Tree {...treeProps} />
                     </div>
-                    Ou <a onClick={this.onOpen}>clique aqui</a> para criar uma nova peça genérica.
+                    Ou <a onClick={this.onOpen}>clique aqui para criar um novo conteúdo de peça</a>.
                 </FormItem>
                 <Modal
                     destroyOnClose={true}
                     width='80%'
-                    title="Nova peça genérica"
+                    title="Novo conteúdo da peça"
                     visible={this.state.visible}
                     onOk={this.onSubmit}
                     onCancel={this.onCancel(false)}

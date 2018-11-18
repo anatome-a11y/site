@@ -138,7 +138,7 @@ class Anatomp extends Component {
         const { erros, loading, modo, match } = this.props;
         const { model, options } = this.state;
 
-        const title = modo == 'assoc' ? 'Associação de peça física' : (match.params.id ? 'Alteração de mapeamento' : 'Cadastro de mapeamento')
+        const title = modo == 'assoc' ? 'Associação de peça física' : (match.params.id ? 'Alteração de roteiro setado' : 'Cadastro de roteiro setado')
 
         return (
             <div style={{ padding: 24 }}>
@@ -147,7 +147,7 @@ class Anatomp extends Component {
                     <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>  }              
                 <Collapse bordered={false} defaultActiveKey={['geral', 'pecaFisica', 'mapeamento']} >
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="Informações gerais do roteiro mapeado" />} key='geral'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'roteiro', 'instituicao'])} contentQ={<p>...</p>} title="Informações gerais do roteiro setado" />} key='geral'>
                         <FormGeral
                             {...model}
                             {...options}
@@ -190,7 +190,7 @@ class Anatomp extends Component {
                     modo != 'assoc' && (
                         <div style={{textAlign: 'center'}}>
                             <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
-                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar mapeamento</Button>
+                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar roteiro setado</Button>
                         </div>
                     )
                 }                
@@ -200,7 +200,7 @@ class Anatomp extends Component {
 
     onSubmit = () => {
         onSaveAnatomp(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.model, ret => {
-            this.props.onOpenSnackbar(`O mapeamento ${this.state.model.nome} foi salvo com sucesso!`, 'success');
+            this.props.onOpenSnackbar(`O roteiro setado ${this.state.model.nome} foi salvo com sucesso!`, 'success');
             this.props.onPush('/')
         })
     }    
