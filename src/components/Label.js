@@ -1,10 +1,11 @@
 import React from 'react';
 
 
-const Label = ({ children }) => <div style={{
-    lineHeight: '1.2rem',
+const Label = ({ children, style = {} }) => <div style={{
+    lineHeight: '1.6rem',
     marginBottom: 15,
     color: 'rgba(0, 0, 0, 0.85)',
+    ...style
 }}>
     {children}
 </div>

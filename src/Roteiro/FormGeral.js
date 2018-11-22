@@ -56,7 +56,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             help={erros.msgs[_erros.nome] || ''}
                             label='Nome do roteiro'
                         >
-                            <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
+                            <Input placeholder="Informe o assunto da aula" value={nome} onChange={e => onChange('nome')(e.target.value)} />
                         </FormItem>
                     </Col>
                     <Col span={5}>
@@ -65,7 +65,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             help={erros.msgs[_erros.curso] || ''}
                             label='Curso'
                         >
-                            <Input placeholder="Ex: " value={curso} onChange={e => onChange('curso')(e.target.value)} />
+                            <Input  value={curso} onChange={e => onChange('curso')(e.target.value)} />
                         </FormItem>
                     </Col>
                     <Col span={5}>
@@ -74,12 +74,12 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             help={erros.msgs[_erros.disciplina] || ''}
                             label='Disciplina'
                         >
-                            <Input placeholder="Ex: " value={disciplina} onChange={e => onChange('disciplina')(e.target.value)} />
+                            <Input value={disciplina} onChange={e => onChange('disciplina')(e.target.value)} />
                         </FormItem>
                     </Col>
                     <Col span={24}>
-                        <FormItem label="Informe as generalidades do roteiro">
-                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
+                        <FormItem label="Generalidades do roteiro">
+                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} placeholder='Generalidade sobre o assunto da aula' />
                         </FormItem>
                     </Col>
                     {/* <Col span={12}>

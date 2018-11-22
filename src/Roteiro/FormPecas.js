@@ -32,17 +32,19 @@ class FormPecas extends Component {
         
         const _erros = {
             partes: erros.campos.indexOf('partes'),
-        }        
+        }     
+        
+        console.log()
 
         return (
             <Form layout="vertical">
                 <FormItem
                     validateStatus={_erros.partes != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.partes] || ''}
-                    label='Selecione as partes anatômicas deste roteiro'
+                    label='Selecione as partes anatômicas das peças a serem identificadas neste roteiro'
                 >
-                    <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa' }}>
-                        <Tree {...treeProps} />
+                    <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa', marginBottom: 10 }}>
+                        {pecas.length > 0 && <Tree defaultExpandedKeys={[pecas[0].key]} {...treeProps} />}
                     </div>
                     Ou <a onClick={this.onOpen}>clique aqui para criar um novo conteúdo de peça</a>.
                 </FormItem>

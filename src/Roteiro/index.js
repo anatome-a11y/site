@@ -74,7 +74,7 @@ class Roteiro extends Component {
         
         return (
             <div style={{padding: 24}}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{this.props.match ? 'Alteração do conteúdo do roteiro' : 'Cadastro de conteúdo do roteiro'}</h2>  
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 30 }}>{this.props.match ? 'Alteração do conteúdo do roteiro' : 'Cadastro de conteúdo do roteiro'}</h2>  
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
                     <Button onClick={() => this.props.onPush('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>                
@@ -82,10 +82,10 @@ class Roteiro extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['idioma', 'nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
                         <FormGeral onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Seleção de peças e partes anatômicas" />} key='partes'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Conhecimento Prático (CP)" />} key='partes'>
                         <FormPecas onUpdatePecas={this.onGetData} pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Seleção de informações teóricas" />} key='teoria'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
                     </Panel>
                 </Collapse>

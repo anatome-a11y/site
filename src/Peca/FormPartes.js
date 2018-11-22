@@ -2,14 +2,15 @@ import React, { Component, Fragment } from 'react';
 
 import { Form, Input, Button, Tag, Row, Col, Icon } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
+import Label from '../components/Label'
 
 const uuidv4 = require('uuid/v4');
 
 const FormItem = Form.Item;
 
 const props = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 14 },
+    labelCol: {},
+    wrapperCol: {},
 }
 
 class FormPartes extends Component {
@@ -33,44 +34,47 @@ class FormPartes extends Component {
         return (
             <Fragment>
                 <Form layout="vertical">
-                    <FormItem
-                        validateStatus={_erros.partes != -1 ? 'error' : ''}
-                        help={erros.msgs[_erros.partes] || ''}
-                        label='Partes da peça'
-                        {...props}
-                    >
-                        <TextArea onBlur={this.gerar} autosize id='partesTextArea' placeholder="Partes que compõem a peça separadas por quebra de linha" value={string} onChange={this.onChange} />
-                    </FormItem>
-                    <FormItem label='Partes identificadas' {...props}>
-                        <Row>
-                            {partes.map((p, idx) => {
-                                return (
-                                    <Col span={6} key={p._id} style={{ padding: 5, display: 'flex' }}>
-                                        <Input 
-                                            style={{height: 22}} 
-                                            size='small' 
-                                            value={p.nome} 
-                                            suffix={<Icon style={{marginTop: 4, cursor: 'pointer'}} type="close" onClick={onRemoveParte(p._id)} />}
-                                            onChange={e => onChangeParte(idx, e.target.value)} 
-                                        />
-                                    </Col>
-                                )
-                            })}
-                            {tokens.map((item, idx) => (
-                                <Col span={6} key={item} style={{ padding: 5, display: 'flex' }}>
-                                    <Tag style={{
-                                        height: 22,
-                                        width: '100%', 
-                                        textAlign: 'center',
-                                        whiteSpace: 'nowrap', 
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'                                        
-                                    }}>{item}</Tag>
-                                </Col>                                
-                            ))}
-                            {partes.length == 0 && tokens.length == 0 && 'Esta peça ainda não possui partes associadas'}
-                        </Row>
-                    </FormItem>
+                    <Row>
+                        <Col>
+                            <Label>Copie os nomes das partes anatômicas desta peça e cole-os no campo a seguir ou digite-os um a um</Label>
+                            <FormItem
+                                validateStatus={_erros.partes != -1 ? 'error' : ''}
+                                help={erros.msgs[_erros.partes] || ''}
+                            >
+                                <TextArea onBlur={this.gerar} autosize id='partesTextArea' placeholder="Cada nome deve estar em uma linha" value={string} onChange={this.onChange} />
+                            </FormItem>
+                            <FormItem>
+                                <Row>
+                                    {partes.map((p, idx) => {
+                                        return (
+                                            <Col span={6} key={p._id} style={{ padding: 5, display: 'flex' }}>
+                                                <Input
+                                                    style={{ height: 22 }}
+                                                    size='small'
+                                                    value={p.nome}
+                                                    suffix={<Icon style={{ marginTop: 4, cursor: 'pointer' }} type="close" onClick={onRemoveParte(p._id)} />}
+                                                    onChange={e => onChangeParte(idx, e.target.value)}
+                                                />
+                                            </Col>
+                                        )
+                                    })}
+                                    {tokens.map((item, idx) => (
+                                        <Col span={6} key={item} style={{ padding: 5, display: 'flex' }}>
+                                            <Tag style={{
+                                                height: 22,
+                                                width: '100%',
+                                                textAlign: 'center',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>{item}</Tag>
+                                        </Col>
+                                    ))}
+                                    {partes.length == 0 && tokens.length == 0 && 'Esta peça ainda não possui partes associadas'}
+                                </Row>
+                            </FormItem>
+                        </Col>
+                    </Row>
                 </Form>
             </Fragment>
         )

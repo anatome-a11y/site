@@ -142,7 +142,7 @@ class Anatomp extends Component {
 
         return (
             <div style={{ padding: 24 }}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: modo == 'assoc' ? 0 : 50 }}>{title}</h2>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: modo == 'assoc' ? 0 : 30 }}>{title}</h2>
                 {modo != 'assoc' && <div style={{ textAlign: 'right', marginBottom: 5 }}>
                     <Button onClick={() => this.props.history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>  }              

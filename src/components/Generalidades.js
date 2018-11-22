@@ -20,12 +20,21 @@ const getModelGeneralidade = () => ({
 
 
 class FormItemGeneralidade extends Component {
+
+    ref = null;
+
+    componentDidMount() {
+        if(this.props.sinalNovo != ''){
+            this.ref.focus()
+        }
+    }
+
     render() {
-        const {item, idx, onChange, loading, onEnter} = this.props;
+        const { item, idx, onChange, loading, onEnter, placeholder } = this.props;
         return (
             <div style={_style.item}>
                 <div style={_style.textos}>
-                    <Input onPressEnter={onEnter} value={item.texto} onChange={e => onChange('texto', idx)(e.target.value)} placeholder={`Generalidade`} />
+                    <Input ref={r => this.ref = r} onPressEnter={onEnter} value={item.texto} onChange={e => onChange('texto', idx)(e.target.value)} placeholder={placeholder} />
                 </div>
                 <div style={{ alignSelf: 'center' }}>
                     {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
@@ -36,11 +45,16 @@ class FormItemGeneralidade extends Component {
     }
 }
 
+FormItemGeneralidade.defaultProps = {
+    placeholder: 'Generalidades'
+}
+
 
 
 class Generalidades extends Component {
 
     state = {
+        sinalNovo: '',
         loading: false,
         open: false,
         toDelete: '',
@@ -48,22 +62,22 @@ class Generalidades extends Component {
     }
 
 
-    componentWillReceiveProps(next){
-        if(this.props.defaultValue.length == 0 && next.defaultValue.length > 0){
-            this.setState({itens: next.defaultValue})
+    componentWillReceiveProps(next) {
+        if (this.props.defaultValue.length == 0 && next.defaultValue.length > 0) {
+            this.setState({ itens: next.defaultValue })
         }
     }
 
 
-    componentWillUpdate(nextProps, nextState){
-        if(JSON.stringify(this.state.itens) != JSON.stringify(nextState.itens)){
+    componentWillUpdate(nextProps, nextState) {
+        if (JSON.stringify(this.state.itens) != JSON.stringify(nextState.itens)) {
             this.props.onChange(nextState.itens)
         }
     }
-    
+
 
     render() {
-        const { loading, open, itens } = this.state;
+        const { loading, open, itens, sinalNovo } = this.state;
 
         return (
             <Fragment>
@@ -82,7 +96,7 @@ class Generalidades extends Component {
                             </Upload>,
                             <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
-                            <FormItemGeneralidade onEnter={this.onAdd} loading={loading} item={item} idx={idx} onChange={this.onChange} />
+                            <FormItemGeneralidade placeholder={this.props.placeholder} sinalNovo={sinalNovo} onEnter={this.onAdd} loading={loading} item={item} idx={idx} onChange={this.onChange} />
                         </Item>)}
                 />
                 <div style={{ marginTop: 5, textAlign: 'right' }}>
@@ -130,14 +144,16 @@ class Generalidades extends Component {
     onDelete = () => {
         const { itens, toDelete } = this.state;
         this.onClose();
-            
-        if(itens.length == 1){
-            this.setState({itens: [getModelGeneralidade()]})        
-        }else{
-            this.setState({itens: [
-                ...itens.slice(0, toDelete),
-                ...itens.slice(toDelete+1),
-            ]})            
+
+        if (itens.length == 1) {
+            this.setState({ itens: [getModelGeneralidade()] })
+        } else {
+            this.setState({
+                itens: [
+                    ...itens.slice(0, toDelete),
+                    ...itens.slice(toDelete + 1),
+                ]
+            })
         }
     }
 
@@ -151,16 +167,19 @@ class Generalidades extends Component {
                 ...itens.slice(idx + 1),
             ]
         })
-    } 
-    
+    }
+
     onAdd = () => {
         const { itens } = this.state;
 
-        this.setState({itens: [
-            ...itens,
-            getModelGeneralidade(),                
-        ]})
-    }     
+        this.setState({
+            sinalNovo: + new Date(),
+            itens: [
+                ...itens,
+                getModelGeneralidade(),
+            ]
+        })
+    }
 
     beforeUpload = _id => () => {
         this.setState({ loading: _id })

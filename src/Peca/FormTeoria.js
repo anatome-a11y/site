@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react';
 
-import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 'antd'
+import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin, Row, Col, Form } from 'antd'
 
 import Midia from '../components/Midia'
+import Label from '../components/Label'
 import { filter } from '../utils/data'
 
 const uuidv4 = require('uuid/v4');
@@ -17,7 +18,7 @@ const firebaseRef = firebase.storage().ref();
 
 class FormItemTeoria extends Component {
     render() {
-        const {item, idx, onChange, partes, loading} = this.props;
+        const { item, idx, onChange, partes, loading } = this.props;
         return (
             <div style={_style.item}>
                 <div style={{ width: '40%', marginRight: 5 }}>
@@ -25,7 +26,7 @@ class FormItemTeoria extends Component {
                         notFoundContent='Nenhuma parte foi encontrada'
                         mode="multiple"
                         style={{ width: '100%' }}
-                        placeholder="Partes da peça"
+                        placeholder="Parte(s) da peça"
                         value={item.partes}
                         optionFilterProp="children"
                         filterOption={filter}
@@ -35,8 +36,8 @@ class FormItemTeoria extends Component {
                     </Select>
                 </div>
                 <div style={_style.textos}>
-                    {item.partes.length > 1 && <Input onBlur={this.onBlur(idx, item)} style={{ marginBottom: 10 }} value={item.plural} onChange={e => onChange('plural', idx)(e.target.value)} placeholder={`Conteúdo teórico - Plural`} />}
-                    <Input value={item.singular} onChange={e => onChange('singular', idx)(e.target.value)} placeholder={`Conteúdo teórico - Singular`} />
+                    {item.partes.length > 1 && <Input onBlur={this.onBlur(idx, item)} style={{ marginBottom: 10 }} value={item.plural} onChange={e => onChange('plural', idx)(e.target.value)} placeholder={`Conhecimento Teórico - Plural`} />}
+                    <Input value={item.singular} onChange={e => onChange('singular', idx)(e.target.value)} placeholder={`Conhecimento Teórico - Singular`} />
                 </div>
                 <div style={{ alignSelf: 'center' }}>
                     {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
@@ -47,8 +48,8 @@ class FormItemTeoria extends Component {
     }
 
     onBlur = (idx, item) => e => {
-        const val = item.plural.charAt(0).toLowerCase() + item.plural.slice(1)      
-        this.props.onChange('singular', idx)('É um dos ' + val);        
+        const val = item.plural.charAt(0).toLowerCase() + item.plural.slice(1)
+        this.props.onChange('singular', idx)('É um dos ' + val);
     }
 }
 
@@ -67,32 +68,37 @@ class FormTeoria extends Component {
         const { conteudoTeorico, onChangeConteudoTeorico, partes, onAddConteudoTeorico, onDeleteConteudoTeorico } = this.props;
 
         return (
-            <Fragment>
-                <List
-                    style={{ margin: 20 }}
-                    rowKey='_id'
-                    size="small"
-                    bordered={true}
-                    locale={{ emptyText: 'Esta peça não possui informações teóricas' }}
-                    dataSource={conteudoTeorico}
-                    renderItem={(item, idx) => (
-                        <Item key={item._id} actions={[
-                            <Upload showUploadList={false} onChange={this.onUpload(idx, item.midias)} beforeUpload={this.beforeUpload(item._id)}>
-                                <Tooltip title='Adicionar mídia'>
-                                    <Button type='primary' ghost shape='circle' icon='paper-clip' disabled={loading} />
-                                </Tooltip>
-                            </Upload>,
-                            <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
-                        ]}>
-                            <FormItemTeoria partes={partes} loading={loading} item={item} idx={idx} onChange={onChangeConteudoTeorico} />
-                        </Item>)}
-                />
-                <div style={{ marginBottom: 20, marginRight: 16, textAlign: 'right' }}>
-                    <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
-                    <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
-                </div>
+            <Form layout="vertical">
+                <Row gutter={16}>
+                    <Col>
+                        <Label>Selecione uma ou mais partes anatômicas e, em seguida, informe o Conhecimento Teórico associado sem citar o nome da(s) parte(s). Acesse a ajuda ou exemplos para mais informações</Label>
+                        <List
+                            style={{marginBottom: 20}}
+                            rowKey='_id'
+                            size="small"
+                            bordered={true}
+                            locale={{ emptyText: 'Esta peça não possui informações teóricas' }}
+                            dataSource={conteudoTeorico}
+                            renderItem={(item, idx) => (
+                                <Item key={item._id} actions={[
+                                    <Upload showUploadList={false} onChange={this.onUpload(idx, item.midias)} beforeUpload={this.beforeUpload(item._id)}>
+                                        <Tooltip title='Adicionar mídia'>
+                                            <Button type='primary' ghost shape='circle' icon='paper-clip' disabled={loading} />
+                                        </Tooltip>
+                                    </Upload>,
+                                    <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
+                                ]}>
+                                    <FormItemTeoria partes={partes} loading={loading} item={item} idx={idx} onChange={onChangeConteudoTeorico} />
+                                </Item>)}
+                        />
+                        <div style={{ marginBottom: 20, marginRight: 0, textAlign: 'right' }}>
+                            <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
+                            <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
+                        </div>
+                    </Col>
+                </Row>
                 <Modal
-                    title={'Excluir conteúdo teórico'}
+                    title={'Excluir Conhecimento Teórico'}
                     visible={open}
                     okText='Excluir'
                     onOk={this.onDelete}
@@ -103,7 +109,7 @@ class FormTeoria extends Component {
                 >
                     {this.getBody()}
                 </Modal>
-            </Fragment>
+            </Form>
         )
     }
 
@@ -115,7 +121,7 @@ class FormTeoria extends Component {
         if (toDelete !== '') {
             return (
                 <div>
-                    <p>Deseja realmente excluir o conteúdo teórico:</p>
+                    <p>Deseja realmente excluir o Conhecimento Teórico:</p>
                     <ul>
                         {conteudoTeorico[toDelete].plural && <li>{conteudoTeorico[toDelete].plural}</li>}
                         {conteudoTeorico[toDelete].singular && <li>{conteudoTeorico[toDelete].singular}</li>}

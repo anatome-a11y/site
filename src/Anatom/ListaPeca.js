@@ -57,6 +57,7 @@ class Main extends Component {
 
         return (
             <div style={{padding: 24}}>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 30 }}>Lista de conteúdos das peças</h2>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
                     <Button onClick={() => history.push('/')} size='small' type='primary' ghost>Voltar para página inicial</Button>
                 </div>

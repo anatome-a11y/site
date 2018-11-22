@@ -62,30 +62,34 @@ class FormMapa extends Component {
                                             bordered={false}
                                             locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
                                             dataSource={item.localizacao}
-                                            renderItem={(itemLoc, idxLoc) => (
-                                                <Item key={itemLoc._id} actions={[
-                                                    <Checkbox checked={itemLoc.referenciaRelativa.referencia != ''} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc)}>Loc. Relativa</Checkbox>,
-                                                    <Tooltip title='Excluir'><Button type='primary' ghost onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
-                                                ]}>
-                                                    <div style={_style.item}>
-                                                        <div style={{ width: 'calc(100% - 155px)', marginRight: 5 }}>
-                                                            <Select
-                                                                notFoundContent='Nenhuma peça física foi adicionada'
-                                                                style={{ width: '100%' }}
-                                                                placeholder="Peça física"
-                                                                value={itemLoc.pecaFisica}
-                                                                optionFilterProp="children"
-                                                                filterOption={filter}
-                                                                onChange={onChangeMapa('pecaFisica', idx, idxLoc)}
-                                                            >
-                                                                {(pecasFisicas.length == 1 && pecasFisicas[0].nome == '') ? null : pecasFisicas.map(({ nome, _id }) => <Option value={_id} key={_id}>{nome}</Option>)}
-                                                            </Select>
+                                            renderItem={(itemLoc, idxLoc) => {
+                                                const hasRefRel = itemLoc.referenciaRelativa.referencia != '';
+
+                                                return (
+                                                    <Item key={itemLoc._id} actions={[
+                                                        <Checkbox checked={hasRefRel} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc)}>Loc. Relativa</Checkbox>,
+                                                        <Tooltip title='Excluir'><Button type='primary' ghost onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
+                                                    ]}>
+                                                        <div style={_style.item}>
+                                                            <div style={{ width: 'calc(100% - 155px)', marginRight: 5 }}>
+                                                                <Select
+                                                                    notFoundContent='Nenhuma peça física foi adicionada'
+                                                                    style={{ width: '100%' }}
+                                                                    placeholder="Peça física"
+                                                                    value={itemLoc.pecaFisica}
+                                                                    optionFilterProp="children"
+                                                                    filterOption={filter}
+                                                                    onChange={onChangeMapa('pecaFisica', idx, idxLoc)}
+                                                                >
+                                                                    {(pecasFisicas.length == 1 && pecasFisicas[0].nome == '') ? null : pecasFisicas.map(({ nome, _id }) => <Option value={_id} key={_id}>{nome}</Option>)}
+                                                                </Select>
+                                                            </div>
+                                                            <div style={{ width: 150 }}>
+                                                                <InputNumber style={{ width: '100%' }} value={itemLoc.numero} onChange={onChangeMapa('numero', idx, idxLoc)} min={0} placeholder={`Nº da etiqueta`} />
+                                                            </div>
                                                         </div>
-                                                        <div style={{ width: 150 }}>
-                                                            <InputNumber style={{ width: '100%' }} value={itemLoc.numero} onChange={onChangeMapa('numero', idx, idxLoc)} min={0} placeholder={`Nº da etiqueta`} />
-                                                        </div>
-                                                    </div>
-                                                </Item>)}
+                                                    </Item>)
+                                            }}
                                         />
                                     </div>
                                 </div>

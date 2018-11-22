@@ -108,7 +108,7 @@ class Peca extends Component {
         const title = this.props.modo == 'assoc' ? false : (this.props.match.params.id ? 'Alteração do conteúdo da peça' : 'Cadastro de conteúdo da peça')
         return (
             <div style={{padding: title ? 24 : 0}}>
-                {title && <h2 className='section' style={{ textAlign: 'center', marginTop: 50 }}>{title}</h2>}  
+                {title && <h2 className='section' style={{ textAlign: 'center', marginTop: 30 }}>{title}</h2>}  
                 {title && <div style={{ textAlign: 'right', marginBottom: 5 }}>
                     <Button style={{marginRight: 5}} onClick={() => this.props.history.push('/pecas')} size='small' type='primary' ghost>Voltar para a lista de peças</Button>
                 </div> }                     
@@ -116,10 +116,10 @@ class Peca extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['nome', 'regiao', 'sistema'])} contentQ={<p>Conteúdos trabalhados em várias disciplinas</p>} title="Conteúdo da peça" />} key='geral'>
                         <FormPeca {...model} {...options} onOpenSnackbar={this.props.onOpenSnackbar} somentePratica={somentePratica} erros={erros} onChange={this.onChange} onChangeSomentePratica={this.onChangeSomentePratica} />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças que são trabalhados em uma disciplina</p>} title="Inclusão de conteúdo prático - Nome das partes anatômicas" />} key='partes'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças que são trabalhados em uma disciplina</p>} title="Conhecimento Prático (CP)" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                     </Panel>
-                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Inclusão de conteúdo teórico - Informações teóricas associadas às partes anatômicas" />} key='teoria'>
+                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
                         <FormTeoria {...model} onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
                     </Panel>}
                 </Collapse>

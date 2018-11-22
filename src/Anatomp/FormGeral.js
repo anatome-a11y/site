@@ -55,9 +55,9 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                     <FormItem
                         validateStatus={_erros.nome != -1 ? 'error' : ''}
                         help={erros.msgs[_erros.nome] || ''}
-                        label='Nome da An@tom-P'
+                        label='Nome da Anatome-AT'
                     >
-                        <Input placeholder="Ex: " value={nome} onChange={e => onChange('nome')(e.target.value)} />
+                        <Input value={nome} onChange={e => onChange('nome')(e.target.value)} />
                     </FormItem>
                 </Col>
                 <Col span={8}>
@@ -66,12 +66,12 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                         help={erros.msgs[_erros.instituicao] || ''}
                         label='Instituição'
                     >
-                        <Input placeholder="Ex: " value={instituicao} onChange={e => onChange('instituicao')(e.target.value)} />
+                        <Input value={instituicao} onChange={e => onChange('instituicao')(e.target.value)} />
                     </FormItem>
                 </Col>
                 <Col span={24}>
                         <FormItem label="Informe as generalidades do roteiro setado">
-                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} />
+                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} placeholder='Sugestão da ordem das peças a serem aprendidas' />
                         </FormItem>
                     </Col>                
             </Row>

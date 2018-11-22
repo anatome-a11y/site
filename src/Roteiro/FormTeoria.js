@@ -75,7 +75,7 @@ class FormTeoria extends Component {
                 <FormItem
                     validateStatus={_erros.conteudo != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.conteudo] || ''}
-                    label='Selecione os conteúdos teóricos que estarão presentes no roteiro.'
+                    label='Selecione os Conhecimentos Teóricos abordados no roteiro'
                 >
                     <div className='table-no-border'>
                         <Table
@@ -86,7 +86,7 @@ class FormTeoria extends Component {
                             dataSource={filtrado}
                             pagination={false}
                             size='small'
-                            locale={{ emptyText: 'Não há conteúdo teórico para ser exibido' }}
+                            locale={{ emptyText: 'Não há Conhecimento Teórico para ser exibido' }}
                         />
                     </div>
                 </FormItem>
