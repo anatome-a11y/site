@@ -19,6 +19,7 @@ class FormMapa extends Component {
     state = {
         loading: false,
         open: false,
+        erroLocalizacao: null,
         toEditRefRel: {
             model: {},
             idx: '',
@@ -28,7 +29,7 @@ class FormMapa extends Component {
     }
 
     render() {
-        const { loading, open, toEditRefRel } = this.state;
+        const { loading, open, toEditRefRel, erroLocalizacao } = this.state;
         const { onChangeMapa, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros } = this.props;
 
         const _erros = {
@@ -107,7 +108,7 @@ class FormMapa extends Component {
                         cancelText='Cancelar'
                         onCancel={this.onClose}
                     >
-                        <FormLocalizacao {...toEditRefRel} onChange={this.onChangeRefRel} partes={mapa.map(i => i.parte)} />
+                        <FormLocalizacao erroLocalizacao={erroLocalizacao} {...toEditRefRel} onChange={this.onChangeRefRel} partes={mapa.map(i => i.parte)} />
                     </Modal>
                 </FormItem>
             </Form>
@@ -119,6 +120,7 @@ class FormMapa extends Component {
         const { toEditRefRel } = this.state;
 
         this.setState({
+            erroLocalizacao: null,
             toEditRefRel: {
                 ...toEditRefRel,
                 model: {
@@ -138,7 +140,8 @@ class FormMapa extends Component {
                 this.props.onChangeMapa('referenciaRelativa', idx, idxLoc, {numero})({ ...model });
                 this.onClearRefRel()
             }else{
-                this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
+                this.setState({erroLocalizacao: 'A localização desta parte ainda não foi setada'})
+                // this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
             }            
         }else{
             this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({ ...model });
@@ -149,6 +152,7 @@ class FormMapa extends Component {
     onClearRefRel = () => {
             this.setState({
                 open: false,
+                erroLocalizacao: null,
                 toEditRefRel: {
                     model: {},
                     idx: '',
@@ -162,6 +166,7 @@ class FormMapa extends Component {
         if(e.target.checked){
             this.setState({
                 open: true,
+                erroLocalizacao: null,
                 toEditRefRel: { model, idx, idxLoc, item }
             })            
         }else{
