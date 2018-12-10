@@ -237,6 +237,7 @@ class Peca extends Component {
                 { ...getModelConteudoTeorico(), partes: [...conteudoTeorico[conteudoTeorico.length-1].partes], _id: uuidv4() },                
             ])
         }
+        window.scrollTo(0,document.body.scrollHeight);
     }
    
 

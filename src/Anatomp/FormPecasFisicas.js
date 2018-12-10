@@ -35,8 +35,6 @@ class FormPecasFisicas extends Component {
             pecasFisicas: erros.campos.indexOf('pecasFisicas'),
         }
 
-        console.log(this.props)
-
         return (
             <Form style={{ margin: 20 }}>
                 <FormItem
