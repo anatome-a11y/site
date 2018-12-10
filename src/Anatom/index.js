@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, List, Button, Tooltip, Spin, Icon, Collapse, Table, Popover } from 'antd';
+import { Input, Modal, Button, Tooltip, Spin, Icon, Collapse, Table, Popover } from 'antd';
 import { withAppContext } from '../context'
 
 import { request, norm } from '../utils/data'
@@ -75,6 +75,9 @@ class Main extends Component {
     state = {
         anatomp: [],
         roteiros: [],
+        open: false,
+        toDelete: null,
+        resourceToDelete: '',
         originais: {
             anatomp: [],
             roteiros: []
@@ -87,7 +90,7 @@ class Main extends Component {
 
     render() {
         const { loading, history } = this.props;
-        const { anatomp, roteiros } = this.state;
+        const { anatomp, roteiros, open, resourceToDelete } = this.state;
 
         return (
             <div style={{ padding: 24 }}>
@@ -141,7 +144,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/roteiro/editar/' + item._id, state: { model: item } })} onDelete={this.onDelete('roteiro', item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/roteiro/editar/' + item._id, state: { model: item } })} onDelete={this.onShowDelete('roteiro', item)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -184,7 +187,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/mapeamento/editar/' + item._id, state: { model: item } })} onDelete={this.onDelete('anatomp', item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({ pathname: '/mapeamento/editar/' + item._id, state: { model: item } })} onDelete={this.onShowDelete('anatomp', item)} />,
                                 }
                             ]}
                             rowKey='_id'
@@ -193,9 +196,39 @@ class Main extends Component {
                         />
                     </Panel>
                 </Collapse>
+                <Modal
+                    title={`Excluir ${resourceToDelete == 'anatomp' ? 'roteiro setado' : 'conteúdo do roteiro'}`}
+                    visible={open}
+                    okText='Excluir'
+                    onOk={this.onDelete}
+                    cancelText='Cancelar'
+                    onCancel={this.onClose}
+                    okButtonProps={{ loading }}
+                    cancelButtonProps={{ loading }}
+                >
+                    {this.onGetBody()}
+                </Modal>                  
             </div>
         )
     }
+
+    onGetBody = () => {
+        const {toDelete, resourceToDelete} = this.state;
+        if(toDelete !== null){
+            return <div>Deseja realmente excluir o {resourceToDelete == 'anatomp' ? 'roteiro setado' : 'conteúdo do roteiro'} <span style={{fontWeight: 'bold'}}>{toDelete.nome}</span>?</div>
+        }else{
+            return null;
+        }
+    }
+
+    onShowDelete = (resourceToDelete, toDelete) => () => {
+        this.setState({ open: true, toDelete, resourceToDelete })
+    }    
+
+    onClose = () => this.setState({ open: false }, () => {
+        this.setState({toDelete: null, resourceToDelete: ''})
+    })    
+
 
     onGetData = () => {
         const { onOpenSnackbar, onSetAppState } = this.props;
@@ -226,9 +259,12 @@ class Main extends Component {
     }
 
 
-    onDelete = (model, id) => () => {
+    onDelete =  () => {
         this.props.onSetAppState({ loading: true })
         this.props.onOpenSnackbar('Aguarde...', 'loading');
+
+        const model = this.state.resourceToDelete;
+        const id = this.state.toDelete._id;
 
         const nome = model == 'roteiro' ? 'Conteúdo do roteiro' : 'Roteiro setado';
 
@@ -245,7 +281,10 @@ class Main extends Component {
                 const msg = typeof e == 'string' ? e : 'Não foi possível excluir o ' + nome.toLowerCase() + ' selecionado';
                 this.props.onOpenSnackbar(msg);
             })
-            .finally(() => this.props.onSetAppState({ loading: false }))
+            .finally(() => {
+                this.onClose()
+                this.props.onSetAppState({ loading: false })
+            })
     }
 
 

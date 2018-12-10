@@ -234,7 +234,7 @@ class Peca extends Component {
         } else {
             this.onChange('conteudoTeorico')([
                 ...conteudoTeorico,
-                { ...getModelConteudoTeorico(), partes: [...conteudoTeorico[0].partes], _id: uuidv4() },                
+                { ...getModelConteudoTeorico(), partes: [...conteudoTeorico[conteudoTeorico.length-1].partes], _id: uuidv4() },                
             ])
         }
     }

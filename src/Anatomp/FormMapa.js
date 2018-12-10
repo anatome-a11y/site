@@ -22,7 +22,8 @@ class FormMapa extends Component {
         toEditRefRel: {
             model: {},
             idx: '',
-            idxLoc: ''
+            idxLoc: '',
+            item: null
         }
     }
 
@@ -33,8 +34,6 @@ class FormMapa extends Component {
         const _erros = {
             mapa: erros.campos.indexOf('mapa'),
         }
-
-        console.log(mapa)
 
         return (
             <Form style={{ margin: 20 }}>
@@ -63,16 +62,20 @@ class FormMapa extends Component {
                                             locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
                                             dataSource={item.localizacao}
                                             renderItem={(itemLoc, idxLoc) => {
-                                                const hasRefRel = itemLoc.referenciaRelativa.referencia != '';
+                                                const hasRefRel = itemLoc.referenciaRelativa.referencia != null;
 
                                                 return (
                                                     <Item key={itemLoc._id} actions={[
-                                                        <Checkbox checked={hasRefRel} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc)}>Loc. Relativa</Checkbox>,
+                                                        <div>
+                                                            <Checkbox checked={hasRefRel} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc, item)}/>
+                                                            <a onClick={() => this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc, item)({target: {checked: true}})}>Loc. Relativa</a>
+                                                        </div>,
                                                         <Tooltip title='Excluir'><Button type='primary' ghost onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
                                                     ]}>
                                                         <div style={_style.item}>
                                                             <div style={{ width: 'calc(100% - 155px)', marginRight: 5 }}>
                                                                 <Select
+                                                                    showSearch
                                                                     notFoundContent='Nenhuma peça física foi adicionada'
                                                                     style={{ width: '100%' }}
                                                                     placeholder="Peça física"
@@ -85,7 +88,7 @@ class FormMapa extends Component {
                                                                 </Select>
                                                             </div>
                                                             <div style={{ width: 150 }}>
-                                                                <InputNumber style={{ width: '100%' }} value={itemLoc.numero} onChange={onChangeMapa('numero', idx, idxLoc)} min={0} placeholder={`Nº da etiqueta`} />
+                                                                <InputNumber disabled={hasRefRel} style={{ width: '100%' }} value={itemLoc.numero} onChange={onChangeMapa('numero', idx, idxLoc)} min={0} placeholder={`Nº da etiqueta`} />
                                                             </div>
                                                         </div>
                                                     </Item>)
@@ -128,25 +131,42 @@ class FormMapa extends Component {
 
 
     onAppyChangeRefRel = ({ idx, idxLoc, model }) => {
-        this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({ ...model });
-        this.setState({
-            open: false,
-            toEditRefRel: {
-                model: {},
-                idx: '',
-                idxLoc: ''
-            }
-        })
+        const itemMapa = this.props.mapa.find(m => m.parte._id == model.referencia);
+        if(itemMapa){
+            const {numero} = itemMapa.localizacao[idxLoc];
+            if(numero){
+                this.props.onChangeMapa('referenciaRelativa', idx, idxLoc, {numero})({ ...model });
+                this.onClearRefRel()
+            }else{
+                this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
+            }            
+        }else{
+            this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({ ...model });
+            this.onClearRefRel()            
+        }
     }
 
-    onOpenRefRel = (model, idx, idxLoc) => e => {
+    onClearRefRel = () => {
+            this.setState({
+                open: false,
+                toEditRefRel: {
+                    model: {},
+                    idx: '',
+                    idxLoc: '',
+                    item: null
+                }
+            })        
+    }
+
+    onOpenRefRel = (model, idx, idxLoc, item) => e => {
         if(e.target.checked){
             this.setState({
                 open: true,
-                toEditRefRel: { model, idx, idxLoc }
+                toEditRefRel: { model, idx, idxLoc, item }
             })            
         }else{
-            this.onAppyChangeRefRel({ idx, idxLoc, model: {...model, referencia: ''} })
+            this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({...model, referencia: null});
+            this.onClearRefRel()
         }
     }
 

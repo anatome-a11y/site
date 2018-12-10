@@ -21,7 +21,7 @@ const getModelReferenciaRelativa = () => ({
     _id: uuidv4(),
     referenciaParaReferenciado: '',
     referenciadoParaReferencia: '',
-    referencia: ''
+    referencia: null, 
 })
 
 
@@ -86,7 +86,7 @@ class Anatomp extends Component {
                         model: {
                             ...model,
                             roteiro: model.roteiro._id,
-                            mapa: model.mapa.map(m => ({ ...m, localizacao: m.localizacao.map(l => ({ ...l, pecaFisica: l.pecaFisica._id })) }))
+                            mapa: model.mapa.map(m => ({ ...m, localizacao: m.localizacao.map(l => ({ ...l, pecaFisica: l.pecaFisica._id, referenciaRelativa: {...l.referenciaRelativa, referencia: l.referenciaRelativa.referencia == null ? null : l.referenciaRelativa.referencia._id} })) }))
                         }
                     } : {};
 
@@ -183,6 +183,7 @@ class Anatomp extends Component {
                             onChangeMapa={this.onChangeMapa}
                             onAddPecaFisica={this.onAddPecaFisicaAoMapa}
                             onRemovePecaFisica={this.onRemovePecaFisicaDoMapa}
+                            onOpenSnackbar={this.props.onOpenSnackbar}
                         />
                     </Panel>
                 </Collapse>
@@ -330,7 +331,7 @@ class Anatomp extends Component {
         })
     }
 
-    onChangeMapa = (field, idx, idxLoc) => value => {
+    onChangeMapa = (field, idx, idxLoc, extraProps) => value => {
         const { model } = this.state;
 
         this.setState({
@@ -342,7 +343,7 @@ class Anatomp extends Component {
                         ...model.mapa[idx],
                         localizacao: [
                             ...model.mapa[idx].localizacao.slice(0, idxLoc),
-                            { ...model.mapa[idx].localizacao[idxLoc], [field]: value },
+                            { ...model.mapa[idx].localizacao[idxLoc], ...extraProps, [field]: value },
                             ...model.mapa[idx].localizacao.slice(idxLoc + 1),
                         ]
                     },

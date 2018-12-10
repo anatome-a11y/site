@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Input, List, Button, Tooltip, Spin, Icon, Collapse, Table } from 'antd';
+import { Card, Input, Modal, Button, Tooltip, Spin, Icon, Collapse, Table } from 'antd';
 import { withAppContext } from '../context'
 
 import { request, norm, Maybe } from '../utils/data'
@@ -41,6 +41,8 @@ const Crud = ({ onEdit, onDelete }) => {
 class Main extends Component {
 
     state = {
+        toDelete: null,
+        open: false,
         pecas: [],
         originais: {
             pecas: [],
@@ -53,7 +55,7 @@ class Main extends Component {
 
     render() {
         const { loading, history } = this.props;
-        const { pecas } = this.state;
+        const { pecas, open } = this.state;
 
         return (
             <div style={{padding: 24}}>
@@ -85,7 +87,7 @@ class Main extends Component {
                                     title: '',
                                     key: 'action',
                                     width: 100,
-                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/peca/editar/' + item._id, state: {model: item}})} onDelete={this.onDelete(item._id)} />,
+                                    render: (text, item) => <Crud onEdit={() => history.push({pathname: '/peca/editar/' + item._id, state: {model: item}})} onDelete={this.onShowDelete(item)} />,
                                 }
                             ]}
                             pagination={{ style: { textAlign: 'center', width: '100%' } }}
@@ -94,16 +96,41 @@ class Main extends Component {
                         />
                     </Panel>
                 </Collapse>
+                <Modal
+                    title={'Excluir conteúdo da peça'}
+                    visible={open}
+                    okText='Excluir'
+                    onOk={this.onDelete}
+                    cancelText='Cancelar'
+                    onCancel={this.onClose}
+                    okButtonProps={{ loading }}
+                    cancelButtonProps={{ loading }}
+                >
+                    {this.onGetBody()}
+                </Modal>                
             </div>
         )
     }
+
+    onGetBody = () => {
+        const {toDelete} = this.state;
+        if(toDelete !== null){
+            return <div>Deseja realmente excluir o conteúdo da peça <span style={{fontWeight: 'bold'}}>{toDelete.nome}</span>?</div>
+        }else{
+            return null;
+        }
+    }
+
+    onShowDelete = toDelete => () => {
+        this.setState({ open: true, toDelete })
+    }
+
+    onClose = () => this.setState({ open: false, toDelete: null })
 
     onFilter = attr => val => {
         const list = this.state.originais[attr];
 
         const _val = norm(val);
-
-        console.log(list)
 
         const _list = list.filter(p => {            
             return (
@@ -147,10 +174,11 @@ class Main extends Component {
             })        
     }
 
-    onDelete = id => () => {
+    onDelete = () => {
         this.props.onSetAppState({loading: true})
         this.props.onOpenSnackbar('Aguarde...', 'loading');
 
+        const id = this.state.toDelete._id;
 
         request('peca/'+id, {method: 'DELETE'})
         .then(ret => {
@@ -165,7 +193,10 @@ class Main extends Component {
             const msg = typeof e == 'string' ? e : 'Não foi possível excluir a peça selecionada';          
             this.props.onOpenSnackbar(msg);
         })
-        .finally(() => this.props.onSetAppState({loading: false}))
+        .finally(() => {
+            this.onClose()
+            this.props.onSetAppState({loading: false})
+        })
     }    
 
 }

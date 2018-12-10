@@ -29,6 +29,13 @@ class Content extends React.Component {
 		}
 	}
 
+
+	componentWillReceiveProps(next) {
+		if (this.props.location.pathname !== next.location.pathname) {
+			window.scrollTo(0, 0);
+		}
+	}
+
 	render() {
 
 		const { isLogged, zoom, loading, erros } = this.state;
