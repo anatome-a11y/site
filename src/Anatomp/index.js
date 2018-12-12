@@ -234,6 +234,15 @@ class Anatomp extends Component {
 
     onSelectRoteiro = (partes, model) => {
 
+        const roteiro = this.state.options.listaRoteiros.find(r => r._id == model.roteiro)
+        const extra = roteiro ? {
+            options: {
+                ...this.state.options,
+                listaPecasGenericas: roteiro.pecasGenericas
+            }              
+        } : {};
+
+
         this.setState({
             model: {
                 ...this.state.model,
@@ -246,7 +255,8 @@ class Anatomp extends Component {
                         referenciaRelativa: getModelReferenciaRelativa()
                     }]
                 }))
-            }
+            },
+            ...extra
         })
     }
 

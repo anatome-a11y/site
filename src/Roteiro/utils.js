@@ -3,7 +3,7 @@ const uuidv4 = require('uuid/v4');
 
 
 export const onValidate = model => {
-    const { nome, curso, disciplina, conteudo, partes, idioma } = model;
+    const { nome, curso, disciplina, conteudo, partes, idioma, somentePratica } = model;
     let campos = [], msgs = []
 
     if (idioma == '') {
@@ -31,9 +31,11 @@ export const onValidate = model => {
         msgs = [...msgs, 'Inclua ao menos uma parte no roteiro'];
     }        
 
-    if (conteudo.selected.length == 0) {
-        campos = [...campos, 'conteudo'];
-        msgs = [...msgs, 'Inclua ao menos um conteúdo no roteiro'];
+    if(!somentePratica){
+        if (conteudo.selected.length == 0) {
+            campos = [...campos, 'conteudo'];
+            msgs = [...msgs, 'Inclua ao menos um conteúdo no roteiro'];
+        }        
     }
 
     return { campos, msgs }
@@ -53,7 +55,7 @@ export const onSave = (onOpenSnackbar, onSetAppState, model, cb = false) => {
     onSetAppState({ loading: true })
     const body = {
         ...model,
-        conteudos: model.conteudo.selected.map(ct => (ct._id))
+        conteudos: model.somentePratica ? [] : model.conteudo.selected.map(ct => (ct._id))
     }
 
     const _request = model._id != null ? request(`roteiro/${model._id}`, { method: 'PUT', body: JSON.stringify(body) }) : request('roteiro', { method: 'POST', body: JSON.stringify({...body, _id: uuidv4()}) })

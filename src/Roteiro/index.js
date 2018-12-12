@@ -35,22 +35,26 @@ class Roteiro extends Component {
         pecas: [],
         pecasFlat: [],
         conteudoExpandido: [],
+        somentePratica: false
     }
 
     componentDidMount() {
         const model = Maybe(this.props.history).bind(h => h.location).bind(l => l.state).maybe(false, s => s.model);
 
         if(model){
-            this.setState({model: {
-                ...model, 
-                idioma: model.idioma._id,
-                partes: [],
-                conteudo: {
-                    selected: [],
-                    original: [],
-                    filtrado: []
-                }
-            }})
+            this.setState({
+                somentePratica: model.conteudos.length == 0,
+                model: {
+                    ...model, 
+                    idioma: model.idioma._id,
+                    partes: [],
+                    conteudo: {
+                        selected: [],
+                        original: [],
+                        filtrado: []
+                    }
+                }                
+            })
         }     
 
         this.onGetData(false)
@@ -59,7 +63,7 @@ class Roteiro extends Component {
 
     componentWillUpdate(nextProps, nextState){
         if((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange){
-            this.props.onChange(nextState.model)
+            this.props.onChange({...nextState.model, somentePratica: nextState.somentePratica})
         }
     }
 
@@ -70,7 +74,7 @@ class Roteiro extends Component {
 
     render() {
         const {erros, loading} = this.props;
-        const { model, pecas, conteudoExpandido } = this.state;
+        const { model, pecas, conteudoExpandido, somentePratica } = this.state;
         
         return (
             <div style={{padding: 24}}>
@@ -80,14 +84,14 @@ class Roteiro extends Component {
                 </div>                
                 <Collapse bordered={false} defaultActiveKey={['geral', 'partes', 'teoria']} >
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['idioma', 'nome', 'curso', 'disciplina'])} contentQ={<p>....</p>} title="Informações gerais do roteiro" />} key='geral'>
-                        <FormGeral onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onChange={this.onChange} {...model} />
+                        <FormGeral somentePratica={somentePratica} onChangeSomentePratica={this.onChangeSomentePratica} onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Conhecimento Prático (CP)" />} key='partes'>
                         <FormPecas onUpdatePecas={this.onGetData} pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
+                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
-                    </Panel>
+                    </Panel>}
                 </Collapse>
                 {
                     this.props.match && (
@@ -101,8 +105,15 @@ class Roteiro extends Component {
         )
     }
 
+    onChangeSomentePratica = somentePratica => this.setState({somentePratica}, () => {
+        if(this.props.onChange){
+            this.props.onChange({...this.state.model, somentePratica})            
+        }
+    })
+
     onSubmit = () => {
-        onSaveRoteiro(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.model, ret => {
+        const {somentePratica} = this.state;
+        onSaveRoteiro(this.props.onOpenSnackbar, this.props.onSetAppState, {...this.state.model, somentePratica}, ret => {
             this.props.onOpenSnackbar(`O roteiro ${this.state.model.nome} foi salvo com sucesso!`, 'success');            
             this.props.onPush('/')
         })

@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { Form, Input, Select, Row, Col } from 'antd';
+import { Form, Input, Select, Row, Col, Checkbox } from 'antd';
 
 import { listaIdiomas } from '../utils/mock';
 
@@ -17,7 +17,7 @@ const props = {
     wrapperCol: { span: 14 },
 }
 
-const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma, generalidades, onOpenSnackbar }) => {
+const FormGeral = ({ nome, curso, disciplina, somentePratica, onChangeSomentePratica, erros, onChange, idioma, generalidades, onOpenSnackbar }) => {
 
     const _erros = {
         idioma: erros.campos.indexOf('idioma'),
@@ -65,7 +65,7 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                             help={erros.msgs[_erros.curso] || ''}
                             label='Curso'
                         >
-                            <Input  value={curso} onChange={e => onChange('curso')(e.target.value)} />
+                            <Input value={curso} onChange={e => onChange('curso')(e.target.value)} />
                         </FormItem>
                     </Col>
                     <Col span={5}>
@@ -80,6 +80,11 @@ const FormGeral = ({ nome, curso, disciplina, proposito, erros, onChange, idioma
                     <Col span={24}>
                         <FormItem label="Generalidades do roteiro">
                             <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} placeholder='Generalidade sobre o assunto da aula' />
+                        </FormItem>
+                    </Col>
+                    <Col span={24}>
+                        <FormItem>
+                            <Checkbox checked={somentePratica} onChange={e => onChangeSomentePratica(e.target.checked)}>Somente conteúdo prático</Checkbox>
                         </FormItem>
                     </Col>
                     {/* <Col span={12}>
