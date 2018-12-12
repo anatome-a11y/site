@@ -17,7 +17,7 @@ const props = {
 
 const columns = [
     {
-        title: 'Informação teórica',
+        title: 'Conhecimento teórico',
         dataIndex: 'frases',
         render: frases => frases.map((p, idx) => <div>{p}</div>)
     },
