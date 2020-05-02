@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { Form, Input, List, TreeSelect, Tree, Row, Col, Button, Modal } from 'antd';
 
 import PecaGenerica from '../Peca'
+import {withI18n} from '../messages/withI18n'
 
 import request from '../utils/request'
 
@@ -17,7 +18,7 @@ class FormPecas extends Component {
     }
 
     render() {
-        const { onChange, partes, pecas, erros,  } = this.props;
+        const { onChange, partes, pecas, erros, i18n } = this.props;
         const { buttons } = this.state;
 
         const treeProps = {
@@ -34,8 +35,6 @@ class FormPecas extends Component {
             partes: erros.campos.indexOf('partes'),
         }     
         
-        console.log()
-
         return (
             <Form layout="vertical">
                 <FormItem
@@ -51,12 +50,12 @@ class FormPecas extends Component {
                 <Modal
                     destroyOnClose={true}
                     width='80%'
-                    title="Novo conteúdo da peça"
+                    title={i18n('newPieceContent.title')}
                     visible={this.state.visible}
                     onOk={this.onSubmit}
                     onCancel={this.onCancel(false)}
-                    okText='Salvar'
-                    cancelText='Cancelar'
+                    okText={i18n('actions.save')}
+                    cancelText={i18n('actions.cancel')}
                     bodyStyle={{ padding: 0 }}
                     footer={null}
                 >
@@ -88,4 +87,4 @@ class FormPecas extends Component {
 
 
 
-export default FormPecas;
+export default withI18n(FormPecas);

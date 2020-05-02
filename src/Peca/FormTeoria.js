@@ -5,6 +5,7 @@ import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin, Row, C
 import Midia from '../components/Midia'
 import Label from '../components/Label'
 import { filter } from '../utils/data'
+import { withI18n } from '../messages/withI18n';
 
 const uuidv4 = require('uuid/v4');
 
@@ -65,15 +66,15 @@ class FormTeoria extends Component {
 
     render() {
         const { loading, open, toDelete } = this.state;
-        const { conteudoTeorico, onChangeConteudoTeorico, partes, onAddConteudoTeorico, onDeleteConteudoTeorico } = this.props;
+        const { conteudoTeorico, onChangeConteudoTeorico, partes, onAddConteudoTeorico, i18n } = this.props;
 
         return (
             <Form layout="vertical">
                 <Row gutter={16}>
                     <Col>
-                        <Label>Selecione uma ou mais partes anatômicas e, em seguida, informe o Conhecimento Teórico associado sem citar o nome da(s) parte(s). Acesse a ajuda ou exemplos para mais informações</Label>
+                        <Label>{i18n('newPieceContent.sections.theoricalKnowledge.description')}</Label>
                         <List
-                            style={{marginBottom: 20}}
+                            style={{ marginBottom: 20 }}
                             rowKey='_id'
                             size="small"
                             bordered={true}
@@ -92,8 +93,8 @@ class FormTeoria extends Component {
                                 </Item>)}
                         />
                         <div style={{ marginBottom: 20, marginRight: 0, textAlign: 'right' }}>
-                            <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />Adicionar CT</Button>
-                            <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />Adicionar CT a nova parte</Button>
+                            <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />{i18n('newPieceContent.sections.theoricalKnowledge.actions.add')}</Button>
+                            <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />{i18n('newPieceContent.sections.theoricalKnowledge.actions.addToNewPart')}</Button>
                         </div>
                     </Col>
                 </Row>
@@ -216,4 +217,4 @@ const _style = {
     textos: { display: 'flex', alignItems: 'center', flexDirection: 'column', width: '40%', marginRight: 5 }
 }
 
-export default FormTeoria;
+export default withI18n(FormTeoria);

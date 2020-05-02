@@ -6,6 +6,7 @@ import { filter } from '../utils/data'
 import Label from '../components/Label'
 
 import FormLocalizacao from './FormLocalizacao'
+import { withI18n } from '../messages/withI18n';
 
 const uuidv4 = require('uuid/v4');
 const { Option } = Select;
@@ -30,7 +31,7 @@ class FormMapa extends Component {
 
     render() {
         const { loading, open, toEditRefRel, erroLocalizacao } = this.state;
-        const { onChangeMapa, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros } = this.props;
+        const { onChangeMapa, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros, i18n } = this.props;
 
         const _erros = {
             mapa: erros.campos.indexOf('mapa'),
@@ -103,9 +104,9 @@ class FormMapa extends Component {
                         destroyOnClose={true}
                         title='Localização Relativa'
                         visible={open}
-                        okText='Salvar'
+                        okText={i18n('actions.save')}
                         onOk={() => this.onAppyChangeRefRel(this.state.toEditRefRel)}
-                        cancelText='Cancelar'
+                        cancelText={i18n('actions.cancel')}
                         onCancel={this.onClose}
                     >
                         <FormLocalizacao erroLocalizacao={erroLocalizacao} {...toEditRefRel} onChange={this.onChangeRefRel} partes={mapa.map(i => i.parte)} />
@@ -190,4 +191,4 @@ const _style = {
     textos: { display: 'flex', alignItems: 'center', flexDirection: 'column', width: '60%', marginRight: 5 }
 }
 
-export default FormMapa;
+export default withI18n(FormMapa);

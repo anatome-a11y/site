@@ -12,6 +12,7 @@ import { request, Maybe } from '../utils/data'
 import { withAppContext } from '../context';
 
 import { onSave as onSaveRoteiro } from '../Roteiro/utils';
+import { withI18n } from '../messages/withI18n';
 
 
 const Panel = Collapse.Panel;
@@ -73,7 +74,7 @@ class Roteiro extends Component {
 
 
     render() {
-        const {erros, loading} = this.props;
+        const {erros, loading, i18n} = this.props;
         const { model, pecas, conteudoExpandido, somentePratica } = this.state;
         
         return (
@@ -89,7 +90,7 @@ class Roteiro extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>....</p>} title="Conhecimento Prático (CP)" />} key='partes'>
                         <FormPecas onUpdatePecas={this.onGetData} pecas={pecas} erros={erros} onChange={this.onChange} {...model} />
                     </Panel>
-                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
+                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['conteudo'])} contentQ={<p>....</p>} title={i18n('newPieceContent.sections.theoricalKnowledge.title')} />} key='teoria'>
                         <FormTeoria erros={erros} onChange={this.onChangeConteudoRoteiro} {...model.conteudo} partes={model.partes} conteudoExpandido={conteudoExpandido} />                  
                     </Panel>}
                 </Collapse>
@@ -206,4 +207,4 @@ Roteiro.defaultProps = {
     onAddPeca: false
 }
 
-export default withAppContext(Roteiro)
+export default withAppContext(withI18n(Roteiro))

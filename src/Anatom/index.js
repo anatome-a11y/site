@@ -6,57 +6,57 @@ import { request, norm } from '../utils/data'
 import Header from '../components/Header'
 
 import { listaIdiomas } from '../utils/mock'
+import {withI18n} from '../messages/withI18n'
 
 const ButtonGroup = Button.Group;
 const Search = Input.Search;
 const Panel = Collapse.Panel;
 
-const colsAnatomp = [
+const _colsAnatomp = [
     {
-        title: 'Roteiro',
+        title: 'common.script',
         dataIndex: 'nome',
         key: 'nome',
     },
     {
-        title: 'Disciplina',
+        title: 'common.grade',
         dataIndex: 'roteiro.disciplina',
         key: 'roteiro.disciplina',
     },
     {
-        title: 'Curso',
+        title: 'common.course',
         dataIndex: 'roteiro.curso',
         key: 'roteiro.curso',
     },
     {
-        title: 'Instituição',
+        title: 'common.institute',
         dataIndex: 'instituicao',
         key: 'instituicao',
     },
 
 ]
 
-const colsRoteiro = [
+const _colsRoteiro = [
     {
-        title: 'Roteiro',
+        title: 'common.script',
         dataIndex: 'nome',
         key: 'nome',
     },
     {
-        title: 'Disciplina',
+        title: 'common.grade',
         dataIndex: 'disciplina',
         key: 'disciplina',
     },
     {
-        title: 'Curso',
+        title: 'common.course',
         dataIndex: 'curso',
         key: 'curso',
     },
     {
-        title: 'Idioma',
+        title: 'common.lang',
         dataIndex: 'idioma.name',
         key: 'idioma.name',
     },
-
 ]
 
 const Crud = ({ onEdit, onDelete }) => {
@@ -68,7 +68,6 @@ const Crud = ({ onEdit, onDelete }) => {
     )
 }
 
-const CardTitle = ({ children, loading }) => <div className='anatome-card-title'>{children}{loading ? <Spin size="small" style={{ marginLeft: 5 }} /> : null}</div>
 
 class Main extends Component {
 
@@ -85,16 +84,20 @@ class Main extends Component {
     }
 
     componentDidMount() {
+        console.log(this.props)
         this.onGetData();
     }
 
     render() {
-        const { loading, history } = this.props;
+        const { loading, history, i18n } = this.props;
         const { anatomp, roteiros, open, resourceToDelete } = this.state;
+
+        const colsAnatomp = _colsAnatomp.map(item => ({...item, title: i18n(item.title)}))
+        const colsRoteiro = _colsRoteiro.map(item => ({...item, title: i18n(item.title)}))
 
         return (
             <div style={{ padding: 24 }}>
-                <h2 className='section' style={{ textAlign: 'center', marginTop: 30 }}>Listas de roteiros</h2>
+                <h2 className='section' style={{ textAlign: 'center', marginTop: 30 }}>{i18n('home.title')}</h2>
                 <div style={{ textAlign: 'right', marginBottom: 5 }}>
                     <Popover content={
                         <div>
@@ -105,7 +108,7 @@ class Main extends Component {
                             </ul>
                         </div>
                     }>
-                        <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Ir para conteúdos das peças</Button>
+                        <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>{i18n('home.actions.goToScriptContent')}</Button>
                     </Popover>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['roteiro_digital', 'roteiro_com_peca']} >
@@ -117,14 +120,14 @@ class Main extends Component {
                                 <Popover placement='right' content={
                                     <div style={{ width: 300, textAlign: 'center' }}>Lista de p</div>
                                 }>
-                                    Conteúdos dos roteiros
+                                    {i18n('home.tables.scriptContent.title')}
                                 </Popover>
                             }
                             extra={
                                 <Popover content={
                                     <div style={{ width: 300, textAlign: 'center' }}>Cadastrar conteúdo de novo roteiro</div>
                                 }>
-                                    <Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar roteiro</Button>
+                                    <Button type='primary' onClick={() => history.push('/roteiro/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />{i18n('home.tables.scriptContent.actions.add')}</Button>
                                 </Popover>
                             }
                         />}
@@ -160,21 +163,21 @@ class Main extends Component {
                                 <Popover placement='right' content={
                                     <div style={{ width: 300, textAlign: 'center' }}>Roteiros prontos para os estudantes usarem no APP Anatome</div>
                                 }>
-                                    Roteiros setados
+                                    {i18n('home.tables.pinnedScripts.title')}
                                 </Popover>
                             }
                             extra={
                                 <Popover content={
                                     <div style={{ width: 300, textAlign: 'center' }}>Associar o nome das partes anatômicas do roteiro à sua localização nas peças</div>
                                 }>
-                                    <Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />Setar localização</Button>
+                                    <Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')} style={{ marginRight: 25 }}><Icon type='plus' />{i18n('home.tables.pinnedScripts.actions.pin')}</Button>
                                 </Popover>
                             }
                         />}
                         key='roteiro_com_peca'>
                         <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
-                                placeholder="Filtrar"
+                                placeholder={i18n('actions.filter')}
                                 onSearch={this.onFilterAnatomp}
                                 style={{ width: 200, marginRight: 5 }}
                             />
@@ -323,4 +326,4 @@ class Main extends Component {
 
 }
 
-export default withAppContext(Main);
+export default withAppContext(withI18n(Main));

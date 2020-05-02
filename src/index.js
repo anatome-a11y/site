@@ -11,10 +11,11 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { withRouter } from 'react-router'
 
 import { version } from '../package.json'
-
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
-const { Item } = Menu;
+import 'intl'
+import 'intl/locale-data/jsonp/pt-BR.js'
+import { IntlProvider } from 'react-intl'
+import { flattenMessages, messages } from './messages'
+import { withI18n } from './messages/withI18n';
 
 
 class Content extends React.Component {
@@ -39,7 +40,7 @@ class Content extends React.Component {
 	render() {
 
 		const { isLogged, zoom, loading, erros } = this.state;
-		const { history, location } = this.props;
+		const { history, i18n } = this.props;
 
 		return (
 			<div>
@@ -56,7 +57,7 @@ class Content extends React.Component {
 					<div id='anatome-title-bar' onClick={() => history.push('/')}>
 						<div id='anatome-title' style={{ display: 'flex', flexDirection: 'column', padding: 5, paddingLeft: 24 }}>
 							<span style={{ color: '#1890ff' }}>Anatome-AT<span id='anatome-version'>v.{version}</span></span>
-							<span style={{ opacity: 0.75, marginTop: -10 }}> Ferramenta de autoria Anatome</span>
+		<span style={{ opacity: 0.75, marginTop: -10 }}> {i18n('layout.subtitle')}</span>
 						</div>
 					</div>
 				</div>
@@ -101,12 +102,16 @@ class Content extends React.Component {
 	onSetAppState = state => this.setState(state)
 }
 
-const RoutingContent = withRouter(Content)
+const RoutingContent = withRouter(withI18n(Content))
+const intlMessages = flattenMessages(messages['en'])
+
 
 const Root = props => (
+	<IntlProvider locale="pt-BR" defaultLocale="pt-BR" messages={intlMessages}>
 	<Router>
 		<RoutingContent />
 	</Router>
+	</IntlProvider>
 )
 
 ReactDOM.render(<Root />, document.getElementById('root'));

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <!--
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#000000">
+  <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+  <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -20,108 +21,118 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Anatome-AT</title>
-    <style>
+  <title>Anatome-AT</title>
+  <style>
+    html {
+      font-size: 16px;
+    }
 
-      html{
-        font-size: 16px;
-      }
+    html * {
+      font-family: 'Roboto', sans-serif;
+      font-size: 1rem !important
+    }
 
-      html *{
-        font-family: 'Roboto', sans-serif;
-        font-size: 1rem !important
-      }
+    html .section,
+    html .section>span {
+      font-size: 2rem !important;
+      font-weight: 700;
+      color: #545454;
+      text-align: center;
+    }
 
-      html .section, html .section > span{
-        font-size: 2rem !important;
-        font-weight: 700;
-        color: #545454;
-        text-align: center;
-      }      
+    html,
+    body {
+      width: auto !important;
+      height: auto !important;
+      background-color: #fff !important
+    }
 
-      html, body{
-        width: auto !important;
-        height: auto !important;
-        background-color: #fff !important
-      }
+    .ant-collapse-header .arrow {
+      margin-top: 5px !important;
+    }
 
-      .ant-collapse-header .arrow{
-        margin-top: 5px !important;
-      }
+    .ant-collapse-header {
+      background-color: #e8e8e8
+    }
 
-      .ant-collapse-header{
-        background-color: #e8e8e8
-      }
+    .ant-collapse-content-box {
+      padding: 0 !important
+    }
 
-      .ant-collapse-content-box{
-        padding: 0 !important
-      }
+    .ant-form.ant-form-vertical {
+      padding: 16px !important
+    }
 
-      .ant-form.ant-form-vertical{
-        padding: 16px !important
-      }
+    .ant-modal-title {
+      font-size: 1.2rem !important
+    }
 
-      .ant-modal-title{
-        font-size: 1.2rem !important
-      }
+    .ant-card-head-title {
+      display: flex !important;
+      align-items: center !important
+    }
 
-      .ant-card-head-title{
-        display: flex !important;
-        align-items: center !important
-      }
+    .anatome-card-title {
+      font-size: 1.2rem !important;
+    }
 
-      .anatome-card-title{
-        font-size: 1.2rem !important;
-      }
+    .anatome-panel {
+      border-radius: 4px;
+      margin-bottom: 24px;
+      border: none !important;
+      overflow: hidden;
+    }
 
-      .anatome-panel{
-        border-radius: 4px;
-        margin-bottom: 24px;
-        border: 1px solid #d2d2d2;
-        overflow: hidden;
-  }
-
-  #anatome-title-bar{
-    display: flex;
-    background: #fafafa;
-    border-bottom: 1px solid #e8e8e8    
-  }  
-  
-
-    #anatome-title-bar #anatome-title{
-    cursor: pointer
-  }
-
-    #anatome-title-bar #anatome-title > span:first-child{
-    font-size: 2rem !important
-  }
+    #anatome-title-bar {
+      display: flex;
+      background: #fafafa;
+      border-bottom: 1px solid #e8e8e8
+    }
 
 
-  #anatome-title-bar #anatome-title #anatome-version{
-    font-size: 0.75rem !important
-  }
+    #anatome-title-bar #anatome-title {
+      cursor: pointer
+    }
 
-    </style>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyAOT-H2AS1LloHkXjEM8m0tbrkOILil6Pg",
-        authDomain: "doc-marcia.firebaseapp.com",
-        databaseURL: "https://doc-marcia.firebaseio.com",
-        projectId: "doc-marcia",
-        storageBucket: "doc-marcia.appspot.com",
-        messagingSenderId: "860721215295"
-      };
-      firebase.initializeApp(config);
-    </script>    
-    <!--
+    #anatome-title-bar #anatome-title>span:first-child {
+      font-size: 2rem !important
+    }
+
+
+    #anatome-title-bar #anatome-title #anatome-version {
+      font-size: 0.75rem !important
+    }
+
+    .ant-collapse-borderless {
+      background-color: #fff !important;
+    }
+
+    .ant-collapse-content{
+      border: 1px solid #e8e8e8;
+      border-top: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <div id="root"></div>
+  <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAOT-H2AS1LloHkXjEM8m0tbrkOILil6Pg",
+      authDomain: "doc-marcia.firebaseapp.com",
+      databaseURL: "https://doc-marcia.firebaseio.com",
+      projectId: "doc-marcia",
+      storageBucket: "doc-marcia.appspot.com",
+      messagingSenderId: "860721215295"
+    };
+    firebase.initializeApp(config);
+  </script>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -131,5 +142,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>

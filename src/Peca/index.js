@@ -13,6 +13,7 @@ import FormTeoria from './FormTeoria';
 
 import Header from '../components/Header'
 import { withAppContext } from '../context';
+import { withI18n } from '../messages/withI18n';
 
 const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
@@ -33,13 +34,13 @@ class Peca extends Component {
         submit: {
             key: 'btn-submit',
             type: 'primary',
-            children: 'Salvar',
+            children: this.props.i18n('actions.save'),
             size: 'large',
             onClick: () => this.onSave()
         },
         cancelar: {
             key: 'btn-cancelar',
-            children: 'Cancelar',
+            children: this.props.i18n('actions.cancel'),
             size: 'large',
             onClick: () => this.props.onClose(false)
         },
@@ -103,7 +104,7 @@ class Peca extends Component {
 
     render() {
         const { model, options, erros, open, pendencias, somentePratica } = this.state;
-        const {loading} = this.props;
+        const {loading, i18n} = this.props;
 
         const title = this.props.modo == 'assoc' ? false : (this.props.match.params.id ? 'Alteração do conteúdo da peça' : 'Cadastro de conteúdo da peça')
         return (
@@ -119,7 +120,7 @@ class Peca extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['partes'])} contentQ={<p>Seleção dos conteúdos das peças que são trabalhados em uma disciplina</p>} title="Conhecimento Prático (CP)" />} key='partes'>
                         <FormPartes onRemoveParte={this.onRemoveParte} somentePratica={somentePratica} {...model} erros={erros} onChange={this.onChange} onChangeParte={this.onChangeParte} />
                     </Panel>
-                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title="Conhecimento Teórico (CT)" />} key='teoria'>
+                    {!somentePratica && <Panel className='anatome-panel' header={<Header loading={loading} contentQ={<p>Roteiro com Peças Anatômicas Interativa (com localização já mapeada nas peças)</p>} title={i18n('newPieceContent.sections.theoricalKnowledge.title')} />} key='teoria'>
                         <FormTeoria {...model} onOpenSnackbar={this.props.onOpenSnackbar} erros={erros} onDeleteConteudoTeorico={this.onDeleteConteudoTeorico} onAddConteudoTeorico={this.onAddConteudoTeorico} onChange={this.onChange} onChangeConteudoTeorico={this.onChangeConteudoTeorico} />
                     </Panel>}
                 </Collapse>
@@ -336,4 +337,4 @@ Peca.defaultProps = {
 }
 
 
-export default withAppContext(Peca)
+export default withAppContext(withI18n(Peca))
