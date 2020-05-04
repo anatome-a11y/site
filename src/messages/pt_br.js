@@ -1,15 +1,17 @@
 export default {
-    commons: {
+    common: {
         script: 'Roteiro',
         grade: 'Disciplina',
         course: 'Curso',
         lang: 'Idioma',
         institute: 'Instituição',
+        relativeLocation: 'Loc. Relativa'
     },
     actions: {
         filter: 'Filtrar',
         cancel: 'Cancelar',
-        save: 'Salvar'
+        save: 'Salvar',
+        goBack: 'Voltar'
     },    
     layout: {
         subtitle: 'Ferramenta de autoria Anatome'
@@ -26,7 +28,7 @@ export default {
                     add: 'Cadastrar roteiro'
                 }
             },
-            pinnedScript: {
+            pinnedScripts: {
                 title: 'Roteiros setados',
                 actions: {
                     pin: 'Setar localização'
@@ -34,7 +36,7 @@ export default {
             }
         }
     },
-    newPieceContent: {
+    pieceContent: {
         title: 'Novo conteúdo da peça',
         sections: {
             theoricalKnowledge:{
@@ -48,6 +50,14 @@ export default {
         }
     },
     pinnedScript: {
-        
+        sections: {
+            assocBetweenNameAndLoc: {
+                title: 'Associação entre o nome e a localização da parte na peça',
+                description: 'Associe ao nome de cada parte anatômica o número da seta (ou etiqueta) que indica a sua localização na peça física',
+            }
+        },
+        actions: {
+            save: 'Salvar roteiro setado'
+        }        
     }  
 }

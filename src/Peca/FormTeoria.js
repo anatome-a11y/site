@@ -72,7 +72,7 @@ class FormTeoria extends Component {
             <Form layout="vertical">
                 <Row gutter={16}>
                     <Col>
-                        <Label>{i18n('newPieceContent.sections.theoricalKnowledge.description')}</Label>
+                        <Label>{i18n('pieceContent.sections.theoricalKnowledge.description')}</Label>
                         <List
                             style={{ marginBottom: 20 }}
                             rowKey='_id'
@@ -93,8 +93,8 @@ class FormTeoria extends Component {
                                 </Item>)}
                         />
                         <div style={{ marginBottom: 20, marginRight: 0, textAlign: 'right' }}>
-                            <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />{i18n('newPieceContent.sections.theoricalKnowledge.actions.add')}</Button>
-                            <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />{i18n('newPieceContent.sections.theoricalKnowledge.actions.addToNewPart')}</Button>
+                            <Button ghost type='primary' disabled={loading} style={{ marginRight: 5 }} onClick={onAddConteudoTeorico()}><Icon type="plus" />{i18n('pieceContent.sections.theoricalKnowledge.actions.add')}</Button>
+                            <Button ghost type='primary' disabled={loading} onClick={onAddConteudoTeorico(true)}><Icon type="plus" />{i18n('pieceContent.sections.theoricalKnowledge.actions.addToNewPart')}</Button>
                         </div>
                     </Col>
                 </Row>

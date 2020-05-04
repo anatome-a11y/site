@@ -50,7 +50,7 @@ class FormPecas extends Component {
                 <Modal
                     destroyOnClose={true}
                     width='80%'
-                    title={i18n('newPieceContent.title')}
+                    title={i18n('pieceContent.title')}
                     visible={this.state.visible}
                     onOk={this.onSubmit}
                     onCancel={this.onCancel(false)}

@@ -12,6 +12,7 @@ import { withAppContext } from '../context';
 import Header from '../components/Header';
 
 import { onSave as onSaveAnatomp } from '../Anatomp/utils';
+import { withI18n } from '../messages/withI18n';
 
 const uuidv4 = require('uuid/v4');
 const Panel = Collapse.Panel;
@@ -135,7 +136,7 @@ class Anatomp extends Component {
 
 
     render() {
-        const { erros, loading, modo, match } = this.props;
+        const { erros, loading, modo, match, i18n } = this.props;
         const { model, options } = this.state;
 
         const title = modo == 'assoc' ? 'Associação de peça física' : (match.params.id ? 'Alteração de roteiro setado' : 'Cadastro de roteiro setado')
@@ -175,7 +176,7 @@ class Anatomp extends Component {
                             <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>Peça física</Button>
                         </div>
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Associação entre o nome e a localização da parte na peça" />} key='mapeamento'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title={i18n('pinnedScript.sections.assocBetweenNameAndLoc.title')} />} key='mapeamento'>
                         <FormMapa
                             {...model}
                             erros={erros}
@@ -190,8 +191,8 @@ class Anatomp extends Component {
                 {
                     modo != 'assoc' && (
                         <div style={{textAlign: 'center'}}>
-                            <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
-                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>Salvar roteiro setado</Button>
+                            <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>{i18n('actions.goBack')}</Button>
+                            <Button type='primary' icon='check' onClick={this.onSubmit} size='large'>{i18n('pinnedScript.actions.save')}</Button>
                         </div>
                     )
                 }                
@@ -449,4 +450,4 @@ Anatomp.defaultProps = {
 }
 
 
-export default withAppContext(Anatomp)
+export default withAppContext(withI18n(Anatomp))

@@ -43,7 +43,7 @@ class FormMapa extends Component {
                     validateStatus={_erros.mapa != -1 ? 'error' : ''}
                     help={erros.msgs[_erros.mapa] || ''}
                 >
-                    <Label>Associe ao nome de cada parte anatômica o número da seta (ou etiqueta) que indica a sua localização na peça física</Label>
+                    <Label>{i18n('pinnedScript.sections.assocBetweenNameAndLoc.description')}</Label>
                     <List                        
                         rowKey='_id'
                         size="small"
@@ -70,7 +70,7 @@ class FormMapa extends Component {
                                                     <Item key={itemLoc._id} actions={[
                                                         <div>
                                                             <Checkbox checked={hasRefRel} onChange={this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc, item)}/>
-                                                            <a onClick={() => this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc, item)({target: {checked: true}})}>Loc. Relativa</a>
+                                                    <a onClick={() => this.onOpenRefRel(itemLoc.referenciaRelativa, idx, idxLoc, item)({target: {checked: true}})}>{i18n('common.relativeLocation')}</a>
                                                         </div>,
                                                         <Tooltip title='Excluir'><Button type='primary' ghost onClick={onRemovePecaFisica(idx, idxLoc)} icon='delete' shape='circle' /></Tooltip>
                                                     ]}>

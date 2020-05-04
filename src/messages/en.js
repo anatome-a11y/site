@@ -5,11 +5,13 @@ export default {
         course: 'Course',
         lang: 'Language',
         institute: 'Institute',
+        relativeLocation: 'Relative loc.'
     },
     actions: {
         filter: 'Filter',
         cancel: 'Cancel',
-        save: 'Save'        
+        save: 'Save',
+        goBack: 'Go back'       
     },    
     layout: {
         subtitle: 'Anatome Authoring Tool'
@@ -34,7 +36,7 @@ export default {
             }
         }
     },
-    newPieceContent: {
+    pieceContent: {
         title: 'New piece content',
         sections: {
             theoricalKnowledge:{
@@ -46,5 +48,16 @@ export default {
                 }
             }
         }
-    } 
+    },
+    pinnedScript: {
+        sections: {
+            assocBetweenNameAndLoc: {
+                title: 'Association between the part\'s name and location on the part',
+                description: 'Associate the name of each anatomical part with the number of the arrow (or label) that indicates its location on the physical part',            
+            }
+        },
+        actions: {
+            save: 'Save pinned script'
+        }            
+    }     
 }

@@ -4,7 +4,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import 'antd/dist/antd.css';
-import { Menu, Icon, message, Button, Divider } from 'antd';
+import { Menu, Icon, message, Button, Divider, Select } from 'antd';
 import { injectGlobal } from 'styled-components';
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -40,7 +40,7 @@ class Content extends React.Component {
 	render() {
 
 		const { isLogged, zoom, loading, erros } = this.state;
-		const { history, i18n } = this.props;
+		const { history, i18n, lang, onChangeLang } = this.props;
 
 		return (
 			<div>
@@ -48,6 +48,11 @@ class Content extends React.Component {
 					<div style={{ backgroundColor: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #d9d9d9' }}>
 						<div></div>
 						<div>
+							<Select style={{minWidth: 100}} value={lang} onChange={onChangeLang}>
+								<Select.Option value="pt-BR">PT-BR</Select.Option>
+								<Select.Option value="en">EN</Select.Option>
+							</Select>
+							<Divider type='vertical' />
 							<Button type='primary' ghost shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
 							<Divider type='vertical' />
 							<Button type='primary' ghost disabled={zoom == 16} onClick={this.onZoomOut} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A-</Button>
@@ -57,7 +62,7 @@ class Content extends React.Component {
 					<div id='anatome-title-bar' onClick={() => history.push('/')}>
 						<div id='anatome-title' style={{ display: 'flex', flexDirection: 'column', padding: 5, paddingLeft: 24 }}>
 							<span style={{ color: '#1890ff' }}>Anatome-AT<span id='anatome-version'>v.{version}</span></span>
-		<span style={{ opacity: 0.75, marginTop: -10 }}> {i18n('layout.subtitle')}</span>
+							<span style={{ opacity: 0.75, marginTop: -10 }}> {i18n('layout.subtitle')}</span>
 						</div>
 					</div>
 				</div>
@@ -103,16 +108,26 @@ class Content extends React.Component {
 }
 
 const RoutingContent = withRouter(withI18n(Content))
-const intlMessages = flattenMessages(messages['en'])
 
+const langs = []
 
-const Root = props => (
-	<IntlProvider locale="pt-BR" defaultLocale="pt-BR" messages={intlMessages}>
-	<Router>
-		<RoutingContent />
-	</Router>
-	</IntlProvider>
-)
+class Root extends React.Component {
+	state = {
+		lang: 'en'
+	}
+
+	onChangeLang = (lang) => this.setState({lang})
+
+	render() {
+		return (
+			<IntlProvider locale="pt-BR" defaultLocale="pt-BR" messages={flattenMessages(messages[this.state.lang])}>
+				<Router>
+					<RoutingContent lang={this.state.lang} onChangeLang={this.onChangeLang} />
+				</Router>
+			</IntlProvider>
+		)
+	}
+}
 
 ReactDOM.render(<Root />, document.getElementById('root'));
 registerServiceWorker();
