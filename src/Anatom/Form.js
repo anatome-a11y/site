@@ -11,7 +11,7 @@ import { onSave as onSaveAnatomp, onValidate as onValidateMapeamento } from '../
 import { withAppContext } from '../context';
 
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 class Form extends Component {
 

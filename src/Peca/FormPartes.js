@@ -4,7 +4,7 @@ import { Form, Input, Button, Tag, Row, Col, Icon } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import Label from '../components/Label'
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const FormItem = Form.Item;
 

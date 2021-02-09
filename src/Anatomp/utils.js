@@ -1,5 +1,5 @@
 import { request } from '../utils/data'
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 export const onValidate = model => {
     const { nome, roteiro, instituicao, pecasFisicas, mapa } = model;

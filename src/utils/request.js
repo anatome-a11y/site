@@ -5,7 +5,7 @@ const post = (path, body, reject, resolve) => {
 			data: 'Corpo da mensagem não informado'
 		})
 	}else{
-		const uuidv4 = require('uuid/v4');
+		const { v4: uuidv4 } = require('uuid');
 		const _id = uuidv4();		
 		const previous = localStorage.getItem(path);
 		const previousJS = previous == null ? [] : JSON.parse(previous);

@@ -13,7 +13,7 @@ import Header from '../components/Header';
 
 import { onSave as onSaveAnatomp } from '../Anatomp/utils';
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const Panel = Collapse.Panel;
 const Item = List.Item;
 

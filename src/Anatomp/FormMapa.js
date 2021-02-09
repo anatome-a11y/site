@@ -7,7 +7,7 @@ import Label from '../components/Label'
 
 import FormLocalizacao from './FormLocalizacao'
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const { Option } = Select;
 
 const { Item } = List;
