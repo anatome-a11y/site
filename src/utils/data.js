@@ -7,7 +7,7 @@ export const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").
 
 export const filter = (input, option) => norm(option.props.children).indexOf(norm(input)) >= 0
 
-export const request = (path, options = {}) => fetch('https://frozen-thicket-97625.herokuapp.com/' + path, {headers, ...options}).then(r => r.json())
+export const request = (path, options = {}) => fetch('http://localhost:8080/' + path, {headers, ...options}).then(r => r.json())
 
 export const isEmpty = (prop) => (
     prop === null ||
