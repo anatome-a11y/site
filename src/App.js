@@ -11,6 +11,9 @@ import FormRoteiro from './Roteiro'
 import FormMapeamento from './Anatomp'
 import FormPeca from './Peca'
 
+//
+import Correcao from './Correcao'
+
 
 class App extends Component {
     state = {
@@ -37,6 +40,9 @@ class App extends Component {
                         <Route exact path="/peca/cadastrar" component={FormPeca} />                        
                         <Route exact path="/peca/editar/:id" component={FormPeca} />                                                 
                         <Route exact path="/pecas" component={ListPecas} />
+
+                        <Route exact path="/correcao" component={Correcao} />
+
                     </Switch>
             </AppContext.Provider>
         )
