@@ -1,7 +1,7 @@
 import React from 'react';
 import { Collapse } from 'antd';
 
-import Header from '../components/Header'
+import Header from '../../components/Header'
 
 const Panel = Collapse.Panel;
 

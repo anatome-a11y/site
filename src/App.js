@@ -12,7 +12,7 @@ import FormMapeamento from './Anatomp'
 import FormPeca from './Peca'
 
 //
-import Correcao from './Correcao'
+import TelaCorrecao from './TelaCorrecao'
 
 
 class App extends Component {
@@ -41,7 +41,7 @@ class App extends Component {
                         <Route exact path="/peca/editar/:id" component={FormPeca} />                                                 
                         <Route exact path="/pecas" component={ListPecas} />
 
-                        <Route exact path="/correcao" component={Correcao} />
+                        <Route exact path="/correcao" component={TelaCorrecao} />
 
                     </Switch>
             </AppContext.Provider>
