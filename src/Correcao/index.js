@@ -1,17 +1,16 @@
-import React from 'react'
+import React, { Fragment } from 'react';
+
+import Titulo from './Titulo'
+import Barra from './Barra'
 
 const Correcao = () => {
-    const title = 'Corrigir avaliação';
-    const modo = 'assoc';
-
     return (
-        <div style={{padding: 24}}>
-            <h2
-                className='section'
-                style={{textAlign: 'center', marginTop: modo === 'assoc' ? 0 : 30}}>
-                {title}
-            </h2>
-        </div>
+        <Fragment>
+        <Titulo title='Corrigir avaliação' modo='assoc' />
+        <Barra title='Informações gerais da avaliação selecionada' >
+            <div>CONTEUDO</div>
+        </Barra>
+        </Fragment>
     )
 }
 
