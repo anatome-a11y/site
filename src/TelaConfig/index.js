@@ -9,24 +9,13 @@ import Conhecimento from './components/Conhecimento'
 import Localizacao from './components/Localizacao'
 import Tentativas from './components/Tentativas'
 
+import useConf from './config/useConf'
+
 const TelaConfig = ({history}) => {
 
-    const conf = { 
-        entrada: {value:3},
-        apresentacao: {value:4},
-        conhecimento: {
-            value:2,
-            voz:30,
-            teclado:40,
-        },
-        localizacao: {
-            value:3,
-            nfc:10,
-            voz:20,
-            teclado:30,
-        },
-        tentativas: {value:3},
-    }
+    const {conf,edit,save,reset} = useConf()
+
+    if(!conf) { return <div></div> }
 
     return (
         <Fragment>
