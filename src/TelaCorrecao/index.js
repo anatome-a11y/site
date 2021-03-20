@@ -1,10 +1,12 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from 'react'
+
+import { Button } from 'antd'
 
 import Titulo from './componentes/Titulo'
 import Barra from './componentes/Barra'
 import CabecalhoAvaliacao from './componentes/CabecalhoAvaliacao'
 import Seta from './componentes/Seta'
-import QuestaoAvaliacao from './componentes/QuestaoAvaliacao'
+import Questao from './componentes/Questao'
 
 import { useQuestao } from './avaliacao'
 
@@ -14,11 +16,13 @@ const TelaCorrecao = ({history,idAvaliacao}) => {
 
     return (
         <Fragment>
+
         <Titulo 
           title='Corrigir avaliação' 
           textoBotao='Voltar para página inicial' 
           acaoBotao={ () => history.push('/') }
         />
+
         <Barra title='Informações gerais da avaliação selecionada' >
 
            <Fragment>
@@ -29,13 +33,19 @@ const TelaCorrecao = ({history,idAvaliacao}) => {
 
            <div style={{display:'flex'}}>
                <Seta direction='left' onClick={anterior} enable={temAnterior} />
-               { questao ? <QuestaoAvaliacao quest={questao} /> : null }
+               <div style={{width:'100%'}}>{ questao ? <Questao quest={questao} /> : null }</div>
                <Seta direction='right' onClick={proxima} enable={temProxima} />
+           </div>
+
+           <div style={{width:'100%',display:'flex',justifyContent:'center',margin:24}}>
+                <Button style={{margin:5}} icon='save' type='primary'>Salvar/Continuar</Button>
+                <Button style={{margin:5}} icon='arrow-down' type='primary'>Enviar/FinalizarContinuar</Button>
            </div>
 
            </Fragment>
 
         </Barra>
+
         </Fragment>
     )
 }

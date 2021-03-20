@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { Typography } from 'antd'
+import { Typography , Checkbox } from 'antd'
 
 const Text = Typography.Text
 const Title = Typography.Title
 
-const CardQuestaoResposta = ({res,style}) => {
+const CardQuestaoResposta = ({res,style,onCheck}) => {
 
     const bg = ( style && style.backgroundColor ) ? style.backgroundColor : '#f3f3f3'
 
@@ -23,11 +23,16 @@ const CardQuestaoResposta = ({res,style}) => {
 
             <div style={{display:'flex',flexDirection:'column',backgroundColor:bg,padding:5}}>
 
-                <Text type="secondary" style={{textAlign:'center',width:'100%'}}>
+                <Text type="secondary" style={{textAlign:'center',width:'100%',marginBottom:5}}>
                     Parte {res.numero}
                 </Text>
 
-                <div>{res.nome}</div>
+                <div style={{display:'flex'}}>
+                    <div style={{flex:1}}>{res.nome}</div>
+                    <div style={{flex:1,textAlign:'right'}}>
+                        <Checkbox onChange={ ({target}) => onCheck(target.checked) } />
+                    </div>
+                </div>
 
             </div>
 

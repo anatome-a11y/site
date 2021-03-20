@@ -2,11 +2,11 @@ import React from 'react'
 
 import { Input } from 'antd'
 
-import CardQuestaoResposta from './CardQuestaoResposta'
+import CardResposta from './CardResposta'
 
 const { TextArea } = Input
 
-const QuestaoAvaliacao = ({quest}) => {
+const Questao = ({quest}) => {
    return (
        <div style={{
            width:'100%',
@@ -17,12 +17,12 @@ const QuestaoAvaliacao = ({quest}) => {
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
          <div style={{padding:10}}>Resposta do aluno</div>
-         <CardQuestaoResposta res={quest.respostaAluno} />
+         <CardResposta res={quest.respostaAluno} onCheck={ (v) => console.log(v) } />
        </div>
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
          <div style={{padding:10}}>Correção do sistema</div>
-         <CardQuestaoResposta res={quest.correcaoSistema} style={{backgroundColor:'#eaf7fd'}} />
+         <CardResposta res={quest.correcaoSistema} onCheck={ (v) => console.log(v) } style={{backgroundColor:'#eaf7fd'}} />
        </div>
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
@@ -34,4 +34,4 @@ const QuestaoAvaliacao = ({quest}) => {
    ) 
 }
 
-export default QuestaoAvaliacao
+export default Questao
