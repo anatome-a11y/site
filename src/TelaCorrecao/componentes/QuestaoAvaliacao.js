@@ -1,9 +1,35 @@
 import React from 'react'
 
+import { Input } from 'antd'
+
+import CardQuestaoResposta from './CardQuestaoResposta'
+
+const { TextArea } = Input
+
 const QuestaoAvaliacao = ({quest}) => {
    return (
-       <div>
-           {quest.respostaAluno.descricao}
+       <div style={{
+           width:'100%',
+           display:'flex',
+           justifyContent:'center',
+           alignItems:'stretch',
+       }}>
+
+       <div style={{display:'flex',flexDirection:'column',flex:1}}>
+         <div style={{padding:10}}>Resposta do aluno</div>
+         <CardQuestaoResposta res={quest.respostaAluno} />
+       </div>
+
+       <div style={{display:'flex',flexDirection:'column',flex:1}}>
+         <div style={{padding:10}}>Correção do sistema</div>
+         <CardQuestaoResposta res={quest.correcaoSistema} style={{backgroundColor:'#eaf7fd'}} />
+       </div>
+
+       <div style={{display:'flex',flexDirection:'column',flex:1}}>
+         <div style={{padding:10}}>Considerações do professor</div>
+         <TextArea style={{flex:1}}/>
+       </div>
+
        </div>
    ) 
 }

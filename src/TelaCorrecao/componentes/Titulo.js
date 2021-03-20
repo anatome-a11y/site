@@ -13,7 +13,7 @@ const Titulo = ({title,textoBotao,acaoBotao}) => {
             justifyContent: 'center',
         }}>
             <div style={{flex:1}}></div>
-            <h2 style={{flex:1}}className='section'>{title}</h2>
+            <h2 style={{flex:1}} className='section'>{title}</h2>
             <div style={{
                 flex:1,
                 display:'flex',

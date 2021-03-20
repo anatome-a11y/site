@@ -9,7 +9,7 @@ const db = {
         [
             Questao(
               Parte('Crânio',34,'Maxila','Osso par irregular e suporta a arcada dentária superior'),
-              Parte('Crânio',34,'Maxila','Osso par irregular e pneumático da face lorem impsum etc'),
+              Parte('Crânio',34,'Maxila','Osso par irregular e pneumático da face lorem impsum etcaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
               '',
             ),
             Questao(

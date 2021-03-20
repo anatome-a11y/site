@@ -9,7 +9,7 @@ const Barra = ({title,children}) => {
 
     return (
         <div style={{ paddingLeft: 24 , paddingRight: 24 }}>
-            <Collapse bordered={false}>
+            <Collapse bordered={false} style={{backgroundColor:'white'}}>
                 <Panel className='anatome-panel' header={
                     <Header 
                       contentQ={<p>....</p>} 
