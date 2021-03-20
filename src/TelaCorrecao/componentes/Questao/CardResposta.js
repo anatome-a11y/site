@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { Typography , Checkbox } from 'antd'
+import { Typography , Checkbox , Button } from 'antd'
 
 const Text = Typography.Text
 const Title = Typography.Title
 
-const CardQuestaoResposta = ({res,style,onCheck}) => {
+const CardQuestaoResposta = ({res,style,onCheck,onEdit}) => {
 
     const bg = ( style && style.backgroundColor ) ? style.backgroundColor : '#f3f3f3'
 
@@ -18,7 +18,13 @@ const CardQuestaoResposta = ({res,style,onCheck}) => {
 
             <div style={{display:'flex',backgroundColor:bg,marginBottom:5,padding:5}}>
                 <div style={{flex:1}}>{res.pai}</div>
-                <div style={{flex:1,textAlign:'right'}}></div>
+                { onEdit 
+               ? <div style={{flex:1,textAlign:'right'}}>
+                   <Button onClick={onEdit} type='secondary' icon='edit'></Button> 
+                   <Button type='secondary' icon='delete'></Button> 
+                 </div>
+               : <div style={{flex:1,textAlign:'right'}}></div>
+                }
             </div>
 
             <div style={{display:'flex',flexDirection:'column',backgroundColor:bg,padding:5}}>
@@ -30,7 +36,10 @@ const CardQuestaoResposta = ({res,style,onCheck}) => {
                 <div style={{display:'flex'}}>
                     <div style={{flex:1}}>{res.nome}</div>
                     <div style={{flex:1,textAlign:'right'}}>
-                        <Checkbox onChange={ ({target}) => onCheck(target.checked) } />
+                        <Checkbox 
+                            value={res.correta} 
+                            onChange={ ({target}) => onCheck(target.checked) } 
+                        />
                     </div>
                 </div>
 
