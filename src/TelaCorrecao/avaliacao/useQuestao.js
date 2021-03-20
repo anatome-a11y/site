@@ -7,26 +7,34 @@ const useQuestao = (idAvaliacao) => {
     const [avaliacao,setAvaliacao] = useState(null)
     const [questao,setQuestao] = useState(null)
     const [idQuestao,setIdQuestao] = useState(null)
+
     const [temProxima,setTemProxima] = useState(false)
+    const [temAnterior,setTemAnterior] = useState(false)
 
     // executa 1 vez no inicio para setar a avaliacao
-    // e a primeira questao
-    useEffect( () => {
-        setAvaliacao( service.getAvaliacao(idAvaliacao) )
+    // e o id
+    useEffect( () => { 
+        setAvaliacao( service.getAvaliacao(idAvaliacao) ) 
         setIdQuestao(0)
-    },[])
+    } ,[])
 
     // toda vez que o idQuestao mudar chama essa funcao
     useEffect( () => {
-        if (avaliacao) { 
-            setQuestao( avaliacao.questoes[idQuestao] ) 
-            setTemProxima( avaliacao.questoes[idQuestao+1] ? true : false )
-        }
+
+        if( avaliacao && avaliacao.questoes[idQuestao+1] ) { setTemProxima(true) }
+        else { setTemProxima(false) }
+
+        if( avaliacao && avaliacao.questoes[idQuestao-1] ) { setTemAnterior(true) }
+        else { setTemAnterior(false) }
+
+        if (avaliacao) { setQuestao( avaliacao.questoes[idQuestao] ) }
+
     },[idQuestao])
 
-    // expoe a avaliacao atual , a questao atual , 
-    // a funcao de mudar ela e se temos uma proxima questao
-    return {avaliacao,questao,setIdQuestao,temProxima}
+    const proxima = () => setIdQuestao( (old) => temProxima ? old+1 : old )
+    const anterior = () => setIdQuestao( (old) => temAnterior ? old-1 : old )
+
+    return {avaliacao,questao,proxima,anterior,temProxima,temAnterior}
 
 } 
 
