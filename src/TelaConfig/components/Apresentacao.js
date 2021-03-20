@@ -4,7 +4,7 @@ import { Radio } from 'antd'
 
 const Apresentacao = ({apr,onChange}) => {
    return (
-       <Fragment>
+       <div style={{padding:10}}>
         <div style={{marginBottom:5}}>
             <span style={{fontWeight:'bold'}}>Leitor de tela: </span>
             <span style={{color:'#4facf0'}}>DESATIVADO</span>
@@ -19,7 +19,7 @@ const Apresentacao = ({apr,onChange}) => {
           <Radio value={4}>Texto</Radio>
           <hr align='left' width='50%'/>
        </Radio.Group>
-       </Fragment>
+       </div>
    )
 }
 

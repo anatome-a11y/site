@@ -6,6 +6,7 @@ import Header from './components/Header'
 import Entrada from './components/Entrada'
 import Apresentacao from './components/Apresentacao'
 import Conhecimento from './components/Conhecimento'
+import Localizacao from './components/Localizacao'
 
 const TelaConfig = ({history}) => {
 
@@ -16,6 +17,12 @@ const TelaConfig = ({history}) => {
             value:2,
             voz:30,
             teclado:40,
+        },
+        localizacao: {
+            value:3,
+            nfc:10,
+            voz:20,
+            teclado:30,
         },
     }
 
@@ -41,7 +48,7 @@ const TelaConfig = ({history}) => {
             <Header style={{flex:1,marginBottom:100}} title="Interação" >
                 <div style={{display:'flex'}}>
                     <Conhecimento con={conf.conhecimento} /> 
-                    <Conhecimento con={conf.conhecimento} /> 
+                    <Localizacao loc={conf.localizacao} /> 
                 </div>
             </Header>
 

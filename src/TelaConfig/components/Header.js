@@ -15,7 +15,7 @@ const Header = ({style,title,children}) => {
                {title}
            </div>
 
-           <div style={{flex:1,border:'1px solid #d2d2d2',padding:10}}>
+           <div style={{flex:1,border:'1px solid #d2d2d2'}}>
                {children}
            </div>
 
