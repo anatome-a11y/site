@@ -5,7 +5,7 @@ import { Typography , Checkbox , Button } from 'antd'
 const Text = Typography.Text
 const Title = Typography.Title
 
-const CardQuestaoResposta = ({res,style,onCheck,onEdit}) => {
+const CardQuestaoResposta = ({res,style,onCheck,onEdit,onTrash}) => {
 
     const bg = ( style && style.backgroundColor ) ? style.backgroundColor : '#f3f3f3'
 
@@ -21,7 +21,7 @@ const CardQuestaoResposta = ({res,style,onCheck,onEdit}) => {
                 { onEdit 
                ? <div style={{flex:1,textAlign:'right'}}>
                    <Button onClick={onEdit} type='secondary' icon='edit'></Button> 
-                   <Button type='secondary' icon='delete'></Button> 
+                   <Button onClick={onTrash} type='secondary' icon='delete'></Button> 
                  </div>
                : <div style={{flex:1,textAlign:'right'}}></div>
                 }

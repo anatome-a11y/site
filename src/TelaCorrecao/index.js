@@ -22,7 +22,8 @@ const TelaCorrecao = ({history}) => {
         proxima,
         anterior,
         temProxima,
-        temAnterior
+        temAnterior,
+        backup,
     } = useQuestao(avaliacao,setAvaliacao)
 
     return (
@@ -44,7 +45,7 @@ const TelaCorrecao = ({history}) => {
 
            <div style={{display:'flex'}}>
                <Seta direction='left' onClick={anterior} enable={temAnterior} />
-               <div style={{width:'100%'}}>{ questao ? <Questao edit={edita} quest={questao} /> : null }</div>
+               <div style={{width:'100%'}}>{ questao ? <Questao edit={edita} backup={backup} quest={questao} /> : null }</div>
                <Seta direction='right' onClick={proxima} enable={temProxima} />
            </div>
 

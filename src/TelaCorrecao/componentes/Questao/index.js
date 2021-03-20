@@ -1,4 +1,4 @@
-import React , { useState } from 'react'
+import React , { useState , useEffect } from 'react'
 
 import { Input } from 'antd'
 
@@ -7,9 +7,19 @@ import CardRespostaEdit from './CardRespostaEdit'
 
 const { TextArea } = Input
 
-const Questao = ({quest,edit}) => {
+const Questao = ({quest,backup,edit}) => {
 
    const [editando,setEditando] = useState(false)
+
+   const editSistema = (field,value) => edit({ 
+        ...quest,
+        correcaoSistema:{...quest.correcaoSistema,[field]:value} 
+    })
+
+    const editRespostaAluno = (value) => edit({ 
+        ...quest,
+        correcaoSistema:{...quest.respostaAluno,correta:value} 
+    })
 
    return (
        <div style={{
@@ -21,10 +31,7 @@ const Questao = ({quest,edit}) => {
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
          <div style={{padding:10}}>Resposta do aluno</div>
-         <CardResposta res={quest.respostaAluno} onCheck={ (value) => edit({ 
-                ...quest,
-                correcaoSistema:{...quest.respostaAluno,correta:value} 
-            })} 
+         <CardResposta res={quest.respostaAluno} onCheck={editRespostaAluno}
             style={{backgroundColor:'#eaf7fd'}} 
          />
        </div>
@@ -34,15 +41,14 @@ const Questao = ({quest,edit}) => {
          { editando 
         ? <CardRespostaEdit 
             onEdit={ () => setEditando(false) }
+            onTrash={backup}
             res={quest.correcaoSistema} 
-            edit={ (field,value) => edit({ 
-                    ...quest,
-                    correcaoSistema:{...quest.correcaoSistema,[field]:value} 
-                })} 
+            edit={editSistema}
             style={{backgroundColor:'#eaf7fd'}} 
          />
-        : <CardResposta res={quest.respostaAluno} 
+        : <CardResposta res={quest.correcaoSistema} 
             onEdit={ () => setEditando(true) }
+            onTrash={backup}
             onCheck={ (value) => edit({ 
                 ...quest,
                 correcaoSistema:{...quest.correcaoSistema,correta:value} 
