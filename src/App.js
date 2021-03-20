@@ -13,6 +13,7 @@ import FormPeca from './Peca'
 
 //
 import TelaCorrecao from './TelaCorrecao'
+import TelaConfig from './TelaConfig'
 
 
 class App extends Component {
@@ -42,6 +43,7 @@ class App extends Component {
                         <Route exact path="/pecas" component={ListPecas} />
 
                         <Route exact path="/correcao" component={TelaCorrecao} />
+                        <Route exact path="/config" component={TelaConfig} />
 
                     </Switch>
             </AppContext.Provider>

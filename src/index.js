@@ -47,6 +47,7 @@ class Content extends React.Component {
 					<div style={{ backgroundColor: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #d9d9d9' }}>
 						<div></div>
 						<div>
+							<Button type='primary' onClick={ () => history.push('/config')}ghost shape='circle' icon='setting' style={{ margin: '4px 4px' }} />
 							<Button type='primary' ghost shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
 							<Divider type='vertical' />
 							<Button type='primary' ghost disabled={zoom == 16} onClick={this.onZoomOut} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A-</Button>
