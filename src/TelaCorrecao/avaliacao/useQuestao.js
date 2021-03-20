@@ -2,39 +2,44 @@ import { useState , useEffect } from 'react'
 
 import * as service from './service'
 
-const useQuestao = (idAvaliacao) => {
+const useQuestao = (avaliacao,setAvaliacao) => {
 
-    const [avaliacao,setAvaliacao] = useState(null)
     const [questao,setQuestao] = useState(null)
     const [idQuestao,setIdQuestao] = useState(null)
 
     const [temProxima,setTemProxima] = useState(false)
     const [temAnterior,setTemAnterior] = useState(false)
 
-    // executa 1 vez no inicio para setar a avaliacao
-    // e o id
-    useEffect( () => { 
-        setAvaliacao( service.getAvaliacao(idAvaliacao) ) 
-        setIdQuestao(0)
-    } ,[])
+    useEffect( () => { setIdQuestao(0) } ,[])
 
-    // toda vez que o idQuestao mudar chama essa funcao
     useEffect( () => {
 
-        if( avaliacao && avaliacao.questoes[idQuestao+1] ) { setTemProxima(true) }
+        if(!avaliacao) { return }
+
+        if( avaliacao.questoes[idQuestao+1] ) { setTemProxima(true) }
         else { setTemProxima(false) }
 
-        if( avaliacao && avaliacao.questoes[idQuestao-1] ) { setTemAnterior(true) }
+        if( avaliacao.questoes[idQuestao-1] ) { setTemAnterior(true) }
         else { setTemAnterior(false) }
 
-        if (avaliacao) { setQuestao( avaliacao.questoes[idQuestao] ) }
+        setQuestao( avaliacao.questoes[idQuestao] )
 
     },[idQuestao])
+
+    const salva = () => {
+        if(!avaliacao) { return }
+        setAvaliacao( old => ({
+            ...old,
+            questoes: old.questoes.map( (i,q) => i === idQuestao ? questao : q )
+        }))
+    }
+
+    const edita = (novaQuestao) => setQuestao(novaQuestao)
 
     const proxima = () => setIdQuestao( (old) => temProxima ? old+1 : old )
     const anterior = () => setIdQuestao( (old) => temAnterior ? old-1 : old )
 
-    return {avaliacao,questao,proxima,anterior,temProxima,temAnterior}
+    return {questao,edita,salva,proxima,anterior,temProxima,temAnterior}
 
 } 
 

@@ -8,11 +8,22 @@ import CabecalhoAvaliacao from './componentes/CabecalhoAvaliacao'
 import Seta from './componentes/Seta'
 import Questao from './componentes/Questao'
 
-import { useQuestao } from './avaliacao'
+import { useQuestao , useAvaliacao } from './avaliacao'
 
-const TelaCorrecao = ({history,idAvaliacao}) => {
+const TelaCorrecao = ({history}) => {
 
-    const {avaliacao,questao,proxima,anterior,temProxima,temAnterior} = useQuestao(0)
+    const idAvaliacao = 0
+
+    const [avaliacao,setAvaliacao] = useAvaliacao(idAvaliacao)
+    const {
+        questao,
+        edita,
+        salva,
+        proxima,
+        anterior,
+        temProxima,
+        temAnterior
+    } = useQuestao(avaliacao,setAvaliacao)
 
     return (
         <Fragment>
@@ -39,7 +50,7 @@ const TelaCorrecao = ({history,idAvaliacao}) => {
 
            <div style={{width:'100%',display:'flex',justifyContent:'center',margin:24}}>
                 <Button style={{margin:5}} icon='save' type='primary'>Salvar/Continuar</Button>
-                <Button style={{margin:5}} icon='arrow-down' type='primary'>Enviar/FinalizarContinuar</Button>
+                <Button style={{margin:5}} icon='arrow-down' type='primary'>Enviar/Finalizar</Button>
            </div>
 
            </Fragment>
