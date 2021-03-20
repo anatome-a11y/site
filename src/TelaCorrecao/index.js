@@ -50,7 +50,7 @@ const TelaCorrecao = ({history}) => {
            </div>
 
            <div style={{width:'100%',display:'flex',justifyContent:'center',margin:24}}>
-                <Button style={{margin:5}} onClick={salva} icon='save' type='primary'>Salvar/Continuar</Button>
+                <Button style={{margin:5}} onClick={ () => { salva() ; proxima() } } icon='save' type='primary'>Salvar/Continuar</Button>
                 <Button style={{margin:5}} onClick={ () => history.push('/') } icon='arrow-down' type='primary'>Enviar/Finalizar</Button>
            </div>
 

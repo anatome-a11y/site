@@ -24,17 +24,16 @@ const useQuestao = (avaliacao,setAvaliacao) => {
         if( avaliacao.questoes[idQuestao-1] ) { setTemAnterior(true) }
         else { setTemAnterior(false) }
 
-        console.log('a')
         setQuestao( avaliacao.questoes[idQuestao] )
         setBackup( avaliacao.questoes[idQuestao] )
 
-    },[idQuestao])
+    },[idQuestao,avaliacao])
 
     const salva = () => {
         if(!avaliacao) { return }
         setAvaliacao( old => ({
             ...old,
-            questoes: old.questoes.map( (i,q) => i === idQuestao ? questao : q )
+            questoes: old.questoes.map( (q,i) => i === idQuestao ? questao : q )
         }))
     }
 

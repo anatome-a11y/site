@@ -21,6 +21,12 @@ const Questao = ({quest,backup,edit}) => {
         correcaoSistema:{...quest.respostaAluno,correta:value} 
     })
 
+    const editConsideracoes = (value) => edit({ 
+        ...quest,
+        consideracoes: value,
+    })
+
+
    return (
        <div style={{
            width:'100%',
@@ -60,7 +66,11 @@ const Questao = ({quest,backup,edit}) => {
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
          <div style={{padding:10}}>Considerações do professor</div>
-         <TextArea style={{flex:1}}/>
+         <TextArea 
+             style={{flex:1}} 
+             value={quest.consideracoes} 
+             onChange={ ({target}) => editConsideracoes(target.value) }
+         />
        </div>
 
        </div>
