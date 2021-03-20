@@ -3,9 +3,22 @@ import React , { Fragment } from 'react'
 import { Button } from 'antd'
 
 import Header from './components/Header'
+import Entrada from './components/Entrada'
+import Apresentacao from './components/Apresentacao'
 import Conhecimento from './components/Conhecimento'
 
 const TelaConfig = ({history}) => {
+
+    const conf = { 
+        entrada: {value:3},
+        apresentacao: {value:4},
+        conhecimento: {
+            value:2,
+            voz:30,
+            teclado:40,
+        },
+    }
+
     return (
         <Fragment>
 
@@ -14,23 +27,26 @@ const TelaConfig = ({history}) => {
             <span style={{color:'#4facf0'}}>Configurações</span>
         </div>
 
-        <div style={{paddingLeft:32,paddingRight:32}}>
+        <div style={{paddingLeft:48,paddingRight:48}}>
 
-            <div style={{display:'flex',width:'100%'}}>
+            <div style={{display:'flex',width:'100%',marginBottom:100}}>
                 <Header style={{flex:1}} title="Entrada" >
-                    <div>teste</div>
+                    <Entrada en={conf.entrada} />
                 </Header>
                 <Header style={{flex:1}} title="Apresentação de conhecimento" >
-                    <div>teste</div>
+                    <Apresentacao apr={conf.apresentacao} />
                 </Header>
             </div>
 
-            <Header style={{flex:1}} title="Interação" >
-                <div>teste</div>
+            <Header style={{flex:1,marginBottom:100}} title="Interação" >
+                <div style={{display:'flex'}}>
+                    <Conhecimento con={conf.conhecimento} /> 
+                    <Conhecimento con={conf.conhecimento} /> 
+                </div>
             </Header>
 
             <Header style={{flex:1}} title="Máximo de tentativas" >
-                <div>teste</div>
+                <div style={{flex:1}}>teste</div>
             </Header>
 
         </div>

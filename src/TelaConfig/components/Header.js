@@ -2,7 +2,8 @@ import React from 'react'
 
 const Header = ({style,title,children}) => {
    return (
-       <div style={style}>
+       <div style={{display:'flex',flexDirection:'column',...style}}>
+
            <div style={{
               border:'1px solid #d2d2d2',
               backgroundColor:'#fafafa',
@@ -13,9 +14,11 @@ const Header = ({style,title,children}) => {
            }}>  
                {title}
            </div>
-           <div style={{border:'1px solid #d2d2d2'}}>
+
+           <div style={{flex:1,border:'1px solid #d2d2d2',padding:10}}>
                {children}
            </div>
+
        </div>
    )
 }
