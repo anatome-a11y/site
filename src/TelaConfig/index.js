@@ -7,6 +7,7 @@ import Entrada from './components/Entrada'
 import Apresentacao from './components/Apresentacao'
 import Conhecimento from './components/Conhecimento'
 import Localizacao from './components/Localizacao'
+import Tentativas from './components/Tentativas'
 
 const TelaConfig = ({history}) => {
 
@@ -24,6 +25,7 @@ const TelaConfig = ({history}) => {
             voz:20,
             teclado:30,
         },
+        tentativas: {value:3},
     }
 
     return (
@@ -53,7 +55,7 @@ const TelaConfig = ({history}) => {
             </Header>
 
             <Header style={{flex:1}} title="Máximo de tentativas" >
-                <div style={{flex:1}}>teste</div>
+                <Tentativas tent={conf.tentativas} />
             </Header>
 
         </div>
