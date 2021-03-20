@@ -24,7 +24,7 @@ const TelaCorrecao = ({history,idAvaliacao}) => {
            <Fragment>
 
            <div style={{paddingLeft:15,paddingRight:15}}>
-               <CabecalhoAvaliacao aval={avaliacao} />
+               { avaliacao ? <CabecalhoAvaliacao aval={avaliacao} /> : null }
            </div>
 
            <div style={{display:'flex'}}>
