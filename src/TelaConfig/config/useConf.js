@@ -6,8 +6,6 @@ const useConf = () => {
 
     const [conf,setConf] = useState(null)
 
-    //useEffect( () => console.log(conf) , [conf] )
-
     useEffect( () => setConf( service.getConf() ) , [] )
 
     const edit = (confType,field,value) => {

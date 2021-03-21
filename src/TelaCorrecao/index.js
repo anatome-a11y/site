@@ -14,7 +14,7 @@ const TelaCorrecao = ({history}) => {
 
     const idAvaliacao = 0
 
-    const [avaliacao,setAvaliacao] = useAvaliacao(idAvaliacao)
+    const [avaliacao,setAvaliacao, editAvaliacao] = useAvaliacao(idAvaliacao)
     const {
         questao,
         edita,
@@ -40,7 +40,7 @@ const TelaCorrecao = ({history}) => {
            <Fragment>
 
            <div style={{paddingLeft:15,paddingRight:15}}>
-               { avaliacao ? <CabecalhoAvaliacao aval={avaliacao} /> : null }
+               { avaliacao ? <CabecalhoAvaliacao aval={avaliacao} editAvaliacao={editAvaliacao} /> : null }
            </div>
 
            <div style={{display:'flex'}}>

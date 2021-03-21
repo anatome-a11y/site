@@ -6,15 +6,22 @@ const useAvaliacao = (idAvaliacao) => {
 
     const [avaliacao,setAvaliacao] = useState(null)
 
-    useEffect( () => { 
+    useEffect( () => {
         const aval = service.getAvaliacao(idAvaliacao)
-        setAvaliacao({...aval}) 
+        setAvaliacao({...aval})
     } , [] )
 
     useEffect( () => { service.setAvaliacao({...avaliacao}) },[avaliacao])
 
-    return [avaliacao,setAvaliacao]
+    const editAvaliacao = (field,value) => {
+        setAvaliacao( (old) => ({
+            ...old,
+            [field]: value
+        }))
+    }
 
-} 
+    return [avaliacao,setAvaliacao, editAvaliacao]
+
+}
 
 export default useAvaliacao
