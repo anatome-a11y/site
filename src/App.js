@@ -42,7 +42,7 @@ class App extends Component {
                         <Route exact path="/peca/editar/:id" component={FormPeca} />                                                 
                         <Route exact path="/pecas" component={ListPecas} />
 
-                        <Route exact path="/correcao" component={TelaCorrecao} />
+                        <Route exact path="/correcao/:id" component={TelaCorrecao} />
                         <Route exact path="/config" component={TelaConfig} />
 
                     </Switch>

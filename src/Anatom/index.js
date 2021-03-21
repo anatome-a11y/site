@@ -266,7 +266,7 @@ class Main extends Component {
                                     </div>
                                 }>
                                     <Button type='primary'
-                                            onClick={() => history.push('/correcao')}
+                                            onClick={() => {}}
                                             style={{marginRight: 25}}>
                                         <Icon type='plus'/>Corrigir avaliação
                                     </Button>
