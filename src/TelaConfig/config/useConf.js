@@ -6,15 +6,21 @@ const useConf = () => {
 
     const [conf,setConf] = useState(null)
 
+    //useEffect( () => console.log(conf) , [conf] )
+
     useEffect( () => setConf( service.getConf() ) , [] )
 
-    const edit = (confType,field,value) => setConf( (old) => ({
-        ...old,
-        [confType]: { ...old[confType] , field: value } 
-    }))
+    const edit = (confType,field,value) => {
+        if( !isNaN( Number( conf[confType][field] ) ) && !isNaN( Number(value) ) ) {
+            setConf( (old) => ({
+                ...old,
+                [confType]: { ...old[confType] , [field]: Number(value) } 
+            }))
+        }
+    }
 
     const save = () => service.setConf(conf)
-    const reset = () => setConf( service.resetConf() )
+    const reset = () => setConf( service.getDefConf() )
         
     return {conf,edit,save,reset}
 }

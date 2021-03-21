@@ -18,5 +18,6 @@ export const def = {
 let conf = def
 
 export const getConf = () => conf
+export const getDefConf = () => def
 export const setConf = (c) => conf = c
 export const resetConf = () => { conf = def ; return conf }

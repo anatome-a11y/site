@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Input } from 'antd'
 
-const NumberShow = ({value}) => {
+const NumberShow = ({value,onChange}) => {
     return (
         <div style={{
                 flex:1,
@@ -10,7 +10,7 @@ const NumberShow = ({value}) => {
                 justifyContent:'flex-start',
                 alignItems:'flex-start'
         }}>
-            <Input style={{width:'15%',textAlign:'center'}} value={value}/>
+            <Input min={0} max={180} type="number" onChange={onChange} style={{width:'15%',textAlign:'center'}} value={value}/>
         </div>
     )
 }

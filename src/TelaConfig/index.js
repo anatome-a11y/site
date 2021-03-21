@@ -29,30 +29,30 @@ const TelaConfig = ({history}) => {
 
             <div style={{display:'flex',width:'100%',marginBottom:100}}>
                 <Header style={{flex:1}} title="Entrada" >
-                    <Entrada en={conf.entrada} />
+                    <Entrada en={conf.entrada} edit={edit} />
                 </Header>
                 <Header style={{flex:1}} title="Apresentação de conhecimento" >
-                    <Apresentacao apr={conf.apresentacao} />
+                    <Apresentacao apr={conf.apresentacao} edit={edit} />
                 </Header>
             </div>
 
             <Header style={{flex:1,marginBottom:100}} title="Interação" >
                 <div style={{display:'flex'}}>
-                    <Conhecimento con={conf.conhecimento} /> 
-                    <Localizacao loc={conf.localizacao} /> 
+                    <Conhecimento con={conf.conhecimento} edit={edit} /> 
+                    <Localizacao loc={conf.localizacao} edit={edit} /> 
                 </div>
             </Header>
 
             <Header style={{flex:1}} title="Máximo de tentativas" >
-                <Tentativas tent={conf.tentativas} />
+                <Tentativas tent={conf.tentativas} edit={edit} />
             </Header>
 
         </div>
 
         <div style={{display:'flex',justifyContent:'center',width:'100%',padding:24}}>
             <Button icon='undo' onClick={ () => history.goBack() } >Voltar</Button>
-            <Button icon='check' style={{marginLeft:8,marginRight:8}} type='secondary'>Salvar configurações</Button>
-            <Button type='primary'>Restaurar padrões</Button>
+            <Button icon='check' onClick={() => save()}  style={{marginLeft:8,marginRight:8}} type='secondary'>Salvar configurações</Button>
+            <Button type='primary' onClick={() => reset()} >Restaurar padrões</Button>
         </div>
 
         </Fragment>
