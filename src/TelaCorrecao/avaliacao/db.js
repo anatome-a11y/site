@@ -5,7 +5,10 @@ const db = {
         0,
         'Maria Eduarda da Silva',
         '05/03/2021',
-        'Sistema Esqueletico - Teórico - Avaliação Conteúdo',
+        'Sistema Esqueletico',
+        'Odontologia',
+        'Eng. Comp.',
+        'CEFET MG',
         [
             Questao(
               Parte('Crânio',34,'Maxila','Osso par irregular e suporta a arcada dentária superior'),

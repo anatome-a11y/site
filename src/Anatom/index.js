@@ -7,6 +7,8 @@ import Header from '../components/Header'
 
 import { listaIdiomas } from '../utils/mock'
 
+import {getAvaliacao} from "../TelaCorrecao/avaliacao/service";
+
 const ButtonGroup = Button.Group;
 const Search = Input.Search;
 const Panel = Collapse.Panel;
@@ -62,8 +64,8 @@ const colsRoteiro = [
 const colsAvaliacoesAplicadas = [
     {
         title: 'Avaliação',
-        dataIndex: 'nome',
-        key: 'nome',
+        dataIndex: 'conteudo',
+        key: 'conteudo',
     },
     {
         title: 'Disciplina',
@@ -82,8 +84,8 @@ const colsAvaliacoesAplicadas = [
     },
     {
         title: 'Aluno',
-        dataIndex: 'nome',
-        key: 'nome',
+        dataIndex: 'nomeAluno',
+        key: 'nomeAluno',
     },
 ]
 
@@ -122,6 +124,9 @@ class Main extends Component {
     render() {
         const { loading, history } = this.props;
         const { anatomp, roteiros, open, resourceToDelete } = this.state;
+
+        let dadosAval = [];
+        dadosAval.push(getAvaliacao(0));
 
         return (
             <div style={{ padding: 24 }}>
@@ -287,16 +292,16 @@ class Main extends Component {
                                     render: (text, item) =>
                                         <Crud onEdit={() =>
                                             history.push({
-                                                pathname: '/mapeamento/editar/' + item._id,
+                                                pathname: '/correcao/' + item.id,
                                                 state: {model: item}
                                             })}
                                               onDelete={this.onShowDelete('anatomp', item)}
                                         />,
                                 }
                             ]}
-                            rowKey='_id'
+                            rowKey='id'
                             pagination={{style: {textAlign: 'center', width: '100%'}}}
-                            dataSource={anatomp}
+                            dataSource={dadosAval}
                         />
                     </Panel>
                 </Collapse>
@@ -329,7 +334,7 @@ class Main extends Component {
 
     onShowDelete = (resourceToDelete, toDelete) => () => {
         this.setState({ open: true, toDelete, resourceToDelete })
-    }    
+    }
 
     onClose = () => this.setState({ open: false }, () => {
         this.setState({toDelete: null, resourceToDelete: ''})

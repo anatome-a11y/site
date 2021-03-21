@@ -38,7 +38,7 @@ const Questao = ({quest,backup,edit}) => {
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
          <div style={{padding:10}}>Resposta do aluno</div>
          <CardResposta res={quest.respostaAluno} onCheck={editRespostaAluno}
-            style={{backgroundColor:'#eaf7fd'}} 
+            style={{backgroundColor:'#e7e7e7'}}
          />
        </div>
 

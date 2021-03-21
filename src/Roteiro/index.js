@@ -30,7 +30,6 @@ class Roteiro extends Component {
             conteudo: {
                 selected: [],
             },
-            generalidades: []
         },
         pecas: [],
         pecasFlat: [],
