@@ -136,7 +136,8 @@ class Main extends Component {
         originais: {
             anatomp: [],
             roteiros: [],
-            avaliacoesAplicadas: []
+            avaliacoesAplicadas: [],
+            avaliacoes: []
         }
     }
 
@@ -296,16 +297,16 @@ class Main extends Component {
                                 </Popover>
                             }
                         />}
-                           key='avaliacao_aplicada'>
+                           key='avaliacao'>
                         <div style={{margin: 10, textAlign: 'right'}}>
                             <Search
                                 placeholder="Filtrar"
-                                onSearch={this.onFilterAvaliacaoAplicada}
+                                onSearch={this.onFilterAvaliacao}
                                 style={{width: 200, marginRight: 5}}
                             />
                         </div>
                         <Table
-                            locale={{emptyText: loading ? <Spin/> : 'Nenhuma avaliação aplicada foi encontrada'}}
+                            locale={{emptyText: loading ? <Spin/> : 'Nenhuma avaliação foi encontrada'}}
                             columns={[
                                 ...colsAvaliacoes,
                                 {
@@ -527,6 +528,22 @@ class Main extends Component {
             )
         });
 
+        this.setState({roteiros: _list})
+    }
+
+    onFilterAvaliacao = val => {
+        const list = this.state.originais.avaliacoes;
+
+        const _val = norm(val);
+
+        const _list = list.filter(p => {
+            return (
+                norm(p.conteudo).indexOf(_val) !== -1 ||
+                norm(p.disciplina).indexOf(_val) !== -1 ||
+                norm(p.curso).indexOf(_val) !== -1 ||
+                norm(p.instituicao).indexOf(_val) !== -1
+            )
+        });
         this.setState({roteiros: _list})
     }
 }
