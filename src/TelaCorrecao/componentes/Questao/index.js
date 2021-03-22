@@ -18,7 +18,7 @@ const Questao = ({quest,backup,edit}) => {
 
     const editRespostaAluno = (value) => edit({ 
         ...quest,
-        correcaoSistema:{...quest.respostaAluno,correta:value} 
+        respostaAluno:{...quest.respostaAluno,correta:value} 
     })
 
     const editConsideracoes = (value) => edit({ 

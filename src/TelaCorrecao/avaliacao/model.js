@@ -1,7 +1,7 @@
-export const Parte = (pai,numero,nome,descricao) => 
-    ({pai,numero,nome,descricao})
+export const Parte = (pai,numero,nome,descricao,correta=false) => 
+    ({pai,numero,nome,descricao,correta})
 
-export const Questao = (respostaAluno,correcaoSistema,consideracoesProfessor='',correta=false) =>
+export const Questao = (respostaAluno,correcaoSistema,consideracoesProfessor='') =>
     ({respostaAluno,correcaoSistema,consideracoesProfessor}) 
 
 export const Avaliacao = (id,nomeAluno,data,conteudo,disciplina,curso,instituicao,questoes) =>
