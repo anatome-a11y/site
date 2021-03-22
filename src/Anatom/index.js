@@ -61,6 +61,29 @@ const colsRoteiro = [
 
 ]
 
+const colsAvaliacoes = [
+    {
+        title: 'Avaliação',
+        dataIndex: 'conteudo',
+        key: 'conteudo',
+    },
+    {
+        title: 'Disciplina',
+        dataIndex: 'disciplina',
+        key: 'disciplina',
+    },
+    {
+        title: 'Curso',
+        dataIndex: 'curso',
+        key: 'curso',
+    },
+    {
+        title: 'Instituição',
+        dataIndex: 'instituicao',
+        key: 'instituicao',
+    }
+]
+
 const colsAvaliacoesAplicadas = [
     {
         title: 'Avaliação',
@@ -244,6 +267,64 @@ class Main extends Component {
                             rowKey='_id'
                             pagination={{style: {textAlign: 'center', width: '100%'}}}
                             dataSource={anatomp}
+                        />
+                    </Panel>
+                    <Panel className='anatome-panel' header={
+                        <Header
+                            loading={loading}
+                            contentQ={<p>....</p>}
+                            title={
+                                <Popover placement='right' content={
+                                    <div style={{width: 300, textAlign: 'center'}}>
+                                        Avaliações a serem submetidas
+                                    </div>
+                                }>
+                                    Avaliação
+                                </Popover>
+                            }
+                            extra={
+                                <Popover content={
+                                    <div style={{width: 300, textAlign: 'center'}}>
+                                        Cadastrar uma nova avaliação
+                                    </div>
+                                }>
+                                    <Button type='primary'
+                                            onClick={() => {}}
+                                            style={{marginRight: 25}}>
+                                        <Icon type='plus'/>Cadastrar avaliação
+                                    </Button>
+                                </Popover>
+                            }
+                        />}
+                           key='avaliacao_aplicada'>
+                        <div style={{margin: 10, textAlign: 'right'}}>
+                            <Search
+                                placeholder="Filtrar"
+                                onSearch={this.onFilterAvaliacaoAplicada}
+                                style={{width: 200, marginRight: 5}}
+                            />
+                        </div>
+                        <Table
+                            locale={{emptyText: loading ? <Spin/> : 'Nenhuma avaliação aplicada foi encontrada'}}
+                            columns={[
+                                ...colsAvaliacoes,
+                                {
+                                    title: '',
+                                    key: 'action',
+                                    width: 100,
+                                    render: (text, item) =>
+                                        <Crud onEdit={() =>
+                                            history.push({
+                                                pathname: '/',
+                                                state: {model: item}
+                                            })}
+                                              onDelete={() => {}}
+                                        />,
+                                }
+                            ]}
+                            rowKey='id'
+                            pagination={{style: {textAlign: 'center', width: '100%'}}}
+                            dataSource={dadosAval}
                         />
                     </Panel>
                     <Panel className='anatome-panel' header={
