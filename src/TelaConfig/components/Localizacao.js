@@ -33,8 +33,9 @@ const Localizacao = ({loc,edit}) => {
                  step={1} 
                  marks={{0:0,180:180}} 
                  onChange={ (value) => edit('localizacao','nfc',value) }
+                 style={{marginBottom:60}}
                />
-
+              
 
               <div style={{display:'flex'}}>
                 <Radio style={{flex:1}} value={2}>Voz</Radio>
@@ -50,6 +51,7 @@ const Localizacao = ({loc,edit}) => {
                  step={1} 
                  marks={{0:0,180:180}} 
                  onChange={ (value) => edit('localizacao','voz',value) }
+                 style={{marginBottom:60}}
                />
 
 

@@ -32,6 +32,7 @@ const Conhecimento = ({con,edit}) => {
                  step={1} 
                  marks={{0:0,180:180}} 
                  onChange={ (value) => edit('conhecimento','voz',value) }
+                 style={{marginBottom:60}}
                />
 
               <div style={{display:'flex'}}>

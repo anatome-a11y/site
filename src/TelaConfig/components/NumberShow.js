@@ -10,7 +10,7 @@ const NumberShow = ({value,onChange}) => {
                 justifyContent:'flex-start',
                 alignItems:'flex-start'
         }}>
-            <Input min={0} max={180} type="number" onChange={onChange} style={{width:'15%',textAlign:'center'}} value={value}/>
+            <Input min={0} max={180} type="number" onChange={onChange} style={{width:'25%',textAlign:'center'}} value={value}/>
         </div>
     )
 }

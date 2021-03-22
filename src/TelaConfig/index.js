@@ -20,7 +20,7 @@ const TelaConfig = ({history}) => {
     return (
         <Fragment>
 
-        <div style={{marginTop:32,marginBottom:12}}>
+        <div style={{marginTop:32,marginBottom:12,marginLeft:6}}>
             <span style={{fontWeight:'bold'}}>Você está em: </span> 
             <span style={{color:'#4facf0'}}>Configurações</span>
         </div>
@@ -43,8 +43,10 @@ const TelaConfig = ({history}) => {
                 </div>
             </Header>
 
-            <Header style={{flex:1}} title="Máximo de tentativas" >
-                <Tentativas tent={conf.tentativas} edit={edit} />
+            <Header style={{flex:1,justifyContent:'center'}} title="Máximo de tentativas" >
+                <div style={{justifyContent:'center',display:'flex'}}>
+                    <Tentativas tent={conf.tentativas} edit={edit} />
+                </div>
             </Header>
 
         </div>
