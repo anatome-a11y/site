@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
 
 import {AppContext} from './context'
 
@@ -26,8 +26,8 @@ class App extends Component {
         const {onSetAppState, loading, isLogged, onOpenSnackbar, erros} = this.props
         return (
             <AppContext.Provider value={{
-                onSetAppState, 
-                loading, 
+                onSetAppState,
+                loading,
                 isLogged,
                 onOpenSnackbar,
                 erros,
@@ -48,6 +48,7 @@ class App extends Component {
                         <Route exact path="/login" component={TelaLogin} />
 
                     </Switch>
+            <Redirect to='/login' />
             </AppContext.Provider>
         )
     }
