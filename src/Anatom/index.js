@@ -169,7 +169,7 @@ class Main extends Component {
                             conteúdos das peças</Button>
                     </Popover>
                 </div>
-                <Collapse bordered={false} defaultActiveKey={['avaliacao_aplicada' ,'roteiro_digital', 'roteiro_com_peca']}>
+                <Collapse bordered={false} defaultActiveKey={['avaliacao_aplicada', 'avaliacao' ,'roteiro_digital', 'roteiro_com_peca']}>
                     <Panel className='anatome-panel' header={
                         <Header
                             loading={loading}

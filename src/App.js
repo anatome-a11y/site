@@ -14,6 +14,7 @@ import FormPeca from './Peca'
 //
 import TelaCorrecao from './TelaCorrecao'
 import TelaConfig from './TelaConfig'
+import TelaLogin from './Login'
 
 
 class App extends Component {
@@ -34,16 +35,17 @@ class App extends Component {
             }}>
                     <Switch>
                         <Route exact path="/" component={ListAnatom} />
-                        <Route exact path="/roteiro/cadastrar" component={FormAnatom} />                        
+                        <Route exact path="/roteiro/cadastrar" component={FormAnatom} />
                         <Route exact path="/roteiro/editar/:id" component={FormRoteiro} />
-                        <Route exact path="/mapeamento/cadastrar" component={FormMapeamento} />                        
-                        <Route exact path="/mapeamento/editar/:id" component={FormMapeamento} />  
-                        <Route exact path="/peca/cadastrar" component={FormPeca} />                        
-                        <Route exact path="/peca/editar/:id" component={FormPeca} />                                                 
+                        <Route exact path="/mapeamento/cadastrar" component={FormMapeamento} />
+                        <Route exact path="/mapeamento/editar/:id" component={FormMapeamento} />
+                        <Route exact path="/peca/cadastrar" component={FormPeca} />
+                        <Route exact path="/peca/editar/:id" component={FormPeca} />
                         <Route exact path="/pecas" component={ListPecas} />
 
                         <Route exact path="/correcao/:id" component={TelaCorrecao} />
                         <Route exact path="/config" component={TelaConfig} />
+                        <Route exact path="/login" component={TelaLogin} />
 
                     </Switch>
             </AppContext.Provider>
