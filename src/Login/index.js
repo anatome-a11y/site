@@ -22,7 +22,7 @@ const TelaLogin = ({history}) => {
                 </div>
                 <div style={styles.input}>
                     <span>Senha</span>
-                    <Input value={password} onChange={e => setPassword(e.target.value)} />
+                    <Input type="password" value={password} onChange={e => setPassword(e.target.value)} />
                 </div>
                 <div style={styles.center}>
                     <Button
