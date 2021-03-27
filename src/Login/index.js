@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Button, Input} from "antd";
+import { Button, Input, message } from 'antd';
 
 import iconLock from './lock-icon.svg';
 
@@ -28,7 +28,13 @@ const TelaLogin = ({history}) => {
                     <Button
                         style={styles.button}
                         type='primary'
-                        onClick={() => history.push('/')}
+                        onClick={() => {
+                            if (userName === 'anatome' && password === 'anatome') {
+                                history.push('/');
+                            } else {
+                                message['error']('Usuário ou senha incorreto');
+                            }
+                        }}
                     >Entrar</Button>
                 </div>
             </div>
