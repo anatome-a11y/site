@@ -33,7 +33,11 @@ const useQuestao = (avaliacao,setAvaliacao) => {
         if(!avaliacao) { return }
         setAvaliacao( old => ({
             ...old,
-            questoes: old.questoes.map( (q,i) => i === idQuestao ? questao : q )
+            questoes: [ 
+                ...old.questoes.slice(0,idQuestao) , 
+                questao , 
+                ...old.questoes.slice(idQuestao+1) 
+            ]
         }))
     }
 

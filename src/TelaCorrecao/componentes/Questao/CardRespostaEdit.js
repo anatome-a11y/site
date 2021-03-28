@@ -58,14 +58,27 @@ const CardRespostaEdit = ({res,style,edit,onEdit,onTrash}) => {
 
             </div>
 
-            <div style={{backgroundColor:bg,display:'flex'}}>
-                <div style={{flex:0.15}}> </div>
-                <div style={{flex:2}}><hr/></div>
-            </div>
-
-            <div style={{backgroundColor:bg,padding:5,flex:1}}>
-                <Input.TextArea value={res.descricao} />
-            </div>
+            { res.descricao.map( (d,i) => ( 
+                <div key={i} style={{backgroundColor:bg,padding:5,flex:1}}>
+                    <div style={{backgroundColor:bg,display:'flex'}}>
+                        <div style={{flex:0.15}}> </div>
+                        <div style={{flex:2}}><hr/></div>
+                    </div>
+                    <div><Input.TextArea 
+                        value={d} 
+                        onChange={ 
+                            ({target}) => edit(
+                                'descricao',
+                                [ 
+                                  ...res.descricao.slice(0,i), 
+                                  target.value,
+                                  ...res.descricao.slice(i+1)
+                                ]
+                            )
+                        }
+                   /></div>
+                </div>
+            ))}
 
 
         </div>

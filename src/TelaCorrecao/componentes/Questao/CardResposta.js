@@ -45,14 +45,15 @@ const CardQuestaoResposta = ({res,style,onCheck,onEdit,onTrash}) => {
 
             </div>
 
-            <div style={{backgroundColor:bg,display:'flex'}}>
-                <div style={{flex:0.15}}> </div>
-                <div style={{flex:2}}><hr/></div>
-            </div>
-
-            <div style={{backgroundColor:bg,padding:5,overFlowWrap:'word-wrap',flex:1}}>
-                {res.descricao}
-            </div>
+            { res.descricao.map( (d,i) => (
+                <div key={i} style={{backgroundColor:bg,padding:5,overFlowWrap:'word-wrap',flex:1}}>
+                    <div style={{backgroundColor:bg,display:'flex'}}>
+                        <div style={{flex:0.15}}> </div>
+                        <div style={{flex:2}}><hr/></div>
+                    </div>
+                    <div>{d}</div>
+                </div>
+            ))}
 
 
         </div>
