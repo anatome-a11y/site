@@ -151,6 +151,7 @@ class Main extends Component {
 
         let dadosAval = [];
         dadosAval.push(getAvaliacao(0));
+        dadosAval.push(getAvaliacao(1));
 
         return (
             <div style={{ padding: 24 }}>

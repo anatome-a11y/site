@@ -10,9 +10,9 @@ import Questao from './componentes/Questao'
 
 import { useQuestao , useAvaliacao } from './avaliacao'
 
-const TelaCorrecao = ({history}) => {
+const TelaCorrecao = ({history, match}) => {
 
-    const idAvaliacao = 0
+    const idAvaliacao = match.params.id;
 
     const [avaliacao,setAvaliacao, editAvaliacao] = useAvaliacao(idAvaliacao)
     const {

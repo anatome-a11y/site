@@ -5,7 +5,7 @@ const db = [
         0,
         'Maria Eduarda da Silva',
         '05/03/2021',
-        'Sistema Esqueletico',
+        'Sistema Esqueletico (teorica)',
         'Odontologia',
         'Eng. Comp.',
         'CEFET MG',
@@ -67,26 +67,18 @@ const db = [
                         'Suportam os dentes superiores e forma uma parte do palato, da cavidade nasal e da órbita ocular.',
                     ]
                 ),
-            ),
-
-            Questao(
-                Parte(
-                    'Crânio',
-                    5,
-                    '',
-                    [
-                        'Esfenoide'
-                    ]
-                ),
-                Parte(
-                    'Crânio',
-                    5,
-                    '',
-                    [
-                        'Esfenoide'
-                    ]
-                ),
-            ),
+            )
+        ],
+    ),
+    Avaliacao(
+        1,
+        'Maria Eduarda da Silva',
+        '05/03/2021',
+        'Sistema Esqueletico (localização)',
+        'Odontologia',
+        'Eng. Comp.',
+        'CEFET MG',
+        [
             Questao(
                 Parte(
                     'Crânio',
@@ -104,7 +96,25 @@ const db = [
                         'Occipital'
                     ]
                 ),
-            )
+            ),
+            Questao(
+                Parte(
+                    'Crânio',
+                    5,
+                    '',
+                    [
+                        'Esfenoide'
+                    ]
+                ),
+                Parte(
+                    'Crânio',
+                    5,
+                    '',
+                    [
+                        'Esfenoide'
+                    ]
+                ),
+            ),
         ],
     )
 ]
