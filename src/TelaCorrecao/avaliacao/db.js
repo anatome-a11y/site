@@ -11,31 +11,6 @@ const db = [
         'CEFET MG',
         [
             Questao(
-
-                Parte(
-                    'Crânio',
-                    9,
-                    'Maxila',
-                    [
-                        'Osso par irregular e suporta a arcada dentária superior',
-                        'Osso par irregular e suporta a arcada dentária superior',
-                    ] 
-                ),
-
-                Parte(
-                    'Crânio',
-                    9,
-                    'Maxila',
-                    [ 
-                        'Osso par, irregular e pneumático. Articula-se com o nasal, palatino, etmoide, frontal, zigomático, lacrimal, vômer e concha nasal inferior. Suportam os dentes superiores e forma uma parte do palato, da cavidade nasal e da órbita ocular.',
-                        'Osso par, irregular e pneumático. Articula-se com o nasal, palatino, etmoide, frontal, zigomático, lacrimal, vômer e concha nasal inferior. Suportam os dentes superiores e forma uma parte do palato, da cavidade nasal e da órbita ocular.',
-                    ]
-               ),
-
-            ),
-
-            Questao(
-
                 Parte(
                     'Crânio',
                     2,
@@ -44,7 +19,6 @@ const db = [
                         'Osso par, laminar, localizado nas laterais superiores do crânio.',
                     ]
                 ),
-
                 Parte(
                     'Crânio',
                     2,
@@ -53,20 +27,17 @@ const db = [
                         'Osso par, laminar, localizado nas laterais superiores do crânio.',
                     ]
                 ),
-
             ),
 
             Questao(
-
                 Parte(
                     'Crânio',
                     8,
                     'Zigomático',
                     [
-                        'Osso par, irregular. Localiza-se na região da bochecha e é o mais proeminente da face.',
+                        'Osso par e irregular, se localiza na região da bochecha e é o mais proeminente da face',
                     ]
                 ),
-
                 Parte(
                     'Crânio',
                     8,
@@ -75,9 +46,65 @@ const db = [
                         'Osso par, irregular. Localiza-se na região da bochecha e é o mais proeminente da face.',
                     ]
                 ),
-
             ),
 
+            Questao(
+                Parte(
+                    'Crânio',
+                    9,
+                    'Maxila',
+                    [
+                        'Osso par irregular e pneumático, articula-se com o nasal, etmoide e frontal',
+                        'Suportam os dentes superiores e forma uma parte do palato, da cavidade nasal e da órbita ocular',
+                    ]
+                ),
+                Parte(
+                    'Crânio',
+                    9,
+                    'Maxila',
+                    [
+                        'Osso par, irregular e pneumático. Articula-se com o nasal, palatino, etmoide, frontal, zigomático, lacrimal, vômer e concha nasal inferior.',
+                        'Suportam os dentes superiores e forma uma parte do palato, da cavidade nasal e da órbita ocular.',
+                    ]
+                ),
+            ),
+
+            Questao(
+                Parte(
+                    'Crânio',
+                    5,
+                    '',
+                    [
+                        'Esfenoide'
+                    ]
+                ),
+                Parte(
+                    'Crânio',
+                    5,
+                    '',
+                    [
+                        'Esfenoide'
+                    ]
+                ),
+            ),
+            Questao(
+                Parte(
+                    'Crânio',
+                    3,
+                    '',
+                    [
+                        'Etmoide'
+                    ]
+                ),
+                Parte(
+                    'Crânio',
+                    3,
+                    '',
+                    [
+                        'Occipital'
+                    ]
+                ),
+            )
         ],
     )
 ]
