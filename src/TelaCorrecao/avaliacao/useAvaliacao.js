@@ -11,7 +11,7 @@ const useAvaliacao = (idAvaliacao) => {
         setAvaliacao({...aval})
     } , [] )
 
-    useEffect( () => { service.setAvaliacao({...avaliacao}) },[avaliacao])
+    useEffect( () => { saveAvaliacao(avaliacao) },[avaliacao])
 
     const editAvaliacao = (field,value) => {
         setAvaliacao( (old) => ({
@@ -20,7 +20,9 @@ const useAvaliacao = (idAvaliacao) => {
         }))
     }
 
-    return [avaliacao,setAvaliacao, editAvaliacao]
+    const saveAvaliacao = (novaAvaliacao) => service.setAvaliacao({...novaAvaliacao})
+
+    return [avaliacao,setAvaliacao,editAvaliacao,saveAvaliacao]
 
 }
 

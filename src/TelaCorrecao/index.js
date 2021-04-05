@@ -8,23 +8,14 @@ import CabecalhoAvaliacao from './componentes/CabecalhoAvaliacao'
 import Seta from './componentes/Seta'
 import Questao from './componentes/Questao'
 
-import { useQuestao , useAvaliacao } from './avaliacao'
+import { useQuestoes , useAvaliacao } from './avaliacao'
 
 const TelaCorrecao = ({history, match}) => {
 
     const idAvaliacao = match.params.id;
 
-    const [avaliacao,setAvaliacao, editAvaliacao] = useAvaliacao(idAvaliacao)
-    const {
-        questao,
-        edita,
-        salva,
-        proxima,
-        anterior,
-        temProxima,
-        temAnterior,
-        backup,
-    } = useQuestao(avaliacao,setAvaliacao)
+    const [avaliacao,setAvaliacao, editAvaliacao,saveAvaliacao] = useAvaliacao(idAvaliacao)
+    const {questoes,edita,salva,backup} = useQuestoes(avaliacao,saveAvaliacao)
 
     return (
         <Fragment>
@@ -43,15 +34,14 @@ const TelaCorrecao = ({history, match}) => {
                { avaliacao ? <CabecalhoAvaliacao aval={avaliacao} editAvaliacao={editAvaliacao} /> : null }
            </div>
 
-           <div style={{display:'flex'}}>
-               <Seta direction='left' onClick={anterior} enable={temAnterior} />
-               <div style={{width:'100%'}}>{ questao ? <Questao edit={edita} backup={backup} quest={questao} /> : null }</div>
-               <Seta direction='right' onClick={proxima} enable={temProxima} />
+           <div style={{display:'flex',flexDirection:'column',width:'100%'}}>
+              { questoes.map( (q,i) =>
+                 <Questao key={i} edit={edita(i)} backup={backup(i)} quest={q} /> 
+              )}
            </div>
 
            <div style={{width:'100%',display:'flex',justifyContent:'center',margin:24}}>
-                <Button style={{margin:5}} onClick={ () => { salva() ; proxima() } } icon='save' type='primary'>Salvar/Continuar</Button>
-                <Button style={{margin:5}} onClick={ () => history.push('/') } icon='arrow-down' type='primary'>Enviar/Finalizar</Button>
+                <Button style={{margin:5}} onClick={ () => { salva() ; history.push('/') } } icon='arrow-down' type='primary'>Enviar/Finalizar</Button>
            </div>
 
            </Fragment>

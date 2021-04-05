@@ -33,6 +33,7 @@ const Questao = ({quest,backup,edit}) => {
            display:'flex',
            justifyContent:'space-between',
            alignItems:'stretch',
+           marginBottom:32,
        }}>
 
        <div style={{display:'flex',flexDirection:'column',flex:1,marginLeft:10,marginRight:10}}>
