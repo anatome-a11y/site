@@ -203,7 +203,7 @@ class Main extends Component {
                         <Table
                             locale={{
                                 emptyText: loading ?
-                                    <Spin/> : 'Nenhum conteúdo de roteiro foi encontrado para esta busca'
+                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhum conteúdo de roteiro foi encontrado para esta busca</span>
                             }}
                             columns={[
                                 ...colsRoteiro,
@@ -253,7 +253,10 @@ class Main extends Component {
                             />
                         </div>
                         <Table
-                            locale={{emptyText: loading ? <Spin/> : 'Nenhum roteiro de peça física foi encontrado'}}
+                            locale={{
+                                emptyText: loading ?
+                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhum roteiro de peça física foi encontrado</span>
+                            }}
                             columns={[
                                 ...colsAnatomp,
                                 {
@@ -307,7 +310,10 @@ class Main extends Component {
                             />
                         </div>
                         <Table
-                            locale={{emptyText: loading ? <Spin/> : 'Nenhuma avaliação foi encontrada'}}
+                            locale={{
+                                emptyText: loading ?
+                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação foi encontrada</span>
+                            }}
                             columns={[
                                 ...colsAvaliacoes,
                                 {
@@ -365,7 +371,10 @@ class Main extends Component {
                             />
                         </div>
                         <Table
-                            locale={{emptyText: loading ? <Spin/> : 'Nenhuma avaliação aplicada foi encontrada'}}
+                            locale={{
+                                emptyText: loading ?
+                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação aplicada foi encontrada</span>
+                            }}
                             columns={[
                                 ...colsAvaliacoesAplicadas,
                                 {
