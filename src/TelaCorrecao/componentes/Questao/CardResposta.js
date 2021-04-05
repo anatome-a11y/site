@@ -36,7 +36,9 @@ const CardQuestaoResposta = ({res,style,onCheck,onEdit,onTrash}) => {
                 <div style={{display:'flex'}}>
                     <div style={{flex:1}}>{res.nome}</div>
                     <div style={{flex:1,textAlign:'right'}}>
+                        Correta:
                         <Checkbox 
+                            style={{paddingLeft:8}}
                             checked={res.correta} 
                             onChange={ ({target}) => onCheck(target.checked) } 
                         />
