@@ -375,6 +375,10 @@ class Main extends Component {
                                 emptyText: loading ?
                                     <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação aplicada foi encontrada</span>
                             }}
+                            onRow={ (item,index) => ({ onClick: e => history.push({
+                                pathname: '/correcao/' + item.id,
+                                state: {model: item}
+                            }) }) }
                             columns={[
                                 ...colsAvaliacoesAplicadas,
                                 {
