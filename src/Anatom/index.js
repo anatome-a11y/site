@@ -205,6 +205,10 @@ class Main extends Component {
                                 emptyText: loading ?
                                     <Spin/> : <span style={{color: '#000000A6'}}>Nenhum conteúdo de roteiro foi encontrado para esta busca</span>
                             }}
+                            onRow={ (item,index) => ({ onClick: e => history.push({
+                                    pathname: '/roteiro/editar/' + item._id,
+                                    state: {model: item}
+                            }) }) }
                             columns={[
                                 ...colsRoteiro,
                                 {
@@ -257,6 +261,10 @@ class Main extends Component {
                                 emptyText: loading ?
                                     <Spin/> : <span style={{color: '#000000A6'}}>Nenhum roteiro de peça física foi encontrado</span>
                             }}
+                            onRow={ (item,index) => ({ onClick: e => history.push({
+                                    pathname: '/mapeamento/editar/' + item._id,
+                                    state: {model: item}
+                            }) }) }
                             columns={[
                                 ...colsAnatomp,
                                 {
@@ -314,6 +322,10 @@ class Main extends Component {
                                 emptyText: loading ?
                                     <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação foi encontrada</span>
                             }}
+                            onRow={ (item,index) => ({ onClick: e => history.push({
+                                    pathname: '/',
+                                    state: {model: item}
+                                }) }) }
                             columns={[
                                 ...colsAvaliacoes,
                                 {

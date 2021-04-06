@@ -41,7 +41,7 @@ const TelaCorrecao = ({history, match}) => {
            </div>
 
            <div style={{width:'100%',display:'flex',justifyContent:'center',margin:24}}>
-                <Button style={{margin:5}} onClick={ () => { salva() ; history.push('/') } } icon='arrow-down' type='primary'>Enviar/Finalizar</Button>
+                <Button style={{margin:5}} onClick={ () => { salva() ; history.push('/') } } icon='save' type='primary'>Enviar/Finalizar</Button>
            </div>
 
            </Fragment>
