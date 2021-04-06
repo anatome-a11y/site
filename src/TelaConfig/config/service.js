@@ -1,6 +1,11 @@
 export const def = { 
     entrada: {value:3},
-    apresentacao: {value:4},
+    apresentacao: {
+        imagem: false,
+        video: false,
+        audio: false,
+        texto: false
+    },
     conhecimento: {
         value:2,
         voz:30,

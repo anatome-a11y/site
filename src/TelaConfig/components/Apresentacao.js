@@ -1,6 +1,6 @@
 import React , {Fragment} from 'react'
 
-import { Radio } from 'antd'
+import { Checkbox } from 'antd'
 
 const Apresentacao = ({apr,edit}) => {
    return (
@@ -9,20 +9,42 @@ const Apresentacao = ({apr,edit}) => {
             <span style={{fontWeight:'bold'}}>Leitor de tela: </span>
             <span style={{color:'#4facf0'}}>DESATIVADO</span>
         </div>
-       <Radio.Group 
-         style={{width:'100%'}}  
-         onChange={ ({target}) => edit('apresentacao','value',target.value) } 
-         value={apr.value}
-        >
-          <Radio value={1}>Imagem</Radio>
-          <hr align='left' width='50%'/>
-          <Radio value={2}>Vídeo</Radio>
-          <hr align='left' width='50%'/>
-          <Radio value={3}>Áudio</Radio>
-          <hr align='left' width='50%'/>
-          <Radio value={4}>Texto</Radio>
-          <hr align='left' width='50%'/>
-       </Radio.Group>
+           <div style={{flex:1,textAlign:'left'}}>
+               <Checkbox
+                   style={{paddingRight: 10}}
+                   checked={apr.imagem}
+                   onChange={ ({target}) => edit('apresentacao','imagem', target.checked) }
+               />
+               Imagem
+           </div>
+           <hr align='left' width='60%'/>
+           <div style={{flex:1,textAlign:'left'}}>
+               <Checkbox
+                   style={{paddingRight: 10}}
+                   checked={apr.video}
+                   onChange={ ({target}) => edit('apresentacao','video', target.checked) }
+               />
+               Vídeo
+           </div>
+           <hr align='left' width='60%'/>
+           <div style={{flex:1,textAlign:'left'}}>
+               <Checkbox
+                   style={{paddingRight: 10}}
+                   checked={apr.audio}
+                   onChange={ ({target}) => edit('apresentacao','audio', target.checked) }
+               />
+               Áudio
+           </div>
+           <hr align='left' width='60%'/>
+           <div style={{flex:1,textAlign:'left'}}>
+               <Checkbox
+                   style={{paddingRight: 10}}
+                   checked={apr.texto}
+                   onChange={ ({target}) => edit('apresentacao','texto', target.checked) }
+               />
+               Texto
+           </div>
+           <hr align='left' width='60%'/>
        </div>
    )
 }
