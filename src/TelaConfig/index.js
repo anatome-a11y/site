@@ -52,8 +52,8 @@ const TelaConfig = ({history}) => {
         </div>
 
         <div style={{display:'flex',justifyContent:'center',width:'100%',padding:24}}>
-            <Button icon='left' onClick={ () => history.goBack() } >Voltar</Button>
-            <Button icon='check' onClick={() => save()}  style={{marginLeft:8,marginRight:8}} type='secondary'>Salvar configurações</Button>
+            <Button icon='left' onClick={ () => history.goBack() } style={{color:'black'}} >Voltar</Button>
+            <Button icon='check' onClick={() => save()}  style={{marginLeft:8,marginRight:8,color:'black'}} type='secondary'>Salvar configurações</Button>
             <Button type='primary' onClick={() => reset()} >Restaurar padrões</Button>
         </div>
 
