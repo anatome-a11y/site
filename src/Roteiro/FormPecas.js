@@ -6,7 +6,7 @@ import PecaGenerica from '../Peca'
 
 import request from '../utils/request'
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const FormItem = Form.Item;
 
 class FormPecas extends Component {

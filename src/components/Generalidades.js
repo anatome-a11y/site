@@ -4,7 +4,7 @@ import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 
 
 import Midia from '../components/Midia'
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const { Item } = List;
 

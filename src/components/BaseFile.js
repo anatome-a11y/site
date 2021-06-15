@@ -14,7 +14,7 @@ import IconeRemover from '@material-ui/icons/Clear';
 import IconeCarregar from '@material-ui/icons/Archive';
 
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const _tiposMidia = {
     aud: 'Áudio',

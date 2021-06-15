@@ -14,7 +14,7 @@ import FormTeoria from './FormTeoria';
 import Header from '../components/Header'
 import { withAppContext } from '../context';
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const Panel = Collapse.Panel;
 const Item = List.Item;
 

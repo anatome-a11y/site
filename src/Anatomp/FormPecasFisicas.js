@@ -6,7 +6,7 @@ import { filter } from '../utils/data'
 
 import Label from '../components/Label'
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const { Item } = List;
 const { Option } = Select;
