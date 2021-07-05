@@ -7,7 +7,7 @@ export const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").
 
 export const filter = (input, option) => norm(option.props.children).indexOf(norm(input)) >= 0
 
-const apiUrl = 'https://anatome.herokuapp.com/';
+const apiUrl = 'http://localhost:8080/';//'https://anatome.herokuapp.com/';
 export const request = (path, options = {}) => fetch(`${apiUrl}${path}`, {headers, ...options}).then(r => r.json())
 
 export const isEmpty = (prop) => (

@@ -2,7 +2,7 @@ import { request } from '../utils/data'
 const { v4: uuidv4 } = require('uuid');
 
 export const onValidate = model => {
-    const { nome, roteiro, instituicao, pecasFisicas, mapa } = model;
+    const { nome, roteiro, instituicao, pecasFisicas, mapa, tipoPecaMapeamento } = model;
     let campos = [], msgs = []
 
 
@@ -32,21 +32,23 @@ export const onValidate = model => {
     }
 
     const hasError = mapa.find(m => {
-
-        if (m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')) {
-            return true
+        if (tipoPecaMapeamento == "pecaFisica") {
+            if (m.localizacao.find(l => l.numero == '' || l.pecaFisica.trim() == '')) {
+                return true
+            }
+            return false;
+        } else {
+            return false;
         }
-
-        return false;
     })
 
     if (hasError) {
         campos = [...campos, 'mapa'];
         msgs = [...msgs, 'Preencha todos os campos obrigatórios'];
-    }else{
-        if(mapa.length == 0){
+    } else {
+        if (mapa.length == 0) {
             campos = [...campos, 'mapa'];
-            msgs = [...msgs, 'Inclua as partes anatômicas para serem setadas'];            
+            msgs = [...msgs, 'Inclua as partes anatômicas para serem setadas'];
         }
     }
 

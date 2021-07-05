@@ -34,8 +34,6 @@ class FormPecas extends Component {
             partes: erros.campos.indexOf('partes'),
         }     
         
-        console.log()
-
         return (
             <Form layout="vertical">
                 <FormItem
