@@ -7,7 +7,7 @@ import Header from '../components/Header'
 
 import { listaIdiomas } from '../utils/mock'
 
-import {getAvaliacao} from "../TelaCorrecao/avaliacao/service";
+import { getAvaliacao } from "../TelaCorrecao/avaliacao/service";
 
 const ButtonGroup = Button.Group;
 const Search = Input.Search;
@@ -112,18 +112,18 @@ const colsAvaliacoesAplicadas = [
     },
 ]
 
-const Crud = ({onEdit, onDelete}) => {
+const Crud = ({ onEdit, onDelete }) => {
     return (
         <ButtonGroup>
-            <Tooltip title='Editar'><Button type={'primary'} ghost onClick={onEdit} icon='edit'/></Tooltip>
-            <Tooltip title='Remover'><Button type={'primary'} ghost onClick={onDelete} icon='delete'/></Tooltip>
+            <Tooltip title='Editar'><Button type={'primary'} ghost onClick={onEdit} icon='edit' /></Tooltip>
+            <Tooltip title='Remover'><Button type={'primary'} ghost onClick={onDelete} icon='delete' /></Tooltip>
         </ButtonGroup>
     )
 }
 
-const CardTitle = ({children, loading}) =>
+const CardTitle = ({ children, loading }) =>
     <div className='anatome-card-title'>{children}{loading ?
-    <Spin size="small" style={{marginLeft: 5}}/> : null}</div>
+        <Spin size="small" style={{ marginLeft: 5 }} /> : null}</div>
 
 class Main extends Component {
 
@@ -170,45 +170,41 @@ class Main extends Component {
                             conteúdos das peças</Button>
                     </Popover>
                 </div>
-                <Collapse bordered={false} defaultActiveKey={['avaliacao_aplicada', 'avaliacao' ,'roteiro_digital', 'roteiro_com_peca']}>
+                <Collapse bordered={false} defaultActiveKey={['avaliacao_aplicada', 'avaliacao', 'roteiro_digital', 'roteiro_com_peca']}>
                     <Panel className='anatome-panel' header={
                         <Header
                             loading={loading}
                             contentQ={<p>....</p>}
                             title={
                                 <Popover placement='right' content={
-                                    <div style={{width: 300, textAlign: 'center'}}>Lista de p</div>
+                                    <div style={{ width: 300, textAlign: 'center' }}>Lista de p</div>
                                 }>
                                     Conteúdos dos roteiros
                                 </Popover>
                             }
                             extra={
                                 <Popover content={
-                                    <div style={{width: 300, textAlign: 'center'}}>Cadastrar conteúdo de novo
+                                    <div style={{ width: 300, textAlign: 'center' }}>Cadastrar conteúdo de novo
                                         roteiro</div>
                                 }>
                                     <Button type='primary' onClick={() => history.push('/roteiro/cadastrar')}
-                                            style={{marginRight: 25}}><Icon type='plus'/>Cadastrar roteiro</Button>
+                                        style={{ marginRight: 25 }}><Icon type='plus' />Cadastrar roteiro</Button>
                                 </Popover>
                             }
                         />}
-                           key='roteiro_digital'>
-                        <div style={{margin: 10, textAlign: 'right'}}>
+                        key='roteiro_digital'>
+                        <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
                                 placeholder="Filtrar"
                                 onSearch={this.onFilterRoteiro}
-                                style={{width: 200, marginRight: 5}}
+                                style={{ width: 200, marginRight: 5 }}
                             />
                         </div>
                         <Table
                             locale={{
                                 emptyText: loading ?
-                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhum conteúdo de roteiro foi encontrado para esta busca</span>
+                                    <Spin /> : <span style={{ color: '#000000A6' }}>Nenhum conteúdo de roteiro foi encontrado para esta busca</span>
                             }}
-                            onRow={ (item,index) => ({ onClick: e => history.push({
-                                    pathname: '/roteiro/editar/' + item._id,
-                                    state: {model: item}
-                            }) }) }
                             columns={[
                                 ...colsRoteiro,
                                 {
@@ -217,12 +213,12 @@ class Main extends Component {
                                     width: 100,
                                     render: (text, item) => <Crud onEdit={() => history.push({
                                         pathname: '/roteiro/editar/' + item._id,
-                                        state: {model: item}
-                                    })} onDelete={this.onShowDelete('roteiro', item)}/>,
+                                        state: { model: item }
+                                    })} onDelete={this.onShowDelete('roteiro', item)} />,
                                 }
                             ]}
                             rowKey='_id'
-                            pagination={{style: {textAlign: 'center', width: '100%'}}}
+                            pagination={{ style: { textAlign: 'center', width: '100%' } }}
                             dataSource={roteiros}
                         />
                     </Panel>
@@ -232,7 +228,7 @@ class Main extends Component {
                             contentQ={<p>....</p>}
                             title={
                                 <Popover placement='right' content={
-                                    <div style={{width: 300, textAlign: 'center'}}>Roteiros prontos para os estudantes
+                                    <div style={{ width: 300, textAlign: 'center' }}>Roteiros prontos para os estudantes
                                         usarem no APP Anatome</div>
                                 }>
                                     Roteiros setados
@@ -240,31 +236,27 @@ class Main extends Component {
                             }
                             extra={
                                 <Popover content={
-                                    <div style={{width: 300, textAlign: 'center'}}>Associar o nome das partes anatômicas
+                                    <div style={{ width: 300, textAlign: 'center' }}>Associar o nome das partes anatômicas
                                         do roteiro à sua localização nas peças</div>
                                 }>
                                     <Button type='primary' onClick={() => history.push('/mapeamento/cadastrar')}
-                                            style={{marginRight: 25}}><Icon type='plus'/>Setar localização</Button>
+                                        style={{ marginRight: 25 }}><Icon type='plus' />Setar localização</Button>
                                 </Popover>
                             }
                         />}
-                           key='roteiro_com_peca'>
-                        <div style={{margin: 10, textAlign: 'right'}}>
+                        key='roteiro_com_peca'>
+                        <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
                                 placeholder="Filtrar"
                                 onSearch={this.onFilterAnatomp}
-                                style={{width: 200, marginRight: 5}}
+                                style={{ width: 200, marginRight: 5 }}
                             />
                         </div>
                         <Table
                             locale={{
                                 emptyText: loading ?
-                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhum roteiro de peça física foi encontrado</span>
+                                    <Spin /> : <span style={{ color: '#000000A6' }}>Nenhum roteiro de peça física foi encontrado</span>
                             }}
-                            onRow={ (item,index) => ({ onClick: e => history.push({
-                                    pathname: '/mapeamento/editar/' + item._id,
-                                    state: {model: item}
-                            }) }) }
                             columns={[
                                 ...colsAnatomp,
                                 {
@@ -273,12 +265,12 @@ class Main extends Component {
                                     width: 100,
                                     render: (text, item) => <Crud onEdit={() => history.push({
                                         pathname: '/mapeamento/editar/' + item._id,
-                                        state: {model: item}
-                                    })} onDelete={this.onShowDelete('anatomp', item)}/>,
+                                        state: { model: item }
+                                    })} onDelete={this.onShowDelete('anatomp', item)} />,
                                 }
                             ]}
                             rowKey='_id'
-                            pagination={{style: {textAlign: 'center', width: '100%'}}}
+                            pagination={{ style: { textAlign: 'center', width: '100%' } }}
                             dataSource={anatomp}
                         />
                     </Panel>
@@ -288,7 +280,7 @@ class Main extends Component {
                             contentQ={<p>....</p>}
                             title={
                                 <Popover placement='right' content={
-                                    <div style={{width: 300, textAlign: 'center'}}>
+                                    <div style={{ width: 300, textAlign: 'center' }}>
                                         Avaliações a serem submetidas
                                     </div>
                                 }>
@@ -297,35 +289,31 @@ class Main extends Component {
                             }
                             extra={
                                 <Popover content={
-                                    <div style={{width: 300, textAlign: 'center'}}>
+                                    <div style={{ width: 300, textAlign: 'center' }}>
                                         Cadastrar uma nova avaliação
                                     </div>
                                 }>
                                     <Button type='primary'
-                                            onClick={() => {}}
-                                            style={{marginRight: 25}}>
-                                        <Icon type='plus'/>Cadastrar avaliação
+                                        onClick={() => { }}
+                                        style={{ marginRight: 25 }}>
+                                        <Icon type='plus' />Cadastrar avaliação
                                     </Button>
                                 </Popover>
                             }
                         />}
-                           key='avaliacao'>
-                        <div style={{margin: 10, textAlign: 'right'}}>
+                        key='avaliacao'>
+                        <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
                                 placeholder="Filtrar"
                                 onSearch={this.onFilterAvaliacao}
-                                style={{width: 200, marginRight: 5}}
+                                style={{ width: 200, marginRight: 5 }}
                             />
                         </div>
                         <Table
                             locale={{
                                 emptyText: loading ?
-                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação foi encontrada</span>
+                                    <Spin /> : <span style={{ color: '#000000A6' }}>Nenhuma avaliação foi encontrada</span>
                             }}
-                            onRow={ (item,index) => ({ onClick: e => history.push({
-                                    pathname: '/',
-                                    state: {model: item}
-                                }) }) }
                             columns={[
                                 ...colsAvaliacoes,
                                 {
@@ -336,14 +324,14 @@ class Main extends Component {
                                         <Crud onEdit={() =>
                                             history.push({
                                                 pathname: '/',
-                                                state: {model: item}
+                                                state: { model: item }
                                             })}
-                                              onDelete={() => {}}
+                                            onDelete={() => { }}
                                         />,
                                 }
                             ]}
                             rowKey='id'
-                            pagination={{style: {textAlign: 'center', width: '100%'}}}
+                            pagination={{ style: { textAlign: 'center', width: '100%' } }}
                             dataSource={dadosAval}
                         />
                     </Panel>
@@ -353,7 +341,7 @@ class Main extends Component {
                             contentQ={<p>....</p>}
                             title={
                                 <Popover placement='right' content={
-                                    <div style={{width: 300, textAlign: 'center'}}>
+                                    <div style={{ width: 300, textAlign: 'center' }}>
                                         Avaliações submetidas pelos aluno para serem corrigidas
                                     </div>
                                 }>
@@ -362,35 +350,31 @@ class Main extends Component {
                             }
                             extra={
                                 <Popover content={
-                                    <div style={{width: 300, textAlign: 'center'}}>
+                                    <div style={{ width: 300, textAlign: 'center' }}>
                                         Cadastrar uma nova avaliação aplicada do estudante
                                     </div>
                                 }>
                                     <Button type='primary'
-                                            onClick={() => {}}
-                                            style={{marginRight: 25}}>
-                                        <Icon type='plus'/>Corrigir avaliação
+                                        onClick={() => { }}
+                                        style={{ marginRight: 25 }}>
+                                        <Icon type='plus' />Corrigir avaliação
                                     </Button>
                                 </Popover>
                             }
                         />}
-                           key='avaliacao_aplicada'>
-                        <div style={{margin: 10, textAlign: 'right'}}>
+                        key='avaliacao_aplicada'>
+                        <div style={{ margin: 10, textAlign: 'right' }}>
                             <Search
                                 placeholder="Filtrar"
                                 onSearch={this.onFilterAvaliacaoAplicada}
-                                style={{width: 200, marginRight: 5}}
+                                style={{ width: 200, marginRight: 5 }}
                             />
                         </div>
                         <Table
                             locale={{
                                 emptyText: loading ?
-                                    <Spin/> : <span style={{color: '#000000A6'}}>Nenhuma avaliação aplicada foi encontrada</span>
+                                    <Spin /> : <span style={{ color: '#000000A6' }}>Nenhuma avaliação aplicada foi encontrada</span>
                             }}
-                            onRow={ (item,index) => ({ onClick: e => history.push({
-                                pathname: '/correcao/' + item.id,
-                                state: {model: item}
-                            }) }) }
                             columns={[
                                 ...colsAvaliacoesAplicadas,
                                 {
@@ -401,14 +385,14 @@ class Main extends Component {
                                         <Crud onEdit={() =>
                                             history.push({
                                                 pathname: '/correcao/' + item.id,
-                                                state: {model: item}
+                                                state: { model: item }
                                             })}
-                                              onDelete={this.onShowDelete('anatomp', item)}
+                                            onDelete={this.onShowDelete('anatomp', item)}
                                         />,
                                 }
                             ]}
                             rowKey='id'
-                            pagination={{style: {textAlign: 'center', width: '100%'}}}
+                            pagination={{ style: { textAlign: 'center', width: '100%' } }}
                             dataSource={dadosAval}
                         />
                     </Panel>
@@ -420,8 +404,8 @@ class Main extends Component {
                     onOk={this.onDelete}
                     cancelText='Cancelar'
                     onCancel={this.onClose}
-                    okButtonProps={{loading}}
-                    cancelButtonProps={{loading}}
+                    okButtonProps={{ loading }}
+                    cancelButtonProps={{ loading }}
                 >
                     {this.onGetBody()}
                 </Modal>
@@ -430,11 +414,11 @@ class Main extends Component {
     }
 
     onGetBody = () => {
-        const {toDelete, resourceToDelete} = this.state;
+        const { toDelete, resourceToDelete } = this.state;
         if (toDelete !== null) {
             return <div>Deseja realmente excluir
                 o {resourceToDelete == 'anatomp' ? 'roteiro setado' : 'conteúdo do roteiro'} <span
-                    style={{fontWeight: 'bold'}}>{toDelete.nome}</span>?</div>
+                    style={{ fontWeight: 'bold' }}>{toDelete.nome}</span>?</div>
         } else {
             return null;
         }
@@ -445,7 +429,7 @@ class Main extends Component {
     }
 
     onClose = () => this.setState({ open: false }, () => {
-        this.setState({toDelete: null, resourceToDelete: ''})
+        this.setState({ toDelete: null, resourceToDelete: '' })
     })
 
 
@@ -478,7 +462,7 @@ class Main extends Component {
     }
 
 
-    onDelete =  () => {
+    onDelete = () => {
         this.props.onSetAppState({ loading: true })
         this.props.onOpenSnackbar('Aguarde...', 'loading');
 
@@ -537,7 +521,7 @@ class Main extends Component {
             )
         });
 
-        this.setState({roteiros: _list})
+        this.setState({ roteiros: _list })
     }
 
     onFilterAvaliacaoAplicada = val => {
@@ -554,7 +538,7 @@ class Main extends Component {
             )
         });
 
-        this.setState({roteiros: _list})
+        this.setState({ roteiros: _list })
     }
 
     onFilterAvaliacao = val => {
@@ -570,7 +554,7 @@ class Main extends Component {
                 norm(p.instituicao).indexOf(_val) !== -1
             )
         });
-        this.setState({roteiros: _list})
+        this.setState({ roteiros: _list })
     }
 }
 

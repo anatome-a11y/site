@@ -34,8 +34,7 @@ export default class ImageMappedPoints extends Component {
 
                 var offset = this.referenciasImagens[idx].current.getBoundingClientRect();
                 var x = Math.floor((e.pageX - 10 - offset.left) / offset.width * 10000) / 100;
-                //265
-                var y = (Math.floor((e.pageY - 15 - offset.top) / offset.height * 10000) / 100) - 250;
+                var y = (Math.floor((e.clientY - 15 - offset.top) / offset.height * 10000) / 100);
 
                 this.state.mapa[this.idxProximo].pontos[0] = label;
                 var mapa = this.state.mapa[this.idxProximo];
