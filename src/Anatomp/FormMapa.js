@@ -140,6 +140,7 @@ class FormMapa extends Component {
                                 pecaFisicaDigital={this.state.pecaFisicaDigital}
                                 mapa={mapa}
                                 style={{ top: 0 }}
+                                onChangeMapa={onChangeMapa}
                             />
                         </Modal>
                     </div>

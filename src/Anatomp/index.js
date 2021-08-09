@@ -358,6 +358,7 @@ class Anatomp extends Component {
     }
 
     onChangeMapa = (field, idx, idxLoc, extraProps) => value => {
+
         const { model } = this.state;
 
         this.setState({

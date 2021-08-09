@@ -24,7 +24,6 @@ class FormLocalizacao extends Component {
     render() {
 
         const { model, onChange, partes, item, erroLocalizacao } = this.props;
-
         const {
             referenciaParaReferenciado,
             referenciadoParaReferencia,
@@ -39,8 +38,8 @@ class FormLocalizacao extends Component {
                 <Label error={erroLocalizacao}>A parte <span style={{ fontWeight: 'bold' }}>{item.parte.nome}</span> é referenciada pela parte:</Label>
                 <Form>
                     <FormItem
-                            validateStatus={erroLocalizacao != null ? 'error' : ''}
-                            help={erroLocalizacao}                    
+                        validateStatus={erroLocalizacao != null ? 'error' : ''}
+                        help={erroLocalizacao}
                     >
                         <Select
                             showSearch
