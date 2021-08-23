@@ -47,7 +47,7 @@ const MappedPoint = ({ key, point, enableDelete, idx, idxPonto, deletePoint }) =
             <Modal
                 title={point.parte.nome}
                 visible={isModalVisible}
-                onOk={handleOk}
+                onOk={handleOk} 
                 onCancel={handleCancel}
                 footer={[
                     <div>

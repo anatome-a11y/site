@@ -12,9 +12,15 @@ export default class ImageMappedPoints extends Component {
     selecionou = false;
     referenciasImagens = [];
 
-    openTeste = false;
+    openModalLocRelativa = false;
+    openModalExcluirPonto = false;
+    pontosExcluidos = [];
 
-    toEditRefRelTeste = {};
+    indexPontoExcluir = null;
+    labelPontoExcluir = null;
+    nomePartePontoExcluir = null;
+
+    toEditRefRelLocal = {};
 
     constructor(props) {
         super(props);
@@ -24,16 +30,17 @@ export default class ImageMappedPoints extends Component {
 
         if (this.enableOnClick) {
             if (this.idxProximo != -1) {
+                var label = null;
 
                 if (this.selecionou) {
-                    var existePonto = this.getPointByLabel(this.idxProximo + 1);
+                    var existePonto = this.getPointByLabel(this.labelProximo);
                     if (existePonto == true) {
-                        var label = this.idxProximo + 1;
+                        label = this.labelProximo;
                     } else {
-                        var label = this.getNextLabel();
+                        label = this.getNextLabel();
                     }
                 } else {
-                    var label = this.getNextLabel();
+                    label = this.getNextLabel();
                 }
                 this.selecionou = false;
 
@@ -74,9 +81,11 @@ export default class ImageMappedPoints extends Component {
 
     getPointByLabel(label) {
 
-        for (let idx = 0; idx < this.state.mapa.length; idx++) {
-            if (this.state.mapa[idx].pontos[0] == label) {
-                return true;
+        if (label) {
+            for (let idx = 0; idx < this.state.mapa.length; idx++) {
+                if (this.state.mapa[idx].pontos[0] == label) {
+                    return true;
+                }
             }
         }
         return false;
@@ -97,7 +106,6 @@ export default class ImageMappedPoints extends Component {
 
     deletePoint = (idx, idxPonto) => {
 
-        const label = this.state.pecaFisicaDigital.midias[idx].pontos[idxPonto].label;
         this.state.pecaFisicaDigital.midias[idx].pontos.splice(idxPonto, 1);
         this.forceUpdate();
 
@@ -108,13 +116,13 @@ export default class ImageMappedPoints extends Component {
         if (this.pontos.length == 0) {
             return 1;
         }
-
-        var labelMaior = this.pontos[0].label;
+        var labelMaior = 1;
         for (let idx = 0; idx < this.pontos.length; idx++) {
             if (parseInt(this.pontos[idx].label) > parseInt(labelMaior)) {
                 labelMaior = this.pontos[idx].label;
             }
         }
+
         return labelMaior + 1;
 
     }
@@ -123,10 +131,11 @@ export default class ImageMappedPoints extends Component {
 
         for (let idx = this.idxProximo; idx < this.state.mapa.length; idx++) {
             if (
+                this.state.mapa[idx] !== undefined &&
+                this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null &&
                 (this.state.mapa[idx].pontos[0] === undefined
                     || this.state.mapa[idx].pontos[0] == null
                     || this.state.mapa[idx].pontos[0] == "")
-                && this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null
             ) {
                 this.idxProximo = idx;
                 return;
@@ -145,18 +154,19 @@ export default class ImageMappedPoints extends Component {
 
     getIcon(idx) {
 
-        if (idx == this.idxProximo) {
+        if (this.idxProximo != -1 && idx == this.idxProximo) {
             return <Icon type='arrow-right' style={{ color: '#1890ff' }} />;
         }
         return <div></div>;
 
     }
 
-    setIdxProximo(index) {
+    setIdxProximo(index, label) {
 
         if (this.state.mapa[index].localizacao[0].referenciaRelativa.referencia == null) {
             this.selecionou = true;
             this.idxProximo = index;
+            this.labelProximo = label;
             this.forceUpdate();
         }
 
@@ -176,6 +186,61 @@ export default class ImageMappedPoints extends Component {
 
     }
 
+    limparPontosReferenciaRelativa(item, idx) {
+
+        // Remove os pontos da imagem
+        const filteredObjs = this.state.pecaFisicaDigital.midias.map((image) => {
+            image.pontos = image.pontos.filter((point) => {
+                if (point.label == item.localizacao[0].numero) {
+                    return false
+                }
+
+                return true
+            })
+        });
+
+        this.state.mapa[idx].pontos = [];
+
+        this.getNextPart();
+
+    }
+
+    openModalExcluirPontoFunction = (index, label,nomeParte) => {
+
+        this.setState({
+            openModalExcluirPonto: true
+        })
+        this.indexPontoExcluir = index;
+        this.labelPontoExcluir = label;
+        this.nomePartePontoExcluir = nomeParte;
+        this.openModalExcluirPonto = true;
+
+    }
+
+    closeModalExcluirPontoFunction = () => {
+
+        this.setState({
+            openModalExcluirPonto: false
+        })
+        this.indexPontoExcluir = null;
+        this.labelPontoExcluir = null;
+        this.nomePartePontoExcluir = null;
+        this.openModalExcluirPonto = false;
+
+    }
+
+    excluirLabelPonto = () => {
+
+        if (this.indexPontoExcluir != null) {
+            this.pontosExcluidos.push(this.labelPontoExcluir);
+            this.state.mapa[this.indexPontoExcluir].pontos = [];
+
+            this.removerPontoMapa(this.labelPontoExcluir);
+            this.closeModalExcluirPontoFunction();
+        }
+
+    }
+
     onChangeLocalizacaoRelativa = (model, idx, idxLoc, item) => e => {
 
         if (e.target.checked) {
@@ -184,12 +249,14 @@ export default class ImageMappedPoints extends Component {
                 erroLocalizacao: null,
                 toEditRefRel: { model, idx, idxLoc, item }
             })
-            this.openTeste = true;
-            this.toEditRefRelTeste = { model, idx, idxLoc, item };
+            this.openModalLocRelativa = true;
+            this.toEditRefRelLocal = { model, idx, idxLoc, item };
 
             this.state.mapa[idx].localizacao[idxLoc].referenciaRelativa.referencia = ' ';
+            this.limparPontosReferenciaRelativa(item, idx);
 
         } else {
+            this.idxProximo = idx;
             this.state.mapa[idx].localizacao[idxLoc].referenciaRelativa.referencia = null;
             this.onClearRefRel()
         }
@@ -205,8 +272,8 @@ export default class ImageMappedPoints extends Component {
                     erroLocalizacao: null,
                     toEditRefRel: { model, idx, idxLoc, item }
                 })
-                this.toEditRefRelTeste = { model, idx, idxLoc, item };
-                this.openTeste = true;
+                this.toEditRefRelLocal = { model, idx, idxLoc, item };
+                this.openModalLocRelativa = true;
             } else {
                 this.state.mapa[idx].localizacao[idxLoc].referenciaRelativa.referencia = null;
                 this.onClearRefRel()
@@ -245,7 +312,7 @@ export default class ImageMappedPoints extends Component {
                 item: null
             }
         })
-        this.openTeste = false;
+        this.openModalLocRelativa = false;
     }
 
     onChangeRefRel = field => value => {
@@ -262,7 +329,7 @@ export default class ImageMappedPoints extends Component {
             }
         })
 
-        this.toEditRefRelTeste.model[field] = value;
+        this.toEditRefRelLocal.model[field] = value;
     }
 
     render() {
@@ -277,6 +344,7 @@ export default class ImageMappedPoints extends Component {
             pecaFisicaDigital: this.props.pecaFisicaDigital,
             mapa: this.props.mapa,
             open: false,
+            openModalExcluirPonto: false,
             erroLocalizacao: null,
             toEditRefRel: {
                 model: {},
@@ -293,21 +361,30 @@ export default class ImageMappedPoints extends Component {
         this.pontos = [];
         for (let idx = 0; idx < this.state.pecaFisicaDigital.midias.length; idx++) {
             for (let idxP = 0; idxP < this.state.pecaFisicaDigital.midias[idx].pontos.length; idxP++) {
-                this.pontos.push(this.state.pecaFisicaDigital.midias[idx].pontos[idxP])
+                if (this.state.pecaFisicaDigital.midias[idx].pontos[idxP] != null && !this.pontosExcluidos.includes(this.state.pecaFisicaDigital.midias[idx].pontos[idxP].label)) {
+                    this.pontos.push(this.state.pecaFisicaDigital.midias[idx].pontos[idxP])
+                } else {
+                    this.state.pecaFisicaDigital.midias[idx].pontos.splice(idxP, 1)
+                }
             }
         }
+
 
         for (let idx = 0; idx < this.state.mapa.length; idx++) {
             let label = this.getLabelParte(this.state.mapa[idx].parte._id);
-            this.state.mapa[idx].pontos.push(label)
-            if (this.state.pecaFisicaDigital._id == this.state.mapa[idx].localizacao[0].pecaFisica) {
-                this.state.mapa[idx].localizacao[0].numero = label;
+
+            if (!this.pontosExcluidos.includes(label)) {
+                this.state.mapa[idx].pontos.push(label)
+                if (this.state.pecaFisicaDigital._id == this.state.mapa[idx].localizacao[0].pecaFisica) {
+                    this.state.mapa[idx].localizacao[0].numero = label;
+                }
             }
         }
 
-        if (this.pontos.length == 0) {
+        if (this.pontos.length == 0 && this.idxProximo != -1) {
             this.idxProximo = 0;
         }
+
 
         return (
             <div>
@@ -321,7 +398,7 @@ export default class ImageMappedPoints extends Component {
                             renderItem={(item, index) =>
 
                                 <List.Item>
-                                    <div onClick={() => this.setIdxProximo(index)} style={{ textAlign: 'left' }}>
+                                    <div onClick={() => this.setIdxProximo(index, item.pontos[0])} style={{ textAlign: 'left' }}>
                                         {this.getIcon(index)}
                                         {item.parte.nome}
                                     </div>
@@ -329,7 +406,11 @@ export default class ImageMappedPoints extends Component {
                                         float: 'right'
                                     }}>
                                         <div>
-                                            <Badge count={item.pontos[0]} />
+                                            <a
+                                                onClick={() => this.openModalExcluirPontoFunction(index, item.pontos[0],item.parte.nome)}
+                                                key={item.parte._id}>
+                                                <Badge count={item.pontos[0]} />
+                                            </a>
                                             <Checkbox
                                                 checked={item.localizacao[0].referenciaRelativa.referencia != null}
                                                 onChange={this.onChangeLocalizacaoRelativa(item.localizacao[0].referenciaRelativa, index, 0, item)}
@@ -383,14 +464,24 @@ export default class ImageMappedPoints extends Component {
                 <Modal
                     destroyOnClose={true}
                     title='Localização Relativa'
-                    visible={this.openTeste}
+                    visible={this.openModalLocRelativa}
                     okText='Salvar'
-                    onOk={() => this.onAppyChangeRefRel(this.toEditRefRelTeste)}
+                    onOk={() => this.onAppyChangeRefRel(this.toEditRefRelLocal)}
                     cancelText='Cancelar'
                     onCancel={this.onClearRefRel}
                 >
-                    <FormLocalizacao erroLocalizacao={this.state.erroLocalizacao} {...this.toEditRefRelTeste} onChange={this.onChangeRefRel} partes={this.state.mapa.map(i => i.parte)} />
+                    <FormLocalizacao erroLocalizacao={this.state.erroLocalizacao} {...this.toEditRefRelLocal} onChange={this.onChangeRefRel} partes={this.state.mapa.map(i => i.parte)} />
                 </Modal>
+
+                <Modal
+                    title={'Excluir Mapeamento de Peça Digital'}
+                    visible={this.openModalExcluirPonto}
+                    onOk={() => this.excluirLabelPonto()}
+                    onCancel={this.closeModalExcluirPontoFunction}
+                >
+                    <div>  Deseja realmente excluir o mapeamento da parte <span style={{ fontWeight: 'bold' }}>{this.nomePartePontoExcluir} </span>?</div>
+                </Modal>
+
             </div >
         );
     }
