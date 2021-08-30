@@ -8,7 +8,7 @@ export default class ImageMappedPoints extends Component {
 
     pontos = [];
     enableOnClick = false;
-    idxProximo = -1;
+    idxProximo = 0;
     selecionou = false;
     referenciasImagens = [];
 
@@ -194,7 +194,6 @@ export default class ImageMappedPoints extends Component {
                 if (point.label == item.localizacao[0].numero) {
                     return false
                 }
-
                 return true
             })
         });
@@ -205,7 +204,7 @@ export default class ImageMappedPoints extends Component {
 
     }
 
-    openModalExcluirPontoFunction = (index, label,nomeParte) => {
+    openModalExcluirPontoFunction = (index, label, nomeParte) => {
 
         this.setState({
             openModalExcluirPonto: true
@@ -369,7 +368,6 @@ export default class ImageMappedPoints extends Component {
             }
         }
 
-
         for (let idx = 0; idx < this.state.mapa.length; idx++) {
             let label = this.getLabelParte(this.state.mapa[idx].parte._id);
 
@@ -380,11 +378,6 @@ export default class ImageMappedPoints extends Component {
                 }
             }
         }
-
-        if (this.pontos.length == 0 && this.idxProximo != -1) {
-            this.idxProximo = 0;
-        }
-
 
         return (
             <div>
@@ -407,7 +400,7 @@ export default class ImageMappedPoints extends Component {
                                     }}>
                                         <div>
                                             <a
-                                                onClick={() => this.openModalExcluirPontoFunction(index, item.pontos[0],item.parte.nome)}
+                                                onClick={() => this.openModalExcluirPontoFunction(index, item.pontos[0], item.parte.nome)}
                                                 key={item.parte._id}>
                                                 <Badge count={item.pontos[0]} />
                                             </a>
