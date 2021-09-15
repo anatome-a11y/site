@@ -1,21 +1,17 @@
-import React, { Component, Fragment } from 'react';
+import { Button, Card, Checkbox, Col, Form, Icon, InputNumber, List, Modal, Row, Select, Tooltip } from 'antd';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import ImageMappedPoints from '../components/ImageMappedPoints';
+import Label from '../components/Label';
+import { filter } from '../utils/data';
+import FormLocalizacao from './FormLocalizacao';
 
-import { List, Tooltip, Button, Checkbox, Form, Select, Modal, InputNumber, Card, Row, Col, Icon } from 'antd'
-import { filter } from '../utils/data'
-
-import Label from '../components/Label'
-import ImageMappedPoints from '../components/ImageMappedPoints'
-
-import FormLocalizacao from './FormLocalizacao'
 
 const { v4: uuidv4 } = require('uuid');
 const { Option } = Select;
 
 const { Item } = List;
 const FormItem = Form.Item;
-
-
 class FormMapa extends Component {
 
     state = {
@@ -29,7 +25,8 @@ class FormMapa extends Component {
             item: null
         },
         tipoPecaMapeamento: "pecaDigital",
-        offsetTop: 0
+        offsetTop: 0,
+        partesFormLocalizacao: []
     }
 
     showModal = (pecaFisicaDigital, idxPecaFisica, mapa) => {
@@ -51,7 +48,7 @@ class FormMapa extends Component {
     };
 
     render() {
-        const { loading, open, toEditRefRel, erroLocalizacao } = this.state;
+        const { loading, open, toEditRefRel, erroLocalizacao, partesFormLocalizacao } = this.state;
         const { onChangeMapa, onChangeMapaCompleto, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros, tipoPecaMapeamento, onChangePecaFisica } = this.props;
 
         const _erros = {
@@ -69,6 +66,11 @@ class FormMapa extends Component {
 
             onChangePecaFisica('midias', this.state.idxPecaFisicaDigital)(this.state.pecaFisicaDigitalBkp.midias)
         };
+
+        if (toEditRefRel.item) {
+            const mapaFiltrado = mapa.filter(m => m.localizacao[0].pecaFisica == toEditRefRel.item.localizacao[0].pecaFisica);
+            this.state.partesFormLocalizacao = mapaFiltrado.map(i => i.parte).filter(p => p._id != toEditRefRel.item.parte._id);
+        }
 
         return (
             <Form style={{ margin: 20 }}>
@@ -212,7 +214,12 @@ class FormMapa extends Component {
                             cancelText='Cancelar'
                             onCancel={this.onClose}
                         >
-                            <FormLocalizacao erroLocalizacao={erroLocalizacao} {...toEditRefRel} onChange={this.onChangeRefRel} partes={mapa.map(i => i.parte)} />
+                            <FormLocalizacao
+                                erroLocalizacao={erroLocalizacao}
+                                {...toEditRefRel}
+                                onChange={this.onChangeRefRel}
+                                partes={this.state.partesFormLocalizacao}
+                            />
                         </Modal>
                     </div>
                 </FormItem>

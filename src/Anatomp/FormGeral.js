@@ -55,7 +55,7 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                     <FormItem
                         validateStatus={_erros.nome != -1 ? 'error' : ''}
                         help={erros.msgs[_erros.nome] || ''}
-                        label='Nome da Anatome-AT'
+                        label='Nome do Roteiro Setado'
                     >
                         <Input value={nome} onChange={e => onChange('nome')(e.target.value)} />
                     </FormItem>

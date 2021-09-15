@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import FormLocalizacao from '../Anatomp/FormLocalizacao';
 import MappedPoint from './MappedPoint';
 
-
 export default class ImageMappedPoints extends Component {
 
     pontos = [];
@@ -351,6 +350,7 @@ export default class ImageMappedPoints extends Component {
                 idxLoc: '',
                 item: null
             },
+            partesFormLocalizacao: []
         };
 
         for (let idx = 0; idx < this.state.pecaFisicaDigital.midias.length; idx++) {
@@ -379,6 +379,11 @@ export default class ImageMappedPoints extends Component {
             }
         }
 
+        if (this.toEditRefRelLocal.item) {
+            const mapaFiltrado = this.state.mapa.filter(m => m.localizacao[0].pecaFisica == this.toEditRefRelLocal.item.localizacao[0].pecaFisica);
+            this.state.partesFormLocalizacao = mapaFiltrado.map(i => i.parte).filter(p => p._id != this.toEditRefRelLocal.item.parte._id);
+        }
+
         return (
             <div>
                 <Row>
@@ -387,7 +392,7 @@ export default class ImageMappedPoints extends Component {
                             size="small"
                             header={<div style={{ fontWeight: 'bold' }}>Partes anatômicas</div>}
                             bordered
-                            dataSource={this.state.mapa}
+                            dataSource={this.state.mapa/*.filter(m => m.localizacao[0].pecaFisica == this.state.pecaFisicaDigital._id)*/}
                             renderItem={(item, index) =>
 
                                 <List.Item>
@@ -463,7 +468,12 @@ export default class ImageMappedPoints extends Component {
                     cancelText='Cancelar'
                     onCancel={this.onClearRefRel}
                 >
-                    <FormLocalizacao erroLocalizacao={this.state.erroLocalizacao} {...this.toEditRefRelLocal} onChange={this.onChangeRefRel} partes={this.state.mapa.map(i => i.parte)} />
+                    <FormLocalizacao
+                        erroLocalizacao={this.state.erroLocalizacao}
+                        {...this.toEditRefRelLocal}
+                        onChange={this.onChangeRefRel}
+                        partes={this.state.partesFormLocalizacao}
+                    />
                 </Modal>
 
                 <Modal

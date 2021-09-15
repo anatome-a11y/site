@@ -1,10 +1,10 @@
+import { Button, Form, Input, List, Radio, Select, Spin, Tooltip, Upload } from 'antd';
 import React, { Component, Fragment } from 'react';
+import Label from '../components/Label';
+import MidiaImage from '../components/MidiaImage';
+import { filter } from '../utils/data';
 
-import { List, Tooltip, Button, Input, Select, Form, Radio, Upload, Spin } from 'antd'
-import { filter } from '../utils/data'
 
-import MidiaImage from '../components/MidiaImage'
-import Label from '../components/Label'
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -133,7 +133,7 @@ class FormPecasFisicas extends Component {
                         <Radio value={'pecaFisica'}>Peças físicas</Radio>
                     </Radio.Group>
 
-                    <Label>Inclua as informações sobre as peças que terão os elementos anatômicos etiquetados e serão disponibilizadas aos estudantes para aprenderem o conteúdo deste roteiro usando o APP Anatome</Label>
+                    <Label>Inclua as informações sobre as peças que terão as partes anatômicas etiquetadas e serão disponibilizadas aos estudantes para aprenderem o conteúdo deste roteiro usando o APP Anatome</Label>
                     <List
                         rowKey='_id'
                         size="small"
