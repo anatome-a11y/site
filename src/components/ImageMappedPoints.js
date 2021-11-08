@@ -393,33 +393,38 @@ export default class ImageMappedPoints extends Component {
                             header={<div style={{ fontWeight: 'bold' }}>Partes anatômicas</div>}
                             bordered
                             dataSource={this.state.mapa/*.filter(m => m.localizacao[0].pecaFisica == this.state.pecaFisicaDigital._id)*/}
-                            renderItem={(item, index) =>
+                            renderItem={(item, index) => (
 
-                                <List.Item>
-                                    <div onClick={() => this.setIdxProximo(index, item.pontos[0])} style={{ textAlign: 'left' }}>
-                                        {this.getIcon(index)}
-                                        {item.parte.nome}
-                                    </div>
-                                    <div style={{
-                                        float: 'right'
-                                    }}>
-                                        <div>
-                                            <a
-                                                onClick={() => this.openModalExcluirPontoFunction(index, item.pontos[0], item.parte.nome)}
-                                                key={item.parte._id}>
-                                                <Badge count={item.pontos[0]} />
-                                            </a>
-                                            <Checkbox
-                                                checked={item.localizacao[0].referenciaRelativa.referencia != null}
-                                                onChange={this.onChangeLocalizacaoRelativa(item.localizacao[0].referenciaRelativa, index, 0, item)}
-                                                style={{ marginLeft: 5 }} />
-                                            <a onClick={() => this.onOpenRefRel(item.localizacao[0].referenciaRelativa, index, 0, item)({ target: { checked: true } })}>
-                                                <Icon type='environment' />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </List.Item>
+                                <div style={{}}>
+                                    {
+                                        item.localizacao[0].pecaFisica == this.state.pecaFisicaDigital._id && <List.Item key={index} style={{ border: '1px solid #e8e8e8' }}>
+                                            <div onClick={() => this.setIdxProximo(index, item.pontos[0])} style={{ textAlign: 'left' }}>
+                                                {this.getIcon(index)}
+                                                {item.parte.nome}
+                                            </div>
+                                            <div style={{
+                                                float: 'right'
+                                            }}>
+                                                <div>
+                                                    <a
+                                                        onClick={() => this.openModalExcluirPontoFunction(index, item.pontos[0], item.parte.nome)}
+                                                        key={item.parte._id}>
+                                                        <Badge count={item.pontos[0]} />
+                                                    </a>
+                                                    <Checkbox
+                                                        checked={item.localizacao[0].referenciaRelativa.referencia != null}
+                                                        onChange={this.onChangeLocalizacaoRelativa(item.localizacao[0].referenciaRelativa, index, 0, item)}
+                                                        style={{ marginLeft: 5 }} />
+                                                    <a onClick={() => this.onOpenRefRel(item.localizacao[0].referenciaRelativa, index, 0, item)({ target: { checked: true } })}>
+                                                        <Icon type='environment' />
+                                                    </a>
+                                                </div>
+                                            </div>
 
+                                        </List.Item>
+                                    }
+                                </div>
+                            )
                             }
                         />
                     </Col>

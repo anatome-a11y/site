@@ -42,23 +42,23 @@ class Form extends Component {
                             </div>
                         </div>
                     ) : (
-                            <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
-                                <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
-                                <Button style={{ marginRight: 5 }} type='primary' ghost icon='check' onClick={this.onSubmitRoteiro} size='large'>Salvar conteúdo do roteiro</Button>
-                                <Button type='primary' icon='environment' onClick={() => this.setState({ mapearAgora: true })} size='large'>Setar localização agora</Button>
-                            </div>
-                        )
+                        <div style={{ textAlign: 'center', marginTop: 15, marginBottom: 30 }}>
+                            <Button style={{ marginRight: 5 }} icon='rollback' onClick={() => this.props.onPush('/')} size='large'>Voltar</Button>
+                            <Button style={{ marginRight: 5 }} type='primary' ghost icon='check' onClick={this.onSubmitRoteiro} size='large'>Salvar conteúdo do roteiro</Button>
+                            {/*<Button type='primary' icon='environment' onClick={() => this.setState({ mapearAgora: true })} size='large'>Setar localização agora</Button>*/}
+                        </div>
+                    )
                 }
             </div>
         )
     }
 
-    onAddPeca = () => this.setState({sinalPeca: uuidv4()})
+    onAddPeca = () => this.setState({ sinalPeca: uuidv4() })
 
 
     onSubmitRoteiro = () => {
         onSaveRoteiro(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.modelRoteiro, ret => {
-            this.props.onOpenSnackbar(`O roteiro ${this.state.modelRoteiro.nome} foi salvo com sucesso!`, 'success');            
+            this.props.onOpenSnackbar(`O roteiro ${this.state.modelRoteiro.nome} foi salvo com sucesso!`, 'success');
             this.props.onPush('/')
         })
     }
