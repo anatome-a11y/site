@@ -31,10 +31,17 @@ class FormMapa extends Component {
 
     showModal = (pecaFisicaDigital, idxPecaFisica, mapa) => {
         var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+
+        var idsPecasFisicas = this.props.pecasFisicas.filter(p => p.pecaGenerica == pecaFisicaDigital.pecaGenerica).map(function (item) {
+            return item._id;
+        });
+
+
         this.setState({
             visible: true,
             offsetTop: rect.offsetTop,
             pecaFisicaDigital: pecaFisicaDigital,
+            idsPecasFisicas: idsPecasFisicas,
             pecaFisicaDigitalBkp: JSON.parse(JSON.stringify(pecaFisicaDigital)),
             idxPecaFisicaDigital: idxPecaFisica,
             mapaBkp: mapa
@@ -49,7 +56,7 @@ class FormMapa extends Component {
 
     render() {
         const { loading, open, toEditRefRel, erroLocalizacao, partesFormLocalizacao } = this.state;
-        const { onChangeMapa, onChangeMapaCompleto, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros, tipoPecaMapeamento, onChangePecaFisica } = this.props;
+        const { onChangeMapa, onChangeMapaCompleto, mapa, pecasFisicas, onAddPecaFisica, onRemovePecaFisica, erros, tipoPecaMapeamento, onChangePecaFisica, onOpenSnackbar } = this.props;
 
         const _erros = {
             mapa: erros.campos.indexOf('mapa'),
@@ -139,10 +146,12 @@ class FormMapa extends Component {
                             <ImageMappedPoints
                                 key={mapa._id}
                                 enableOnClick="true"
+                                idsPecasFisicas={this.state.idsPecasFisicas}
                                 pecaFisicaDigital={this.state.pecaFisicaDigital}
                                 mapa={mapa}
                                 style={{ top: 0 }}
                                 onChangeMapa={onChangeMapa}
+                                onOpenSnackbar={onOpenSnackbar}
                             />
                         </Modal>
                     </div>
@@ -253,7 +262,7 @@ class FormMapa extends Component {
                 this.onClearRefRel()
             } else {
                 this.setState({ erroLocalizacao: 'A localização desta parte ainda não foi setada' })
-                // this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
+                this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
             }
         } else {
             this.props.onChangeMapa('referenciaRelativa', idx, idxLoc)({ ...model });
@@ -287,8 +296,8 @@ class FormMapa extends Component {
         }
     }
 
-
     onClose = () => this.setState({ open: false })
+
 }
 
 

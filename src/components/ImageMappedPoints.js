@@ -66,14 +66,24 @@ export default class ImageMappedPoints extends Component {
                 }
 
                 this.state.pecaFisicaDigital.midias[idx].pontos.push(ponto);
+                this.forceUpdate();
                 this.setState({ pontos: this.pontos });
-
-                this.oldx = x; this.oldy = y;
-
                 this.getNextPart();
+
+                this.verificaPontoExcluido(label);
+
             } else {
                 //    this.enableOnClick = false;
             }
+        }
+
+    }
+
+    verificaPontoExcluido(label) {
+
+        var index = this.pontosExcluidos.indexOf(label);
+        if (index !== -1) {
+            this.pontosExcluidos.splice(index, 1);
         }
 
     }
@@ -126,6 +136,8 @@ export default class ImageMappedPoints extends Component {
 
     }
 
+
+
     getNextPart = () => {
 
         for (let idx = this.idxProximo; idx < this.state.mapa.length; idx++) {
@@ -165,7 +177,7 @@ export default class ImageMappedPoints extends Component {
         if (this.state.mapa[index].localizacao[0].referenciaRelativa.referencia == null) {
             this.selecionou = true;
             this.idxProximo = index;
-            this.labelProximo = label;
+            this.labelProximo = label ? label : this.getNextLabel();
             this.forceUpdate();
         }
 
@@ -232,7 +244,6 @@ export default class ImageMappedPoints extends Component {
         if (this.indexPontoExcluir != null) {
             this.pontosExcluidos.push(this.labelPontoExcluir);
             this.state.mapa[this.indexPontoExcluir].pontos = [];
-
             this.removerPontoMapa(this.labelPontoExcluir);
             this.closeModalExcluirPontoFunction();
         }
@@ -290,10 +301,10 @@ export default class ImageMappedPoints extends Component {
                 this.onClearRefRel()
             } else {
                 this.setState({ erroLocalizacao: 'A localização desta parte ainda não foi setada' })
+                this.props.onOpenSnackbar(`Informe a localização desta parte para utilizá-la como referência`, 'warning');
             }
         } else {
             this.state.mapa[idx].localizacao[idxLoc].referenciaRelativa = model;
-
             this.onClearRefRel()
         }
 
@@ -339,6 +350,7 @@ export default class ImageMappedPoints extends Component {
         this.state = {
             maxWidth: 400,
             maxHeight: 400,
+            idsPecasFisicas: this.props.idsPecasFisicas,
             pecaFisicaDigital: this.props.pecaFisicaDigital,
             mapa: this.props.mapa,
             open: false,
@@ -392,12 +404,12 @@ export default class ImageMappedPoints extends Component {
                             size="small"
                             header={<div style={{ fontWeight: 'bold' }}>Partes anatômicas</div>}
                             bordered
-                            dataSource={this.state.mapa/*.filter(m => m.localizacao[0].pecaFisica == this.state.pecaFisicaDigital._id)*/}
+                            dataSource={this.state.mapa}
                             renderItem={(item, index) => (
 
                                 <div style={{}}>
                                     {
-                                        item.localizacao[0].pecaFisica == this.state.pecaFisicaDigital._id && <List.Item key={index} style={{ border: '1px solid #e8e8e8' }}>
+                                        this.state.idsPecasFisicas.includes(item.localizacao[0].pecaFisica) && <List.Item key={index} style={{ border: '1px solid #e8e8e8' }}>
                                             <div onClick={() => this.setIdxProximo(index, item.pontos[0])} style={{ textAlign: 'left' }}>
                                                 {this.getIcon(index)}
                                                 {item.parte.nome}
@@ -494,3 +506,4 @@ export default class ImageMappedPoints extends Component {
         );
     }
 }
+
