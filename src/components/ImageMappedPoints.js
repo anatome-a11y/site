@@ -9,11 +9,12 @@ export default class ImageMappedPoints extends Component {
     enableOnClick = false;
     idxProximo = 0;
     selecionou = false;
+    primeiroPonto = false;
     referenciasImagens = [];
 
     openModalLocRelativa = false;
     openModalExcluirPonto = false;
-    pontosExcluidos = [];
+    pontosExcluidos = []
 
     indexPontoExcluir = null;
     labelPontoExcluir = null;
@@ -30,8 +31,9 @@ export default class ImageMappedPoints extends Component {
         if (this.enableOnClick) {
             if (this.idxProximo != -1) {
                 var label = null;
-
-                if (this.selecionou) {
+                if (this.primeiroPonto) {
+                    label = this.labelProximo;
+                } else if (this.selecionou) {
                     var existePonto = this.getPointByLabel(this.labelProximo);
                     if (existePonto == true) {
                         label = this.labelProximo;
@@ -42,6 +44,7 @@ export default class ImageMappedPoints extends Component {
                     label = this.getNextLabel();
                 }
                 this.selecionou = false;
+                this.primeiroPonto = false;
 
                 var offset = this.referenciasImagens[idx].current.getBoundingClientRect();
                 var x = Math.floor((e.pageX - 10 - offset.left) / offset.width * 10000) / 100;
@@ -122,28 +125,28 @@ export default class ImageMappedPoints extends Component {
 
     getNextLabel = () => {
 
-        if (this.pontos.length == 0) {
-            return 1;
-        }
-        var labelMaior = 1;
-        for (let idx = 0; idx < this.pontos.length; idx++) {
-            if (parseInt(this.pontos[idx].label) > parseInt(labelMaior)) {
-                labelMaior = this.pontos[idx].label;
+        var labelMaior = 0;
+        this.state.mapa.forEach(m => {
+            if (this.state.idsPecasFisicas.includes(m.localizacao[0].pecaFisica)) {
+                var maxPonto = Math.max.apply(null, m.pontos);
+                if (parseInt(maxPonto) > parseInt(labelMaior)) {
+                    labelMaior = maxPonto;
+                }
             }
-        }
+
+        });
 
         return labelMaior + 1;
 
     }
-
-
 
     getNextPart = () => {
 
         for (let idx = this.idxProximo; idx < this.state.mapa.length; idx++) {
             if (
                 this.state.mapa[idx] !== undefined &&
-                this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null &&
+                this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null
+                && this.state.idsPecasFisicas.includes(this.state.mapa[idx].localizacao[0].pecaFisica) &&
                 (this.state.mapa[idx].pontos[0] === undefined
                     || this.state.mapa[idx].pontos[0] == null
                     || this.state.mapa[idx].pontos[0] == "")
@@ -168,6 +171,7 @@ export default class ImageMappedPoints extends Component {
         if (this.idxProximo != -1 && idx == this.idxProximo) {
             return <Icon type='arrow-right' style={{ color: '#1890ff' }} />;
         }
+
         return <div></div>;
 
     }
@@ -176,14 +180,20 @@ export default class ImageMappedPoints extends Component {
 
         if (this.state.mapa[index].localizacao[0].referenciaRelativa.referencia == null) {
             this.selecionou = true;
-            this.idxProximo = index;
             this.labelProximo = label ? label : this.getNextLabel();
-            this.forceUpdate();
+            this.idxProximo = index;
         }
+        this.forceUpdate();
 
     }
 
     getLabelParte(idParte) {
+
+        const itemMapa = this.state.mapa.find(m => m.parte._id == idParte);
+
+        if (itemMapa.localizacao.length > 0 && itemMapa.localizacao[0].numero != "") {
+            return itemMapa.localizacao[0].numero;
+        }
 
         for (let idx = 0; idx < this.state.pecaFisicaDigital.midias.length; idx++) {
             for (let idxP = 0; idxP < this.state.pecaFisicaDigital.midias[idx].pontos.length; idxP++) {
@@ -311,6 +321,7 @@ export default class ImageMappedPoints extends Component {
     }
 
     onClearRefRel = () => {
+
         this.setState({
             open: false,
             erroLocalizacao: null,
@@ -322,9 +333,11 @@ export default class ImageMappedPoints extends Component {
             }
         })
         this.openModalLocRelativa = false;
+
     }
 
     onChangeRefRel = field => value => {
+
         const { toEditRefRel } = this.state;
 
         this.setState({
@@ -339,6 +352,31 @@ export default class ImageMappedPoints extends Component {
         })
 
         this.toEditRefRelLocal.model[field] = value;
+
+    }
+
+
+    getPrimeiraParte = () => {
+
+        var primeiraParte = 999999999;
+        this.state.mapa.forEach((m, index) => {
+            if (this.state.idsPecasFisicas.includes(m.localizacao[0].pecaFisica)) {
+                if (parseInt(index) < parseInt(primeiraParte)) {
+                    primeiraParte = index;
+                }
+            }
+        });
+        return primeiraParte;
+
+    }
+
+    componentDidMount() {
+
+        this.idxProximo = this.getPrimeiraParte();
+        this.labelProximo = this.state.mapa[this.idxProximo].pontos[0];
+        this.primeiroPonto = true;
+        this.forceUpdate();
+
     }
 
     render() {
@@ -352,6 +390,7 @@ export default class ImageMappedPoints extends Component {
             maxHeight: 400,
             idsPecasFisicas: this.props.idsPecasFisicas,
             pecaFisicaDigital: this.props.pecaFisicaDigital,
+            nomePeca: this.props.nomePeca,
             mapa: this.props.mapa,
             open: false,
             openModalExcluirPonto: false,
@@ -382,7 +421,6 @@ export default class ImageMappedPoints extends Component {
 
         for (let idx = 0; idx < this.state.mapa.length; idx++) {
             let label = this.getLabelParte(this.state.mapa[idx].parte._id);
-
             if (!this.pontosExcluidos.includes(label)) {
                 this.state.mapa[idx].pontos.push(label)
                 if (this.state.pecaFisicaDigital._id == this.state.mapa[idx].localizacao[0].pecaFisica) {
@@ -443,7 +481,7 @@ export default class ImageMappedPoints extends Component {
                     <Col span={16} style={{ overflowX: 'auto', overflowY: 'auto', display: 'flex' }}>
                         {this.state.pecaFisicaDigital.midias.map((image, idx) =>
                             <div
-                                key={idx}
+                                key={'id' + (new Date()).getTime() + Math.random().toString(5)}
                                 style={{
                                     position: 'relative',
                                     width: this.state.maxWidth,
@@ -463,12 +501,14 @@ export default class ImageMappedPoints extends Component {
                                 />
                                 {image.pontos.map((point, idxPonto) =>
                                     <MappedPoint
-                                        key={idxPonto}
+                                        key={'id' + (new Date()).getTime() + Math.random().toString(5)}
+                                        key_={'id' + (new Date()).getTime() + Math.random().toString(5)}
                                         point={point}
                                         enableDelete={true}
                                         idx={idx}
                                         idxPonto={idxPonto}
                                         deletePoint={this.deletePoint}
+                                        nomePeca={this.state.nomePeca}
                                     />
                                 )}
                             </div>

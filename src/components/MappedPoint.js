@@ -1,8 +1,8 @@
 
+import { Badge, Button, Icon, Modal } from 'antd';
 import React, { useState } from 'react';
-import { Modal, Button, Badge, Icon } from 'antd';
 
-const MappedPoint = ({ key, point, enableDelete, idx, idxPonto, deletePoint }) => {
+const MappedPoint = ({ key_, point, enableDelete, idx, idxPonto, deletePoint, nomePeca }) => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -38,7 +38,7 @@ const MappedPoint = ({ key, point, enableDelete, idx, idxPonto, deletePoint }) =
         <div>
             <div
                 onClick={showModal}
-                key={key}
+                key={key_}
                 style={{ /*borderRadius: 100, width: 20, height: 20, backgroundColor: 'red',*/ top: point.y + "%", left: point.x + "%", position: 'absolute' }}>
                 {/*}<div style={{ fontSize: 7, padding: 2, textAlign: "center", color: 'white' }} key={key_2}>{point.label}</div>{*/}
                 <Badge count={point.label} />
@@ -47,10 +47,10 @@ const MappedPoint = ({ key, point, enableDelete, idx, idxPonto, deletePoint }) =
             <Modal
                 title={point.parte.nome}
                 visible={isModalVisible}
-                onOk={handleOk} 
+                onOk={handleOk}
                 onCancel={handleCancel}
                 footer={[
-                    <div>
+                    <div key={'id' + (new Date()).getTime()}>
                         <Button onClick={showModalDelete}>
                             <Icon type="delete" />Excluir
                         </Button>
@@ -69,7 +69,7 @@ const MappedPoint = ({ key, point, enableDelete, idx, idxPonto, deletePoint }) =
                 onOk={handleOkDelete}
                 onCancel={handleCancelDelete}
             >
-                <div>  Deseja realmente excluir o mapeamento da parte <span style={{ fontWeight: 'bold' }}>{point.parte.nome} </span>?</div>
+                <div>  Deseja realmente excluir o mapeamento da parte <span style={{ fontWeight: 'bold' }}>{point.parte.nome} </span> da peça <span style={{ fontWeight: 'bold' }}>{nomePeca} </span> ?</div>
             </Modal>
 
         </div>

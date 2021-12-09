@@ -29,13 +29,14 @@ class FormMapa extends Component {
         partesFormLocalizacao: []
     }
 
-    showModal = (pecaFisicaDigital, idxPecaFisica, mapa) => {
+    showModal = (pecaFisicaDigital, idxPecaFisica, mapa, nomePeca) => {
         var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
         var idsPecasFisicas = this.props.pecasFisicas.filter(p => p.pecaGenerica == pecaFisicaDigital.pecaGenerica).map(function (item) {
             return item._id;
         });
 
+        idsPecasFisicas.push(null);
 
         this.setState({
             visible: true,
@@ -44,6 +45,7 @@ class FormMapa extends Component {
             idsPecasFisicas: idsPecasFisicas,
             pecaFisicaDigitalBkp: JSON.parse(JSON.stringify(pecaFisicaDigital)),
             idxPecaFisicaDigital: idxPecaFisica,
+            nomePeca: nomePeca,
             mapaBkp: mapa
         });
     };
@@ -63,7 +65,11 @@ class FormMapa extends Component {
         }
 
         for (let idx = 0; idx < mapa.length; idx++) {
+            var ponto = mapa[idx].pontos[0];
             mapa[idx].pontos = [];
+            if (ponto) {
+                mapa[idx].pontos.push(ponto.label);
+            }
         }
 
         const hideModalCancel = () => {
@@ -90,7 +96,7 @@ class FormMapa extends Component {
 
                         <List
                             grid={{ gutter: 16, column: 4 }}
-                            dataSource={pecasFisicas}
+                            dataSource={pecasFisicas/*.filter(pf => pf.pecaGenerica != "")*/}
                             renderItem={(item, idxPecaFisica) => (
                                 <List.Item>
                                     <Card title={<div style={{ fontWeight: 'bold' }}>{item.nome}</div>}
@@ -98,8 +104,8 @@ class FormMapa extends Component {
                                     >
                                         <Row style={{ height: 250, overflowY: 'auto' }}>
                                             {item.midias.map((t, idxMidia) =>
-                                                <Col span={12}>
-                                                    <img key={t._id}
+                                                <Col span={12} key={idxMidia}>
+                                                    <img key={t}
                                                         style={{
                                                             maxWidth: '100%',
                                                             display: 'block',
@@ -115,7 +121,7 @@ class FormMapa extends Component {
                                         <Row style={{ position: 'absolute', bottom: 0, width: '100%' }}>
                                             <Col span={24} >
                                                 <Button type='primary'
-                                                    onClick={e => this.showModal(item, idxPecaFisica, mapa)}
+                                                    onClick={e => this.showModal(item, idxPecaFisica, mapa, item.nome)}
                                                     style={{
                                                         marginLeft: 'auto',
                                                         marginRight: '-50%',
@@ -131,23 +137,24 @@ class FormMapa extends Component {
                             )}
                         />
 
-                        <Modal title="Mapear peça digital"
+                        <Modal title={"Mapear peça digital"/* + this.state.nomePeca*/}
                             visible={this.state.visible}
                             onOk={this.hideModalOk}
                             onCancel={hideModalCancel}
                             width={1000}
                             okText="Salvar"
                             cancelText="Cancelar"
-                            centered="false"
+                            centered={false}
                             maskClosable={false}
                             closable={false}
                             style={{}}
                         >
                             <ImageMappedPoints
-                                key={mapa._id}
+                                key={'id' + (new Date()).getTime() + Math.random().toString(5)}
                                 enableOnClick="true"
                                 idsPecasFisicas={this.state.idsPecasFisicas}
                                 pecaFisicaDigital={this.state.pecaFisicaDigital}
+                                nomePeca={this.state.nomePeca}
                                 mapa={mapa}
                                 style={{ top: 0 }}
                                 onChangeMapa={onChangeMapa}

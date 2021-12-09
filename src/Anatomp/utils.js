@@ -1,10 +1,9 @@
-import { request } from '../utils/data'
+import { request } from '../utils/data';
 const { v4: uuidv4 } = require('uuid');
 
 export const onValidate = model => {
     const { nome, roteiro, instituicao, pecasFisicas, mapa, tipoPecaMapeamento } = model;
     let campos = [], msgs = []
-
 
     if (nome == '') {
         campos = [...campos, 'nome'];
@@ -55,7 +54,26 @@ export const onValidate = model => {
     return { campos, msgs }
 }
 
-export const onSave = (onOpenSnackbar, onSetAppState, model, cb = false) => {
+
+export const checkMappedAllGenericPeaces = (model, listaPecasGenericas, onOpenSnackbar) => {
+
+    const { pecasFisicas } = model;
+
+    var verificou = false;
+    listaPecasGenericas.forEach(pg => {
+        const verifica = pecasFisicas.find(pf => pg._id == pf.pecaGenerica);
+        if (!verificou && verifica === undefined) {
+            verificou = true;
+            onOpenSnackbar('Atenção! Os alunos não terão acesso a esse roteiro setado pois não foram mapeadas todas as peças deste roteiro!', 'warning');
+            return;
+        }
+    });
+
+}
+
+export const onSave = (onOpenSnackbar, onSetAppState, model, cb = false, listaPecasGenericas = []) => {
+
+    checkMappedAllGenericPeaces(model, listaPecasGenericas, onOpenSnackbar);
     const erros = onValidate(model);
 
     if (erros.campos.length > 0) {

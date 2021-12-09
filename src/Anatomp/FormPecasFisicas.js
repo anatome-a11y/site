@@ -164,7 +164,7 @@ class FormPecasFisicas extends Component {
                                     <div style={{ width: '30%', marginRight: 5 }}>
                                         <Select
                                             showSearch
-                                            disabled={isEdit}
+                                            disabled={isEdit && item.pecaGenerica != ""}
                                             value={item.pecaGenerica == "" ? undefined : item.pecaGenerica}
                                             onChange={onChangePecaFisica('pecaGenerica', idx)}
                                             notFoundContent='Nada foi encontrado'

@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import { Col, Form, Input, Row, Select } from 'antd';
+import React from 'react';
+import Generalidades from '../components/Generalidades';
+import { filter } from '../utils/data';
 
-import { Form, Input, Select, Row, Col } from 'antd';
-import { filter } from '../utils/data'
 
-import Generalidades from '../components/Generalidades'
 
 
 const Option = Select.Option;
@@ -39,8 +39,8 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                                 disabled={isEdit}
                                 showSearch
                                 value={roteiro}
-                                onSelect={(v, d) => {                                    
-                                    onSelectRoteiro(d.props['data-partes'], {roteiro: v, nome: d.props.children});
+                                onSelect={(v, d) => {
+                                    onSelectRoteiro(d.props['data-partes'], { roteiro: v, nome: d.props.children });
                                 }}
                                 notFoundContent='Nenhum roteiro foi encontrado'
                                 optionFilterProp="children"
@@ -70,10 +70,10 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                     </FormItem>
                 </Col>
                 <Col span={24}>
-                        <FormItem label="Informe as generalidades do roteiro setado">
-                            <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} placeholder='Sugestão da ordem das peças a serem aprendidas' />
-                        </FormItem>
-                    </Col>                
+                    <FormItem label="Informe as generalidades do roteiro setado">
+                        <Generalidades defaultValue={generalidades} onOpenSnackBar={onOpenSnackbar} onChange={onChange('generalidades')} placeholder='Sugestão da ordem das peças a serem aprendidas' />
+                    </FormItem>
+                </Col>
             </Row>
         </Form>
     )

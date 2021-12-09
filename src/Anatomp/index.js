@@ -1,17 +1,13 @@
-import React, { Component, Fragment } from 'react';
-
-import { Collapse, Button, Modal, List, Icon } from 'antd';
-
-import { request, Maybe } from '../utils/data'
-
-import FormGeral from './FormGeral'
-import FormPecasFisicas from './FormPecasFisicas';
-import FormMapa from './FormMapa';
-
-import { withAppContext } from '../context';
-import Header from '../components/Header';
-
+import { Button, Collapse, List } from 'antd';
+import React, { Component } from 'react';
 import { onSave as onSaveAnatomp } from '../Anatomp/utils';
+import Header from '../components/Header';
+import { withAppContext } from '../context';
+import { Maybe, request } from '../utils/data';
+import FormGeral from './FormGeral';
+import FormMapa from './FormMapa';
+import FormPecasFisicas from './FormPecasFisicas';
+
 
 const { v4: uuidv4 } = require('uuid');
 const Panel = Collapse.Panel;
@@ -23,7 +19,6 @@ const getModelReferenciaRelativa = () => ({
     referenciadoParaReferencia: '',
     referencia: null,
 })
-
 
 const _modelPecaFisica = {
     _id: uuidv4(),
@@ -53,10 +48,7 @@ const _modelMapa = {
     localizacao: [getModelLocalizacao()],
     pontos: [getModelPonto()]
 }
-
-
 class Anatomp extends Component {
-
 
     state = {
         model: {
@@ -79,7 +71,6 @@ class Anatomp extends Component {
         const { options } = this.state;
 
         const model = Maybe(history).bind(h => h.location).bind(l => l.state).maybe(false, s => s.model);
-
         if (onChange) {
             onChange(this.state.model)
         }
@@ -97,7 +88,15 @@ class Anatomp extends Component {
                         model: {
                             ...model,
                             roteiro: model.roteiro._id,
-                            mapa: model.mapa.map(m => ({ ...m, localizacao: m.localizacao.map(l => ({ ...l, pecaFisica: l.pecaFisica._id, referenciaRelativa: { ...l.referenciaRelativa, referencia: l.referenciaRelativa.referencia == null ? null : l.referenciaRelativa.referencia._id } })) }))
+                            mapa: model.mapa.map(m => ({
+                                ...m, localizacao: m.localizacao.map(l => (
+                                    {
+                                        ...l, pecaFisica: l.pecaFisica ? l.pecaFisica._id : null, referenciaRelativa: {
+                                            ...l.referenciaRelativa,
+                                            referencia: l.referenciaRelativa.referencia == null ? null : l.referenciaRelativa.referencia._id
+                                        }
+                                    }))
+                            }))
                         }
                     } : {};
 
@@ -109,21 +108,19 @@ class Anatomp extends Component {
                             listaPecasGenericas: p.data
                         }
                     })
+
+                    this.onSelectRoteiro(partesRoteiro, this.state.model);
+
                 } else {
                     throw p.error
                 }
             })
-            .catch(e => {
-                const msg = typeof e === 'string' ? e : 'Falha ao obter os dados da peça';
-                onOpenSnackbar(msg)
-                console.error(e)
-            })
+
             .finally(() => onSetAppState({ loading: false }))
     }
 
-
-
     componentWillReceiveProps(next) {
+
         if (JSON.stringify(this.props.partesRoteiro) != JSON.stringify(next.partesRoteiro)) {
             this.onSelectRoteiro(next.partesRoteiro)
         }
@@ -131,20 +128,22 @@ class Anatomp extends Component {
         if (this.props.sinalPeca != next.sinalPeca) {
             this.onGetPecas()
         }
-    }
 
+    }
 
     componentWillUpdate(nextProps, nextState) {
-        if ((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange) {
-            this.props.onChange(nextState.model)
-        }
-    }
 
+        if ((JSON.stringify(this.state.model) != JSON.stringify(nextState.model)) && this.props.onChange) {
+            this.props.onChange(nextState.model);
+        }
+
+    }
 
     componentWillUnmount() {
-        this.props.onSetAppState({ erros: { campos: [], msgs: [] } })
-    }
 
+        this.props.onSetAppState({ erros: { campos: [], msgs: [] } })
+
+    }
 
     render() {
         const { erros, loading, modo, match } = this.props;
@@ -216,10 +215,12 @@ class Anatomp extends Component {
     }
 
     onSubmit = () => {
+        const roteiro = this.state.options.listaRoteiros.find(r => r._id == this.state.model.roteiro);
+        const listaPecasGenericas = roteiro.pecasGenericas;
         onSaveAnatomp(this.props.onOpenSnackbar, this.props.onSetAppState, this.state.model, ret => {
             this.props.onOpenSnackbar(`O roteiro setado ${this.state.model.nome} foi salvo com sucesso!`, 'success');
             this.props.onPush('/')
-        })
+        }, listaPecasGenericas)
     }
 
     onGetPecas() {
@@ -251,6 +252,7 @@ class Anatomp extends Component {
     onSelectRoteiro = (partes, model) => {
 
         const roteiro = this.state.options.listaRoteiros.find(r => r._id == model.roteiro)
+
         const extra = roteiro ? {
             options: {
                 ...this.state.options,
@@ -258,22 +260,31 @@ class Anatomp extends Component {
             }
         } : {};
 
-
-        this.setState({
-            model: {
-                ...this.state.model,
-                ...model,
-                mapa: partes.map(p => ({
-                    ..._modelMapa,
-                    parte: p,
-                    localizacao: [{
-                        ...getModelLocalizacao(),
-                        referenciaRelativa: getModelReferenciaRelativa()
-                    }]
-                }))
-            },
-            ...extra
-        })
+        if (partes && partes.length > 0 && model) {
+            this.setState({
+                model: {
+                    ...this.state.model,
+                    ...model,
+                    mapa: partes.map(p => ({
+                        ..._modelMapa,
+                        parte: p,
+                        localizacao: [{
+                            ...getModelLocalizacao(),
+                            referenciaRelativa: getModelReferenciaRelativa()
+                        }]
+                    }))
+                },
+                ...extra
+            })
+        } else if ((!partes || partes.length == 0) && model) {
+            this.setState({
+                model: {
+                    ...this.state.model,
+                    ...model
+                },
+                ...extra
+            })
+        }
     }
 
     onChangePecaFisica = (field, idx) => value => {
@@ -481,6 +492,5 @@ Anatomp.defaultProps = {
     roteiro: '',
     sinalPeca: ''
 }
-
 
 export default withAppContext(Anatomp)
