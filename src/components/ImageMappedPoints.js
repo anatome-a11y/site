@@ -9,7 +9,6 @@ export default class ImageMappedPoints extends Component {
     enableOnClick = false;
     idxProximo = 0;
     selecionou = false;
-    primeiroPonto = false;
     referenciasImagens = [];
 
     openModalLocRelativa = false;
@@ -31,10 +30,9 @@ export default class ImageMappedPoints extends Component {
         if (this.enableOnClick) {
             if (this.idxProximo != -1) {
                 var label = null;
-                if (this.primeiroPonto) {
-                    label = this.labelProximo;
-                } else if (this.selecionou) {
+                if (this.selecionou) {
                     var existePonto = this.getPointByLabel(this.labelProximo);
+
                     if (existePonto == true) {
                         label = this.labelProximo;
                     } else {
@@ -44,7 +42,6 @@ export default class ImageMappedPoints extends Component {
                     label = this.getNextLabel();
                 }
                 this.selecionou = false;
-                this.primeiroPonto = false;
 
                 var offset = this.referenciasImagens[idx].current.getBoundingClientRect();
                 var x = Math.floor((e.pageX - 10 - offset.left) / offset.width * 10000) / 100;
@@ -374,7 +371,7 @@ export default class ImageMappedPoints extends Component {
 
         this.idxProximo = this.getPrimeiraParte();
         this.labelProximo = this.state.mapa[this.idxProximo].pontos[0];
-        this.primeiroPonto = true;
+        this.selecionou = true;
         this.forceUpdate();
 
     }
@@ -419,6 +416,7 @@ export default class ImageMappedPoints extends Component {
             }
         }
 
+        // Verifica se as partes já foram setadas em outra peça Digital
         for (let idx = 0; idx < this.state.mapa.length; idx++) {
             let label = this.getLabelParte(this.state.mapa[idx].parte._id);
             if (!this.pontosExcluidos.includes(label)) {
