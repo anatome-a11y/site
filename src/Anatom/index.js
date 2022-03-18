@@ -294,7 +294,7 @@ class Main extends Component {
                                     </div>
                                 }>
                                     <Button type='primary'
-                                        onClick={() => { }}
+                                        onClick={() => history.push('/avaliacao/cadastrar')}
                                         style={{ marginRight: 25 }}>
                                         <Icon type='plus' />Cadastrar avaliação
                                     </Button>
