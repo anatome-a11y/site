@@ -168,6 +168,8 @@ class Main extends Component {
                     }>
                         <Button size='small' type='primary' ghost onClick={() => history.push('/pecas')}>Ir para
                             conteúdos das peças</Button>
+                        <Button size='small' type='primary' ghost onClick={() => history.push('/teste3d')}>Teste 3D</Button>
+                        <Button size='small' type='primary' ghost onClick={() => history.push('/teste3dfile')}>Teste 3D upload</Button>
                     </Popover>
                 </div>
                 <Collapse bordered={false} defaultActiveKey={['avaliacao_aplicada', 'avaliacao', 'roteiro_digital', 'roteiro_com_peca']}>
