@@ -78,8 +78,11 @@ class FormPecasFisicas extends Component {
         };
 
         const onUpload = (idx, midias, _id) => info => {
-            const [main, type] = info.file.type.split('/');
-            if (main == "image" || main == "image" || main == "image") {
+            console.log(info.file)
+            const [main, type] = info[0].file.type.split('/');
+            console.log("type: ", type)
+            console.log("main: ", main)
+            if (main === "image" || type === ".glb") {
                 const { onOpenSnackbar } = this.props;
                 if (info.file.status !== 'uploading') {
                     //Adiciona
@@ -117,7 +120,7 @@ class FormPecasFisicas extends Component {
             } else {
                 this.beforeUpload(_id);
                 this.setState({ loading: false });
-                onOpenSnackbar("Formato inválido, o arquivo deve ser uma imagem .png ou .jpg ou .jpeg");
+                onOpenSnackbar("Formato inválido, o arquivo deve ser uma imagem .png, .jpg ou .jpeg ou um objeto 3D do tipo .glb");
             }
         }
 
@@ -148,7 +151,7 @@ class FormPecasFisicas extends Component {
                                         showUploadList={false}
                                         onChange={onUpload(idx, item.midias, item._id)}
                                         beforeUpload={this.beforeUpload(item._id)}
-                                        accept="image/png, image/jpeg">
+                                        accept="image/png, image/jpeg, .glb, .gltf">
                                         <Tooltip title='Adicionar mídia'>
                                             <Button type='primary' ghost shape='circle' icon='paper-clip' disabled={loading} />
                                         </Tooltip>

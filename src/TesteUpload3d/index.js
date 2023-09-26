@@ -1,85 +1,78 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { DirectionalLight } from 'three';
+import { getExtensionFromFileName } from '../utils/fileUtils';
 
-import texture from './MT_Stylized_Skull_normal.png';
+import texture from './textura_fonte.png';
 
 const ThreeDViewerWithFileUpload = () => {
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
   const [loadedModel, setLoadedModel] = useState(null);
-  const [annotations, setAnnotations] = useState([]); // Array para armazenar as marcações
-  const [annotationCount, setAnnotationCount] = useState(1); // Inicialize o contador em 1
+  const [annotationCount, setAnnotationCount] = useState(1);
 
   useEffect(() => {
-    const container = containerRef.current;
+    if (!loadedModel) {
+      return;
+    }
 
-    // Crie uma cena, uma câmera e um renderizador
+    const container = containerRef.current;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
-  
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff);
+    renderer.setSize(window.innerWidth*0.5, window.innerHeight*0.5);
     container.appendChild(renderer.domElement);
 
-    // Carregue o arquivo 3D usando um loader (GLTFLoader) quando o arquivo for carregado
-    if (loadedModel) {
-      scene.add(loadedModel);
-    }
+    scene.add(loadedModel);
 
-    // Função para lidar com cliques
+    const light = new DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1);
+    scene.add(light);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.update();
+
+    camera.position.z = 1;
+
+    const annotationsGroup = new THREE.Group(); // Grupo para armazenar as anotações
+
     const handleClick = (event) => {
       if (!loadedModel) {
         return;
       }
 
-      // Calcula a posição do clique em relação à janela
       const x = (event.clientX / window.innerWidth) * 2 - 1;
       const y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      // Atualiza as coordenadas do mouse
       mouse.set(x, y);
-
-      // Atualiza o raio do mouse
       raycaster.setFromCamera(mouse, camera);
 
-      // Encontra objetos intersectados
       const intersects = raycaster.intersectObjects(loadedModel.children, true);
 
       if (intersects.length > 0) {
         const intersection = intersects[0];
 
-        // Cria a marcação numerada
         const annotation = createAnnotation(intersection.point, annotationCount);
-        setAnnotations([...annotations, annotation]); // Adiciona a marcação à lista
 
-        // Incrementa o contador de marcações
+        // Adicione a nova anotação ao grupo de anotações
+        annotationsGroup.add(annotation);
+
+        // Atualize a cena
+        scene.add(annotationsGroup);
+
+        // Incrementa o contador de anotações
         setAnnotationCount(annotationCount + 1);
       }
     };
 
-    // Event listener para cliques
-    // window.addEventListener('click', handleClick); // TODO: retirar comentário
+    //window.addEventListener('click', handleClick); // TODO: descomentar
 
-    // Adicione uma luz direcional
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(1, 1, 1);
-    scene.add(light);
-    // const ambientLight = new THREE.AmbientLight(0x404040, 0.5); // Cor da luz ambiente e intensidade
-    // scene.add(ambientLight);
-
-    // Inicialize os controles de câmera (OrbitControls)
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.update();
-
-    // Configure a posição inicial da câmera
-    camera.position.z = 5;
-
-    // Função de renderização
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
@@ -87,50 +80,56 @@ const ThreeDViewerWithFileUpload = () => {
 
     animate();
 
-    // Lide com a limpeza quando o componente for desmontado
     return () => {
       window.removeEventListener('click', handleClick);
       renderer.dispose();
     };
-  }, [loadedModel, annotations, annotationCount]);
+  }, [loadedModel, annotationCount]);
 
-  // Função para criar uma marcação numerada
   const createAnnotation = (position, number) => {
     const loader = new THREE.TextureLoader();
-    const textTexture = loader.load(texture); // Carregue a textura de texto aqui
+    const textTexture = loader.load(texture);
 
     const material = new THREE.MeshBasicMaterial({
       map: textTexture,
       transparent: true,
     });
 
-    const geometry = new THREE.PlaneGeometry(1, 1); // Tamanho do texto
+    const geometry = new THREE.PlaneGeometry(1, 1);
     const textMesh = new THREE.Mesh(geometry, material);
 
-    // Posicione o texto na posição do clique
     textMesh.position.copy(position);
 
-    // Retorne o objeto da marcação
     return textMesh;
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const loader = new GLTFLoader();
-      loader.load(URL.createObjectURL(file), (gltf) => {
-        setLoadedModel(gltf.scene);
-      });
+    if (file) { 
+      const file_extension = getExtensionFromFileName(file.name);
+      if (['gltf', 'glb'].includes(file_extension)) {
+        const loader = new GLTFLoader();
+        loader.load(URL.createObjectURL(file), (gltf) => {
+          setLoadedModel(gltf.scene);
+        });
+      } else if (file_extension === 'obj') {
+        const loader = new OBJLoader();
+        loader.load(URL.createObjectURL(file), (obj) => {
+          setLoadedModel(obj);
+        });
+      }
     }
   };
 
   return (
     <div>
-      <input type="file" accept=".glb, .gltf" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
+      <input type="file" accept=".glb, .gltf, .obj" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
       <button onClick={() => fileInputRef.current.click()}>Carregar arquivo 3D</button>
-      <div style={{ width: '80%', height: '50%' }}> 
-        <div ref={containerRef} style={{ width: '75%', height: '50%' }} /> 
-      </div>
+      {loadedModel ? (
+        <div style={{ width: '80%', height: '50%' }}>
+          <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+        </div>
+      ) : null}
     </div>
   );
 };
