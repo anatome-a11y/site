@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { DirectionalLight } from 'three';
-import { getExtensionFromFileName } from '../utils/fileUtils';
+import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
 
 import texture from './textura_fonte.png';
 
@@ -105,14 +105,15 @@ const ThreeDViewerWithFileUpload = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file) { 
-      const file_extension = getExtensionFromFileName(file.name);
-      if (['gltf', 'glb'].includes(file_extension)) {
+    if (file) {
+      const fileExtension = getExtensionFromFileName(file.name)
+      
+      if (is3dFile(file.name)) {
         const loader = new GLTFLoader();
         loader.load(URL.createObjectURL(file), (gltf) => {
           setLoadedModel(gltf.scene);
         });
-      } else if (file_extension === 'obj') {
+      } else if (fileExtension === 'obj') {
         const loader = new OBJLoader();
         loader.load(URL.createObjectURL(file), (obj) => {
           setLoadedModel(obj);

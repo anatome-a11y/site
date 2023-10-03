@@ -5,7 +5,8 @@ import ImageMappedPoints from '../components/ImageMappedPoints';
 import Label from '../components/Label';
 import { filter } from '../utils/data';
 import FormLocalizacao from './FormLocalizacao';
-
+import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
+import ObjectViewer from '../ObjectViewer';
 
 const { v4: uuidv4 } = require('uuid');
 const { Option } = Select;
@@ -99,16 +100,25 @@ class FormMapa extends Component {
                                         <Row style={{ height: 250, overflowY: 'auto' }}>
                                             {item.midias.map((t, idxMidia) =>
                                                 <Col span={12}>
-                                                    <img key={t._id}
-                                                        style={{
-                                                            maxWidth: '100%',
-                                                            display: 'block',
-                                                            marginLeft: 'auto',
-                                                            marginRight: 'auto',
-                                                            padding: 10,
-                                                        }}
-                                                        src={item.midias[idxMidia].url}
-                                                    />
+                                                    {
+                                                        is3dFile(t.name) ? (
+                                                            <ObjectViewer 
+                                                                url={item.midias[idxMidia].url} 
+                                                                fileType={getExtensionFromFileName(t.name)} 
+                                                            />
+                                                        ) : (
+                                                           <img key={t._id}
+                                                                style={{
+                                                                    maxWidth: '100%',
+                                                                    display: 'block',
+                                                                    marginLeft: 'auto',
+                                                                    marginRight: 'auto',
+                                                                    padding: 10,
+                                                                }}
+                                                                src={item.midias[idxMidia].url}
+                                                            />
+                                                        )
+                                                    }              
                                                 </Col>
                                             )}
                                         </Row>
@@ -138,7 +148,7 @@ class FormMapa extends Component {
                             width={1000}
                             okText="Salvar"
                             cancelText="Cancelar"
-                            centered="false"
+                            centered={false}
                             maskClosable={false}
                             closable={false}
                             style={{}}

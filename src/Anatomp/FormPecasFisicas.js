@@ -3,8 +3,7 @@ import React, { Component, Fragment } from 'react';
 import Label from '../components/Label';
 import MidiaImage from '../components/MidiaImage';
 import { filter } from '../utils/data';
-
-
+import { is3dFile } from '../utils/fileUtils';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -78,11 +77,9 @@ class FormPecasFisicas extends Component {
         };
 
         const onUpload = (idx, midias, _id) => info => {
-            console.log(info.file)
-            const [main, type] = info[0].file.type.split('/');
-            console.log("type: ", type)
-            console.log("main: ", main)
-            if (main === "image" || type === ".glb") {
+            const [main, type] = info.file.type.split('/');
+            
+            if (main === "image" || is3dFile(info.file.name)) {
                 const { onOpenSnackbar } = this.props;
                 if (info.file.status !== 'uploading') {
                     //Adiciona
@@ -136,7 +133,11 @@ class FormPecasFisicas extends Component {
                         <Radio value={'pecaFisica'}>Peças físicas</Radio>
                     </Radio.Group>
 
-                    <Label>Inclua as informações sobre as peças que terão as partes anatômicas etiquetadas e serão disponibilizadas aos estudantes para aprenderem o conteúdo deste roteiro usando o APP Anatome</Label>
+                    <Label>Inclua as informações sobre as peças que terão 
+                        as partes anatômicas etiquetadas e serão disponibilizadas aos estudantes para 
+                        aprenderem o conteúdo deste roteiro usando o APP Anatome
+                    </Label>
+
                     <List
                         rowKey='_id'
                         size="small"
@@ -151,7 +152,7 @@ class FormPecasFisicas extends Component {
                                         showUploadList={false}
                                         onChange={onUpload(idx, item.midias, item._id)}
                                         beforeUpload={this.beforeUpload(item._id)}
-                                        accept="image/png, image/jpeg, .glb, .gltf">
+                                        accept="image/png, image/jpeg, .glb, .obj">
                                         <Tooltip title='Adicionar mídia'>
                                             <Button type='primary' ghost shape='circle' icon='paper-clip' disabled={loading} />
                                         </Tooltip>
