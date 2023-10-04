@@ -97,7 +97,20 @@ class Anatomp extends Component {
                         model: {
                             ...model,
                             roteiro: model.roteiro._id,
-                            mapa: model.mapa.map(m => ({ ...m, localizacao: m.localizacao.map(l => ({ ...l, pecaFisica: l.pecaFisica._id, referenciaRelativa: { ...l.referenciaRelativa, referencia: l.referenciaRelativa.referencia == null ? null : l.referenciaRelativa.referencia._id } })) }))
+                            mapa: model.mapa.map(m => 
+                                (
+                                    { ...m, localizacao: m.localizacao.map(l => 
+                                        ({ 
+                                            ...l, 
+                                            pecaFisica: l.pecaFisica ? l.pecaFisica._id : null, 
+                                            referenciaRelativa: { 
+                                                ...l.referenciaRelativa, 
+                                                referencia: l.referenciaRelativa.referencia ? l.referenciaRelativa.referencia._id : null 
+                                            } 
+                                        })) 
+                                    }
+                                )
+                            )
                         }
                     } : {};
 
