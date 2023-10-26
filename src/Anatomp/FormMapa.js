@@ -37,7 +37,6 @@ class FormMapa extends Component {
             return item._id;
         });
 
-
         this.setState({
             visible: true,
             offsetTop: rect.offsetTop,
@@ -45,7 +44,8 @@ class FormMapa extends Component {
             idsPecasFisicas: idsPecasFisicas,
             pecaFisicaDigitalBkp: JSON.parse(JSON.stringify(pecaFisicaDigital)),
             idxPecaFisicaDigital: idxPecaFisica,
-            mapaBkp: mapa
+            mapaBkp: mapa,
+            nomeMidia: pecaFisicaDigital.midias[0].name 
         });
     };
 

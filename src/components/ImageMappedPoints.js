@@ -2,6 +2,8 @@ import { Badge, Checkbox, Col, Icon, List, Modal, Row } from 'antd';
 import React, { Component } from 'react';
 import FormLocalizacao from '../Anatomp/FormLocalizacao';
 import MappedPoint from './MappedPoint';
+import ObjectPointMapper from '../ObjectPointMapper';
+import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
 
 export default class ImageMappedPoints extends Component {
 
@@ -23,6 +25,51 @@ export default class ImageMappedPoints extends Component {
 
     constructor(props) {
         super(props);
+    }
+
+    handleObject3DClick = (x, y, idx) => {
+        console.log('Clique no objeto 3D em coordenadas (x, y):', x, y);
+        if (this.enableOnClick) {
+            if (this.idxProximo != -1) {
+                var label = null;
+
+                if (this.selecionou) {
+                    var existePonto = this.getPointByLabel(this.labelProximo);
+                    if (existePonto == true) {
+                        label = this.labelProximo;
+                    } else {
+                        label = this.getNextLabel();
+                    }
+                } else {
+                    label = this.getNextLabel();
+                }
+                this.selecionou = false;
+                this.state.mapa[this.idxProximo].pontos[0] = label;
+
+                var mapa = this.state.mapa[this.idxProximo];
+
+                this.pontos.push({
+                    x: x,
+                    y: y,
+                    label: label,
+                    parte: mapa.parte
+                });
+
+                let ponto = {
+                    x: x,
+                    y: y,
+                    label: label,
+                    parte: mapa.parte
+                }
+
+                this.state.pecaFisicaDigital.midias[idx].pontos.push(ponto);
+                this.forceUpdate();
+                this.setState({ pontos: this.pontos });
+                this.getNextPart();
+
+                this.verificaPontoExcluido(label);
+            }    
+        }
     }
 
     imageClick = e => idx => {
@@ -453,24 +500,37 @@ export default class ImageMappedPoints extends Component {
                                     left: '0px',
                                     right: '0px',
                                 }}>
-                                <img onClick={e => this.imageClick(e)(idx)} ref={this.referenciasImagens[idx]}
-                                    style={{
-                                        width: this.state.maxWidth,
-                                        height: this.state.maxHeight,
-                                        position: 'relative',
-                                    }}
-                                    src={image.url}
-                                />
-                                {image.pontos.map((point, idxPonto) =>
-                                    <MappedPoint
-                                        key={idxPonto}
-                                        point={point}
-                                        enableDelete={true}
-                                        idx={idx}
-                                        idxPonto={idxPonto}
-                                        deletePoint={this.deletePoint}
-                                    />
-                                )}
+                                {
+                                    is3dFile(image.name) ? (
+                                        <ObjectPointMapper 
+                                            url={image.url} 
+                                            fileType={getExtensionFromFileName(image.name)}
+                                            onObject3DClick={this.handleObject3DClick}
+                                            idx={idx}
+                                        />
+                                    ) : (
+                                        <img onClick={e => this.imageClick(e)(idx)} ref={this.referenciasImagens[idx]}
+                                            style={{
+                                                width: this.state.maxWidth,
+                                                height: this.state.maxHeight,
+                                                position: 'relative',
+                                            }}
+                                            src={image.url}
+                                        />
+                                    )
+                                }
+                                {
+                                    image.pontos.map((point, idxPonto) =>
+                                        <MappedPoint
+                                            key={idxPonto}
+                                            point={point}
+                                            enableDelete={true}
+                                            idx={idx}
+                                            idxPonto={idxPonto}
+                                            deletePoint={this.deletePoint}
+                                        />
+                                    )
+                                }       
                             </div>
                         )}
                     </Col>

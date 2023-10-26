@@ -31,8 +31,8 @@ const ObjectViewer = ({ url, fileType }) => {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.update();
 
-    camera.position.z = 1;
-
+    camera.position.z = 10;
+    
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
