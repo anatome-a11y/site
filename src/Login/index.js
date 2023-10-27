@@ -29,7 +29,7 @@ const TelaLogin = ({history}) => {
                         style={styles.button}
                         type='primary'
                         onClick={() => {
-                            if (userName === 'anatome' && password === '123') {
+                            if (userName === 'anatome' && password === 'admin2023') {
                                 history.push('/');
                             } else {
                                 message['error']('Usuário ou senha incorreto');
