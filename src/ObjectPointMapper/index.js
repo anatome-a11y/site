@@ -4,14 +4,19 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { DirectionalLight } from 'three';
-import { Raycaster } from 'three';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import bumped from "./helvetiker_regular.typeface.json";
 
-const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx }) => {
+const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx, pontos, partes, enableOnClick }) => {
   const containerRef = useRef(null);
   const [loadedModel, setLoadedModel] = useState(null);
-  const raycaster = new Raycaster();
-  const textLabel = useRef(null);
-  const textDiv = useRef(null);
+
+  const mouse = new THREE.Vector2();
+  const intersectionPoint = new THREE.Vector3();
+  const planeNormal = new THREE.Vector3();
+  const plane = new THREE.Plane();
+  const raycaster = new THREE.Raycaster();
 
   useEffect(() => {
     if (!loadedModel) {
@@ -20,8 +25,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx }) => {
 
     const container = containerRef.current;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
     container.appendChild(renderer.domElement);
 
@@ -34,67 +39,110 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx }) => {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.update();
 
-    camera.position.z = 5; // Ajuste o zoom inicial conforme necessário
+    // Adiciona eixos
+    const helper = new THREE.AxesHelper(20);
+    scene.add(helper);
 
-    textDiv.current = document.createElement('div');
-    textDiv.current.textContent = 'X';
-    textDiv.current.style.position = 'absolute';
-    textDiv.current.style.color = 'white';
-    textDiv.current.style.display = 'none';
-    textLabel.current.appendChild(textDiv.current);
+    camera.position.z = 5; // Ajuste o zoom inicial conforme necessário
 
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
 
+    console.log('Partes: ', partes);
+    console.log('Pontos: ', pontos);
+
+    pontos.map((ponto, i)=> {
+      const sphereMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.3, 30, 30),
+        new THREE.MeshStandardMaterial({
+          color: 0xde0b0b,
+          metalness: 0,
+          roughness: 0
+        })
+      );
+
+      let font = new FontLoader().parse(bumped);
+      // Adiciona texto à esfera
+      const textGeometry = new TextGeometry(ponto.label.toString(), {
+        font: font,
+        size: 0.2, // Tamanho do texto
+        height: 0.05 // Espessura do texto
+      });
+
+      const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+      // Posiciona o texto
+      textMesh.position.set(0, 0.4, 0); // Ajuste conforme necessário
+
+      // Adiciona o texto como filho da esfera
+      sphereMesh.add(textMesh);
+
+      sphereMesh.position.x = ponto.x
+      sphereMesh.position.y = ponto.y
+      sphereMesh.position.z = ponto.z
+
+      scene.add(sphereMesh);
+    });
+
     animate();
 
-    container.addEventListener('click', (event) => {
-      console.log('Clique detectado');
+    window.addEventListener("dblclick",  (e) => {
+      console.log('Partes: ', partes);
+      console.log('Pontos: ', pontos);
 
-      if (loadedModel) {
-        // TESTE
-        // const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        // const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+      if (pontos.length < partes.length && enableOnClick) {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
-        const containerRect = container.getBoundingClientRect();
-        const containerX = containerRect.left;
-        const containerY = containerRect.top;
-
-        // Calcula a posição relativa ao contêiner
-        const relativeX = mouseX - containerX;
-        const relativeY = mouseY - containerY;
-
-        raycaster.setFromCamera(
-          { 
-            x: (relativeX / container.clientWidth) * 2 - 1,
-            y: -(relativeY / container.clientHeight) * 2 + 1 
-          }, 
-          camera
-        );
+        raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects([loadedModel], true);
-    
+
         if (intersects.length > 0) {
-          const intersection = intersects[0];
-          const point = intersection.point;
-          console.log("PONTO ", point)
-          console.log("mouseX ", mouseX)
-          console.log("mouseY ", mouseY)
+          planeNormal.copy(camera.position).normalize();
+          plane.setFromNormalAndCoplanarPoint(planeNormal, scene.position);
+          raycaster.ray.intersectPlane(plane, intersectionPoint);
 
-          // Defina as coordenadas left e top para o ponto de interseção
-          textDiv.current.style.left = `${mouseX}px`;
-          textDiv.current.style.top = `${mouseY}px`;
-          textDiv.current.style.display = 'block';
+          const sphereMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.3, 30, 30),
+            new THREE.MeshStandardMaterial({
+              color: 0xde0b0b,
+              metalness: 0,
+              roughness: 0
+            })
+          );
+          scene.add(sphereMesh);
+          sphereMesh.position.copy(intersectionPoint);
 
-          onObject3DClick(mouseX, mouseY, idx)
+          let font = new FontLoader().parse(bumped);
+          // Adiciona texto à esfera
+          const textGeometry = new TextGeometry(getNextLabel(), {
+            font: font,
+            size: 0.2, // Tamanho do texto
+            height: 0.05 // Espessura do texto
+          });
 
-          //TESTE esse deu ruim
-          //textDiv.style.transform = `translate(-50%, -50%) translate(${point.x}px, ${point.y}px)`;
+          const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+          const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+          // Posiciona o texto
+          textMesh.position.set(0, 0.4, 0); // Ajuste conforme necessário
+
+          // Adiciona o texto como filho da esfera
+          sphereMesh.add(textMesh);
+
+          console.log('INTERSECTION POINT', intersectionPoint);
+          onObject3DClick(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, idx);
         }
       }
+    });
+
+    window.addEventListener("resize", function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
     });
 
     return () => {
@@ -106,10 +154,6 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx }) => {
   }, [loadedModel]);
 
   useEffect(() => {
-    if (textDiv.current) {
-      textDiv.current.style.display = 'none';
-    }
-
     if (url) {
       if (fileType === 'glb') {
         const loader = new GLTFLoader();
@@ -125,10 +169,20 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, idx }) => {
     }
   }, [url, fileType]);
 
+  const getNextLabel = () => {
+    let maiorLabel = 0;
+    pontos.map((ponto) => {
+      if (ponto.label > maiorLabel) {
+        maiorLabel = ponto.label;
+      }
+    });
+    maiorLabel++;
+    return maiorLabel.toString();
+  }
+
   return (
     <div>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
-      <div ref={textLabel} style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }} />
     </div>
   );
 };

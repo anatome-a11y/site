@@ -7,6 +7,7 @@ import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
 
 export default class ImageMappedPoints extends Component {
 
+    visualizacao3d = false;
     pontos = [];
     enableOnClick = false;
     idxProximo = 0;
@@ -27,8 +28,8 @@ export default class ImageMappedPoints extends Component {
         super(props);
     }
 
-    handleObject3DClick = (x, y, idx) => {
-        console.log('Clique no objeto 3D em coordenadas (x, y):', x, y);
+    handleObject3DClick = (x, y, z, idx) => {
+        console.log('Clique no objeto 3D em coordenadas (x, y, z):', x, y, z);
         if (this.enableOnClick) {
             if (this.idxProximo != -1) {
                 var label = null;
@@ -51,6 +52,7 @@ export default class ImageMappedPoints extends Component {
                 this.pontos.push({
                     x: x,
                     y: y,
+                    z: z,
                     label: label,
                     parte: mapa.parte
                 });
@@ -58,6 +60,7 @@ export default class ImageMappedPoints extends Component {
                 let ponto = {
                     x: x,
                     y: y,
+                    z: z,
                     label: label,
                     parte: mapa.parte
                 }
@@ -412,6 +415,11 @@ export default class ImageMappedPoints extends Component {
             partesFormLocalizacao: []
         };
 
+        this.state.pecaFisicaDigital.midias.map((midia) => {
+            console.log('Carregando midia: ', midia.name)
+            this.visualizacao3d = is3dFile(midia.name)
+        });
+
         for (let idx = 0; idx < this.state.pecaFisicaDigital.midias.length; idx++) {
             this.referenciasImagens[idx] = React.createRef();
         }
@@ -507,6 +515,10 @@ export default class ImageMappedPoints extends Component {
                                             fileType={getExtensionFromFileName(image.name)}
                                             onObject3DClick={this.handleObject3DClick}
                                             idx={idx}
+                                            pontos={this.state.pecaFisicaDigital.midias[idx].pontos}
+                                            partes={this.state.mapa}
+                                            enableOnClick={this.enableOnClick}
+                                            ref={this.childRef}
                                         />
                                     ) : (
                                         <img onClick={e => this.imageClick(e)(idx)} ref={this.referenciasImagens[idx]}
@@ -520,7 +532,7 @@ export default class ImageMappedPoints extends Component {
                                     )
                                 }
                                 {
-                                    image.pontos.map((point, idxPonto) =>
+                                    !this.visualizacao3d && image.pontos.map((point, idxPonto) =>
                                         <MappedPoint
                                             key={idxPonto}
                                             point={point}

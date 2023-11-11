@@ -17,8 +17,7 @@ const ObjectViewer = ({ url, fileType }) => {
     const container = containerRef.current;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    // renderer.setClearColor(0xffffff); TODO: por padrão fica preto no fundo
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
     container.appendChild(renderer.domElement);
 

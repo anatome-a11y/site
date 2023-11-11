@@ -8,10 +8,12 @@
     "react-dom": "^16.8.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "1.1.4",
+    "react-scripts": "2.1.8",
     "styled-components": "^3.4.10",
     "three": "^0.156.1",
+    "three-addons": "^1.2.0",
     "three-orbitcontrols": "^2.110.3",
+    "three.interaction": "^0.2.3",
     "uuid": "^8.3.2"
   },
   "scripts": {
@@ -20,5 +22,11 @@
     "deploy": "npm run build && firebase deploy",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

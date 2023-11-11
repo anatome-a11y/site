@@ -46,6 +46,7 @@ const getModelPonto = () => ({
     parte: null,
     x: '',
     y: '',
+    z: ''
 })
 
 const _modelMapa = {
