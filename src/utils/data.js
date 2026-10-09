@@ -9,6 +9,13 @@ export const filter = (input, option) => norm(option.props.children).indexOf(nor
 
 const apiUrl = 'https://anatome-api.onrender.com';
 // export const apiUrl = 'http://localhost:8080';
+
+export const mediaUrl = url => (
+  typeof url === 'string'
+    ? url.replace(/^http:\/\/(anatome-api\.onrender\.com)/i, 'https://$1')
+    : url
+);
+
 export const request = (path, options = {}) => fetch(`${apiUrl}/${path}`, {headers, ...options}).then(r => r.json())
 
 export const uploadMedia = file => {
@@ -20,7 +27,10 @@ export const uploadMedia = file => {
     if (!response.ok) {
       throw new Error(result.error || 'Não foi possível enviar o arquivo.');
     }
-    return result.data;
+    return {
+      ...result.data,
+      url: mediaUrl(result.data && result.data.url),
+    };
   });
 }
 

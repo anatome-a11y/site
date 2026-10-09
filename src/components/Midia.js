@@ -2,9 +2,7 @@ import React, { Component, Fragment } from 'react';
 
 import { List, Popover, Tooltip, Button, Select, Input, Icon, Upload, Tag } from 'antd'
 
-import {Maybe} from '../utils/data'
-
-import {filter} from '../utils/data'
+import {Maybe, filter, mediaUrl} from '../utils/data'
 const Option = Select.Option;
 
 const _tags = [
@@ -68,7 +66,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
                 )}                
             </div>
             <div style={{ textAlign: 'center' }}>
-                <Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button>
+                <Button target="_blank" href={mediaUrl(midias[idx].url)}><Icon type="download" />Baixar</Button>
                 {onChange && <Button onClick={() => onChange([
                         ...midias.slice(0, idx),
                         ...midias.slice(idx+1),

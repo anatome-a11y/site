@@ -4,6 +4,7 @@ import FormLocalizacao from '../Anatomp/FormLocalizacao';
 import MappedPoint from './MappedPoint';
 import ObjectPointMapper from '../ObjectPointMapper';
 import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
+import { mediaUrl } from '../utils/data';
 
 export default class ImageMappedPoints extends Component {
 
@@ -519,7 +520,7 @@ export default class ImageMappedPoints extends Component {
                                 {
                                     is3dFile(image.name) ? (
                                         <ObjectPointMapper 
-                                            url={image.url} 
+                                            url={mediaUrl(image.url)} 
                                             fileType={getExtensionFromFileName(image.name)}
                                             onObject3DClick={this.handleObject3DClick}
                                             onPointClick={this.handleObject3DPointClick}
@@ -535,7 +536,7 @@ export default class ImageMappedPoints extends Component {
                                                 height: this.state.maxHeight,
                                                 position: 'relative',
                                             }}
-                                            src={image.url}
+                                            src={mediaUrl(image.url)}
                                         />
                                     )
                                 }

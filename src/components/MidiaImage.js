@@ -1,12 +1,13 @@
 import React from 'react';
 import { Popover, Button, Icon, Input } from 'antd';
 import { is3dFile } from '../utils/fileUtils';
+import { mediaUrl } from '../utils/data';
 
 const MidiaContent = ({ file, onChange, midias, idx }) => {
 
     return (
         <div>
-            <img src={midias[idx].url} style={{
+            <img src={mediaUrl(midias[idx].url)} style={{
                 maxHeight: 100,
                 display: 'block',
                 marginLeft: 'auto',
@@ -53,7 +54,7 @@ const MidiaContent = ({ file, onChange, midias, idx }) => {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-                <Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button>
+                <Button target="_blank" href={mediaUrl(midias[idx].url)}><Icon type="download" />Baixar</Button>
                 {onChange && <Button onClick={() => onChange([
                     ...midias.slice(0, idx),
                     ...midias.slice(idx + 1),
@@ -86,7 +87,7 @@ const Midia3DContent = ({ file, onChange, midias, idx }) => {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-                <Button target="_blank" href={midias[idx].url}><Icon type="download" />Baixar</Button>
+                <Button target="_blank" href={mediaUrl(midias[idx].url)}><Icon type="download" />Baixar</Button>
                 {onChange && <Button onClick={() => onChange([
                     ...midias.slice(0, idx),
                     ...midias.slice(idx + 1),

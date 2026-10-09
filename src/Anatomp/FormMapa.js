@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ImageMappedPoints from '../components/ImageMappedPoints';
 import Label from '../components/Label';
-import { filter } from '../utils/data';
+import { filter, mediaUrl } from '../utils/data';
 import FormLocalizacao from './FormLocalizacao';
 import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
 import ObjectViewer from '../ObjectViewer';
@@ -103,7 +103,7 @@ class FormMapa extends Component {
                                                     {
                                                         is3dFile(t.name) ? (
                                                             <ObjectViewer 
-                                                                url={item.midias[idxMidia].url} 
+                                                                url={mediaUrl(item.midias[idxMidia].url)} 
                                                                 fileType={getExtensionFromFileName(t.name)} 
                                                             />
                                                         ) : (
@@ -115,7 +115,7 @@ class FormMapa extends Component {
                                                                     marginRight: 'auto',
                                                                     padding: 10,
                                                                 }}
-                                                                src={item.midias[idxMidia].url}
+                                                                src={mediaUrl(item.midias[idxMidia].url)}
                                                             />
                                                         )
                                                     }              

@@ -4,12 +4,14 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment';
+import { mediaUrl } from '../utils/data';
 
 export const loadModel = (url, fileType) => new Promise((resolve, reject) => {
+  const modelUrl = mediaUrl(url);
   if (fileType === 'glb' || fileType === 'gltf') {
-    new GLTFLoader().load(url, gltf => resolve(gltf.scene), undefined, reject);
+    new GLTFLoader().load(modelUrl, gltf => resolve(gltf.scene), undefined, reject);
   } else if (fileType === 'obj') {
-    new OBJLoader().load(url, resolve, undefined, reject);
+    new OBJLoader().load(modelUrl, resolve, undefined, reject);
   } else {
     reject(new Error(`Formato não suportado: ${fileType}`));
   }
