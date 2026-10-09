@@ -344,7 +344,7 @@ class Anatomp extends Component {
 
         this.onChange('pecasFisicas')([
             ...pecasFisicas,
-            { ..._modelPecaFisica, _id: uuidv4() },
+            { ..._modelPecaFisica, _id: uuidv4(), nova: true },
         ])
     }
 
@@ -374,7 +374,7 @@ class Anatomp extends Component {
 
         if (pecasFisicas.length == 1) {
             this.onChange('pecasFisicas')([
-                { ..._modelPecaFisica, _id: uuidv4() },
+                { ..._modelPecaFisica, _id: uuidv4(), nova: true },
             ])
         } else {
             this.onChange('pecasFisicas')([
