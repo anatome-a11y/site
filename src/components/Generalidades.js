@@ -3,13 +3,11 @@ import React, { Component, Fragment } from 'react';
 import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 'antd'
 
 import Midia from '../components/Midia'
+import { uploadMedia } from '../utils/data'
 
 const { v4: uuidv4 } = require('uuid');
 
 const { Item } = List;
-
-const firebase = window.firebase;
-const firebaseRef = firebase.storage().ref();
 
 const getModelGeneralidade = () => ({
     _id: uuidv4(),
@@ -191,30 +189,22 @@ class Generalidades extends Component {
         if (info.file.status !== 'uploading') {
             //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
-                const { uid, type } = info.file;
-                const token = {};
-
-                const name = (+new Date()) + '-' + info.file.name;
-                const metadata = { contentType: info.file.type };
-
-                const task = firebaseRef.child(name).put(info.file, metadata);
-
-                task
-                    .then(snapshot => snapshot.ref.getDownloadURL())
-                    .then(url => {
+                const arquivo = info.file.originFileObj || info.file;
+                uploadMedia(arquivo)
+                    .then(uploaded => {
                         this.setState({ loading: false });
                         this.onChange('midias', idx)([...midias, {
                             _id: uuidv4(),
-                            type,
-                            name,
+                            type: uploaded.type || info.file.type,
+                            name: uploaded.name,
                             tags: [],
-                            url,
+                            url: uploaded.url,
                             original: info.file
                         }])
                     })
                     .catch(err => {
+                        this.setState({ loading: false });
                         onOpenSnackbar(err.message)
-                        console.log(err)
                     });
 
             } else {

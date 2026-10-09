@@ -87,7 +87,7 @@ class FormMapa extends Component {
                     help={erros.msgs[_erros.mapa] || ''}
                 >
                     <div hidden={tipoPecaMapeamento != 'pecaDigital'}>
-                        <Label>Selecione imagens digitais depois clique na imagem para associar o nome a cada parte anatômica</Label>
+                        <Label>Clique na imagem ou no modelo 3D da peça digital para associar o nome a cada parte anatômica</Label>
 
                         <List
                             grid={{ gutter: 16, column: 4 }}

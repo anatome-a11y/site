@@ -185,7 +185,7 @@ class Anatomp extends Component {
                             onSelectRoteiro={this.onSelectRoteiro}
                         />
                     </Panel>
-                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title="Inclusão das informações das peças anatômicas físicas" />} key='pecaFisica'>
+                    <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['pecasFisicas'])} contentQ={<p>...</p>} title={model.tipoPecaMapeamento === 'pecaDigital' ? 'Inclusão das informações das peças anatômicas digitais' : 'Inclusão das informações das peças anatômicas físicas'} />} key='pecaFisica'>
                         <FormPecasFisicas
                             {...model}
                             {...options}
@@ -264,13 +264,16 @@ class Anatomp extends Component {
             .finally(() => this.props.onSetAppState({ loading: false }))
     }
 
-    onSelectRoteiro = (partes, model) => {
+    onSelectRoteiro = (partes, selecionado) => {
+        if (!selecionado || !selecionado.roteiro) {
+            return;
+        }
 
-        const roteiro = this.state.options.listaRoteiros.find(r => r._id == model.roteiro)
+        const roteiro = this.state.options.listaRoteiros.find(r => r._id == selecionado.roteiro)
         const extra = roteiro ? {
             options: {
                 ...this.state.options,
-                listaPecasGenericas: roteiro.pecasGenericas
+                listaPecasGenericas: roteiro.pecasGenericas || []
             }
         } : {};
 
@@ -278,10 +281,11 @@ class Anatomp extends Component {
         this.setState({
             model: {
                 ...this.state.model,
-                ...model,
-                mapa: partes.map(p => ({
+                ...selecionado,
+                mapa: (partes || []).map(p => ({
                     ..._modelMapa,
                     parte: p,
+                    pontos: [],
                     localizacao: [{
                         ...getModelLocalizacao(),
                         referenciaRelativa: getModelReferenciaRelativa()
@@ -292,19 +296,47 @@ class Anatomp extends Component {
         })
     }
 
+    mapaComPecas = (mapa, pecasFisicas) => {
+        const ids = pecasFisicas.map(pf => pf.pecaGenerica).filter(id => id);
+        const unicos = ids.filter((item, pos) => ids.indexOf(item) == pos);
+        const pecasGenericas = unicos.map(idPG => {
+            const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
+            if (!dadosPecaGenerica) {
+                return null;
+            }
+            return { ...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG) };
+        }).filter(Boolean);
+
+        return mapa.map(m => {
+            const pecaGenerica = pecasGenericas.find(pg => pg.partes && pg.partes.find(p => p._id == m.parte._id));
+            if (!pecaGenerica) {
+                return m;
+            }
+            return {
+                ...m,
+                localizacao: pecaGenerica.pecasFisicas.map(pf => ({
+                    ...getModelLocalizacao(),
+                    pecaFisica: pf._id,
+                    referenciaRelativa: getModelReferenciaRelativa()
+                }))
+            };
+        });
+    }
+
     onChangePecaFisica = (field, idx) => value => {
         const { model } = this.state;
+        const pecasFisicas = [
+            ...model.pecasFisicas.slice(0, idx),
+            { ...model.pecasFisicas[idx], [field]: value },
+            ...model.pecasFisicas.slice(idx + 1),
+        ];
+        const atualizado = { ...model, pecasFisicas };
 
-        this.setState({
-            model: {
-                ...model,
-                pecasFisicas: [
-                    ...model.pecasFisicas.slice(0, idx),
-                    { ...model.pecasFisicas[idx], [field]: value },
-                    ...model.pecasFisicas.slice(idx + 1),
-                ]
-            }
-        })
+        if (field == 'pecaGenerica' && !model.hasOwnProperty('_id')) {
+            atualizado.mapa = this.mapaComPecas(model.mapa, pecasFisicas);
+        }
+
+        this.setState({ model: atualizado })
     }
 
     onAddPecaFisica = () => {
@@ -419,35 +451,7 @@ class Anatomp extends Component {
     onBlurPecaFisica = () => {
         if (!this.state.model.hasOwnProperty('_id')) {
             const { mapa, pecasFisicas } = this.state.model;
-
-            const pgUtilizadas = pecasFisicas.map(pf => pf.pecaGenerica);
-            const pgUtilizadasUnicas = pgUtilizadas.filter(function (item, pos) {
-                return pgUtilizadas.indexOf(item) == pos;
-            })
-
-            const pecasGenericas = pgUtilizadasUnicas.map(idPG => {
-                const dadosPecaGenerica = this.state.options.listaPecasGenericas.find(pg => pg._id == idPG);
-                return { partes: [], ...dadosPecaGenerica, pecasFisicas: pecasFisicas.filter(pf => pf.pecaGenerica == idPG) }
-            });
-
-            const _mapa = mapa.map(m => {
-                const pecaGenerica = pecasGenericas.find(pg => pg.partes.find(p => p._id == m.parte._id) != undefined);
-
-                if (pecaGenerica) {
-                    return {
-                        ...m,
-                        localizacao: pecaGenerica.pecasFisicas.map(pf => ({
-                            ...getModelLocalizacao(),
-                            pecaFisica: pf._id,
-                            referenciaRelativa: getModelReferenciaRelativa()
-                        }))
-                    }
-                } else {
-                    return m
-                }
-            })
-
-            this.setState({ model: { ...this.state.model, mapa: _mapa } })
+            this.setState({ model: { ...this.state.model, mapa: this.mapaComPecas(mapa, pecasFisicas) } })
         }
     }
 

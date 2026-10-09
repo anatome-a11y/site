@@ -63,7 +63,7 @@ class FormPecasFisicas extends Component {
 
     render() {
         const { loading } = this.state;
-        const { onChangePecaFisica, erros, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas, onBlurPecaFisica, tipoPecaMapeamento, onChange, onOpenSnackbar } = this.props;
+        const { onChangePecaFisica, erros, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas, tipoPecaMapeamento, onChange, onOpenSnackbar } = this.props;
 
         const _erros = {
             pecasFisicas: erros.campos.indexOf('pecasFisicas'),
@@ -72,6 +72,9 @@ class FormPecasFisicas extends Component {
         const onChangeRadio = e => {
             onChange("tipoPecaMapeamento")(e.target.value);
         };
+
+        const digital = tipoPecaMapeamento == 'pecaDigital';
+        const pecaLabel = digital ? 'peça digital' : 'peça física';
 
         const onUpload = (idx, midias, _id) => info => {
             const [main, type] = info.file.type.split('/');
@@ -132,7 +135,7 @@ class FormPecasFisicas extends Component {
                         rowKey='_id'
                         size="small"
                         bordered={true}
-                        locale={{ emptyText: 'Nenhuma peça física foi adicionada' }}
+                        locale={{ emptyText: `Nenhuma ${pecaLabel} foi adicionada` }}
                         dataSource={pecasFisicas}
                         renderItem={(item, idx) => (
                             <Item key={item._id} actions={[
@@ -153,7 +156,7 @@ class FormPecasFisicas extends Component {
                             ]}>
                                 <div style={_style.item}>
                                     <div style={{ width: isEdit ? '40%' : '30%', marginRight: 5 }}>
-                                        <Input value={item.nome} onChange={e => onChangePecaFisica('nome', idx)(e.target.value)} placeholder={`Nome da peça física`} />
+                                        <Input value={item.nome} onChange={e => onChangePecaFisica('nome', idx)(e.target.value)} placeholder={`Nome da ${pecaLabel}`} />
                                     </div>
                                     <div style={{ width: '30%', marginRight: 5 }}>
                                         <Select
@@ -166,13 +169,12 @@ class FormPecasFisicas extends Component {
                                             filterOption={filter}
                                             placeholder='Conteúdo da peça correspondente'
                                             style={{ width: '100%' }}
-                                            onBlur={onBlurPecaFisica}
                                         >
                                             {listaPecasGenericas.map(i => <Option key={i._id} value={i._id}>{i.nome}</Option>)}
                                         </Select>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: isEdit ? '60%' : '40%', marginRight: 5 }}>
-                                        <Input value={item.descricao} onChange={e => onChangePecaFisica('descricao', idx)(e.target.value)} placeholder={`Descrição da peça física`} />
+                                        <Input value={item.descricao} onChange={e => onChangePecaFisica('descricao', idx)(e.target.value)} placeholder={`Descrição da ${pecaLabel}`} />
                                     </div>
                                 </div>
                                 <div style={_styleMidia.item}>

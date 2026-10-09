@@ -4,15 +4,12 @@ import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin, Row, C
 
 import Midia from '../components/Midia'
 import Label from '../components/Label'
-import { filter } from '../utils/data'
+import { filter, uploadMedia } from '../utils/data'
 
 const { v4: uuidv4 } = require('uuid');
 
 const { Item } = List;
 const { Option } = Select;
-
-const firebase = window.firebase;
-const firebaseRef = firebase.storage().ref();
 
 
 
@@ -154,30 +151,22 @@ class FormTeoria extends Component {
         if (info.file.status !== 'uploading') {
             //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
-                const { uid, type } = info.file;
-                const token = {};
-
-                const name = (+new Date()) + '-' + info.file.name;
-                const metadata = { contentType: info.file.type };
-
-                const task = firebaseRef.child(name).put(info.file, metadata);
-
-                task
-                    .then(snapshot => snapshot.ref.getDownloadURL())
-                    .then(url => {
+                const arquivo = info.file.originFileObj || info.file;
+                uploadMedia(arquivo)
+                    .then(uploaded => {
                         this.setState({ loading: false });
                         onChangeConteudoTeorico('midias', idx)([...midias, {
                             _id: uuidv4(),
-                            type,
-                            name,
+                            type: uploaded.type || info.file.type,
+                            name: uploaded.name,
                             tags: [],
-                            url,
+                            url: uploaded.url,
                             original: info.file
                         }])
                     })
                     .catch(err => {
+                        this.setState({ loading: false });
                         onOpenSnackbar(err.message)
-                        console.log(err)
                     });
 
 

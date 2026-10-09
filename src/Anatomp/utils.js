@@ -21,13 +21,17 @@ export const onValidate = model => {
         msgs = [...msgs, 'Campo obrigatório'];
     }
 
+    const digital = tipoPecaMapeamento == 'pecaDigital';
+    const pecaLabel = digital ? 'peça digital' : 'peça física';
+    const pecasLabel = digital ? 'peças digitais' : 'peças físicas';
+
     if (pecasFisicas.length == 0) {
         campos = [...campos, 'pecasFisicas'];
-        msgs = [...msgs, 'Adicione ao menos um peça física'];
+        msgs = [...msgs, `Adicione ao menos uma ${pecaLabel}`];
     } else {
         if (pecasFisicas.find(p => p.nome.trim() == "")) {
             campos = [...campos, 'pecasFisicas'];
-            msgs = [...msgs, 'Informe o nome de todas as peças físicas'];
+            msgs = [...msgs, `Informe o nome de todas as ${pecasLabel}`];
         }
     }
 

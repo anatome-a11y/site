@@ -39,14 +39,16 @@ const FormGeral = ({ nome, instituicao, modo, roteiro, listaRoteiros, erros, onC
                                 disabled={isEdit}
                                 showSearch
                                 value={roteiro}
-                                onSelect={(v, d) => {                                    
-                                    onSelectRoteiro(d.props['data-partes'], {roteiro: v, nome: d.props.children});
+                                onSelect={v => {
+                                    const selecionado = listaRoteiros.find(i => i._id == v);
+                                    if (!selecionado) return;
+                                    onSelectRoteiro(selecionado.partes || [], { roteiro: v, nome: selecionado.nome });
                                 }}
                                 notFoundContent='Nenhum roteiro foi encontrado'
                                 optionFilterProp="children"
                                 filterOption={filter}
                             >
-                                {listaRoteiros.map(i => <Option data-partes={i.partes} key={i._id} value={i._id}>{i.nome}</Option>)}
+                                {listaRoteiros.map(i => <Option key={i._id} value={i._id}>{i.nome}</Option>)}
                             </Select>
                         </FormItem>
                     </Col>
