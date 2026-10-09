@@ -2,16 +2,13 @@ import { Button, Form, Input, List, Radio, Select, Spin, Tooltip, Upload } from 
 import React, { Component, Fragment } from 'react';
 import Label from '../components/Label';
 import MidiaImage from '../components/MidiaImage';
-import { filter } from '../utils/data';
+import { filter, uploadMedia } from '../utils/data';
 import { is3dFile } from '../utils/fileUtils';
 
 const { v4: uuidv4 } = require('uuid');
 
 const { Item } = List;
 const { Option } = Select;
-
-const firebase = window.firebase;
-const firebaseRef = firebase.storage().ref();
 
 const FormItem = Form.Item;
 
@@ -84,30 +81,23 @@ class FormPecasFisicas extends Component {
                 if (info.file.status !== 'uploading') {
                     //Adiciona
                     if (midias.find(f => f.uid == info.file.uid) == undefined) {
-                        const { uid, type } = info.file;
-                        const token = {};
-                        const name = (+new Date()) + '-' + info.file.name;
-                        const metadata = { contentType: info.file.type };
-                        const task = firebaseRef.child(name).put(info.file, metadata);
-
-                        task
-                            .then(snapshot => snapshot.ref.getDownloadURL())
-                            .then(url => {
+                        uploadMedia(info.file.originFileObj || info.file)
+                            .then(uploaded => {
                                 this.setState({ loading: false });
                                 onChangePecaFisica('midias', idx)([...midias, {
                                     _id: uuidv4(),
-                                    type,
-                                    name,
+                                    type: uploaded.type || info.file.type,
+                                    name: uploaded.name,
                                     tags: [],
-                                    url,
+                                    url: uploaded.url,
                                     original: info.file,
                                     img: "",
                                     pontos: [],
                                 }])
                             })
                             .catch(err => {
+                                this.setState({ loading: false });
                                 onOpenSnackbar(err.message)
-                                console.log(err)
                             });
                     } else {
                         this.setState({ loading: false });
@@ -117,7 +107,7 @@ class FormPecasFisicas extends Component {
             } else {
                 this.beforeUpload(_id);
                 this.setState({ loading: false });
-                onOpenSnackbar("Formato inválido, o arquivo deve ser uma imagem .png, .jpg ou .jpeg ou um objeto 3D do tipo .glb");
+                onOpenSnackbar("Formato inválido. Use .png, .jpg, .jpeg, .glb, .gltf ou .obj.");
             }
         }
 

@@ -7,7 +7,6 @@ import { is3dFile, getExtensionFromFileName } from '../utils/fileUtils';
 
 export default class ImageMappedPoints extends Component {
 
-    visualizacao3d = false;
     pontos = [];
     enableOnClick = false;
     idxProximo = 0;
@@ -28,8 +27,22 @@ export default class ImageMappedPoints extends Component {
         super(props);
     }
 
+    handleObject3DPointClick = ponto => {
+        if (!ponto || !ponto.parte) {
+            return;
+        }
+        const index = this.state.mapa.findIndex(m => m.parte._id == ponto.parte._id);
+        if (index !== -1) {
+            this.openModalExcluirPontoFunction(index, ponto.label, ponto.parte.nome);
+        }
+    }
+
+    getNomeProximaParte() {
+        const item = this.idxProximo != -1 ? this.state.mapa[this.idxProximo] : null;
+        return item && item.parte ? item.parte.nome : null;
+    }
+
     handleObject3DClick = (x, y, z, idx) => {
-        console.log('Clique no objeto 3D em coordenadas (x, y, z):', x, y, z);
         if (this.enableOnClick) {
             if (this.idxProximo != -1) {
                 var label = null;
@@ -172,13 +185,13 @@ export default class ImageMappedPoints extends Component {
 
     getNextLabel = () => {
 
-        if (this.pontos.length == 0) {
-            return 1;
-        }
-        var labelMaior = 1;
+        // Labels vindos do banco podem ser strings; soma sempre como número
+        // para não gerar "31" a partir de "3".
+        var labelMaior = 0;
         for (let idx = 0; idx < this.pontos.length; idx++) {
-            if (parseInt(this.pontos[idx].label) > parseInt(labelMaior)) {
-                labelMaior = this.pontos[idx].label;
+            var numero = parseInt(this.pontos[idx].label, 10);
+            if (numero > labelMaior) {
+                labelMaior = numero;
             }
         }
 
@@ -415,11 +428,6 @@ export default class ImageMappedPoints extends Component {
             partesFormLocalizacao: []
         };
 
-        this.state.pecaFisicaDigital.midias.map((midia) => {
-            console.log('Carregando midia: ', midia.name)
-            this.visualizacao3d = is3dFile(midia.name)
-        });
-
         for (let idx = 0; idx < this.state.pecaFisicaDigital.midias.length; idx++) {
             this.referenciasImagens[idx] = React.createRef();
         }
@@ -514,11 +522,11 @@ export default class ImageMappedPoints extends Component {
                                             url={image.url} 
                                             fileType={getExtensionFromFileName(image.name)}
                                             onObject3DClick={this.handleObject3DClick}
+                                            onPointClick={this.handleObject3DPointClick}
                                             idx={idx}
                                             pontos={this.state.pecaFisicaDigital.midias[idx].pontos}
-                                            partes={this.state.mapa}
                                             enableOnClick={this.enableOnClick}
-                                            ref={this.childRef}
+                                            instrucao={this.getNomeProximaParte()}
                                         />
                                     ) : (
                                         <img onClick={e => this.imageClick(e)(idx)} ref={this.referenciasImagens[idx]}
@@ -532,7 +540,7 @@ export default class ImageMappedPoints extends Component {
                                     )
                                 }
                                 {
-                                    !this.visualizacao3d && image.pontos.map((point, idxPonto) =>
+                                    !is3dFile(image.name) && image.pontos.map((point, idxPonto) =>
                                         <MappedPoint
                                             key={idxPonto}
                                             point={point}

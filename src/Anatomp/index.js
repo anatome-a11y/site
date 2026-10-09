@@ -200,7 +200,9 @@ class Anatomp extends Component {
                             onBlurPecaFisica={this.onBlurPecaFisica}
                         />
                         <div style={{ textAlign: 'right', marginBottom: 20, marginRight: 16 }}>
-                            <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>Peça física</Button>
+                            <Button style={{ marginRight: 5 }} onClick={this.onAddPecaFisica} type='primary' ghost icon='plus'>
+                                {model.tipoPecaMapeamento === 'pecaDigital' ? 'Peça digital' : 'Peça física'}
+                            </Button>
                         </div>
                     </Panel>
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Associação entre o nome e a localização da parte na peça" />} key='mapeamento'>

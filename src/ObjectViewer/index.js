@@ -1,64 +1,52 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { DirectionalLight } from 'three';
+import { createViewer, disposeObject, loadModel, statusMessageStyle } from './threeViewer';
 
-const ObjectViewer = ({ url, fileType }) => {
+const ObjectViewer = ({ url, fileType, height = 200 }) => {
   const containerRef = useRef(null);
-  const [loadedModel, setLoadedModel] = useState(null);
+  const [status, setStatus] = useState('loading');
 
   useEffect(() => {
-    if (!loadedModel) {
-      return;
+    if (!url) {
+      return undefined;
     }
 
-    const container = containerRef.current;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5);
-    container.appendChild(renderer.domElement);
+    let cancelled = false;
+    let viewer = null;
+    setStatus('loading');
 
-    scene.add(loadedModel);
+    loadModel(url, fileType)
+      .then(model => {
+        if (cancelled || !containerRef.current) {
+          disposeObject(model);
+          return;
+        }
+        viewer = createViewer(containerRef.current, model);
+        if (cancelled) {
+          viewer.dispose();
+          viewer = null;
+          return;
+        }
+        setStatus('ready');
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setStatus('error');
+        }
+      });
 
-    const light = new DirectionalLight(0xffffff, 1);
-    light.position.set(1, 1, 1);
-    scene.add(light);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.update();
-
-    camera.position.z = 10;
-    
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
-
-    animate();
-  }, [loadedModel]);
-
-  useEffect(() => {
-    if (url) {
-      if (fileType === 'glb') {
-        const loader = new GLTFLoader();
-        loader.load(url, (gltf) => {
-          setLoadedModel(gltf.scene);
-        });
-      } else if (fileType === 'obj') {
-        const loader = new OBJLoader();
-        loader.load(url, (obj) => {
-          setLoadedModel(obj);
-        });
+    return () => {
+      cancelled = true;
+      if (viewer) {
+        viewer.dispose();
+        viewer = null;
       }
-    }
+    };
   }, [url, fileType]);
 
   return (
-    <div>
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height }}>
+      {status === 'loading' && <div style={statusMessageStyle}>Carregando modelo 3D...</div>}
+      {status === 'error' && <div style={statusMessageStyle}>Não foi possível carregar o modelo 3D.</div>}
     </div>
   );
 };

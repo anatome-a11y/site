@@ -8,7 +8,21 @@ export const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, "").
 export const filter = (input, option) => norm(option.props.children).indexOf(norm(input)) >= 0
 
 const apiUrl = 'https://anatome-api.onrender.com';
+// export const apiUrl = 'http://localhost:8080';
 export const request = (path, options = {}) => fetch(`${apiUrl}/${path}`, {headers, ...options}).then(r => r.json())
+
+export const uploadMedia = file => {
+  const body = new FormData();
+  body.append('file', file, file.name);
+
+  return fetch(`${apiUrl}/midia`, { method: 'POST', body }).then(async response => {
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Não foi possível enviar o arquivo.');
+    }
+    return result.data;
+  });
+}
 
 export const isEmpty = (prop) => (
     prop === null ||
