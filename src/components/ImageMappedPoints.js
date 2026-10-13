@@ -45,7 +45,8 @@ export default class ImageMappedPoints extends Component {
 
     handleObject3DClick = (x, y, z, idx) => {
         if (this.enableOnClick) {
-            if (this.idxProximo != -1) {
+            this.alinharIdxProximo();
+            if (this.idxProximo != -1 && this.parteDaPecaSelecionada(this.state.mapa[this.idxProximo])) {
                 var label = null;
 
                 if (this.selecionou) {
@@ -92,7 +93,8 @@ export default class ImageMappedPoints extends Component {
     imageClick = e => idx => {
 
         if (this.enableOnClick) {
-            if (this.idxProximo != -1) {
+            this.alinharIdxProximo();
+            if (this.idxProximo != -1 && this.parteDaPecaSelecionada(this.state.mapa[this.idxProximo])) {
                 var label = null;
 
                 if (this.selecionou) {
@@ -202,29 +204,57 @@ export default class ImageMappedPoints extends Component {
 
 
 
-    getNextPart = () => {
+    mesmoId = (a, b) => String((a && a._id) || a || '') === String((b && b._id) || b || '')
 
-        for (let idx = this.idxProximo; idx < this.state.mapa.length; idx++) {
-            if (
-                this.state.mapa[idx] !== undefined &&
-                this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null &&
-                (this.state.mapa[idx].pontos[0] === undefined
-                    || this.state.mapa[idx].pontos[0] == null
-                    || this.state.mapa[idx].pontos[0] == "")
-            ) {
-                this.idxProximo = idx;
-                return;
-            }
+    parteDaPecaSelecionada = item => {
+        if (!item || !item.parte) {
+            return false;
         }
+        const idsPartes = this.state.idsPartesPeca || [];
+        if (idsPartes.length > 0) {
+            const parteId = item.parte._id || item.parte;
+            return idsPartes.some(id => this.mesmoId(id, parteId));
+        }
+        const idsPecas = this.state.idsPecasFisicas || [];
+        return (item.localizacao || []).some(localizacao => idsPecas.some(id => this.mesmoId(id, localizacao && localizacao.pecaFisica)));
+    }
 
-        for (let idx = 0; idx < this.state.mapa.length; idx++) {
-            if (this.state.mapa[idx].pontos[0] === undefined && this.state.mapa[idx].localizacao[0].referenciaRelativa.referencia == null) {
+    parteProntaParaMarcar = item => {
+        if (!item || !item.localizacao || !item.localizacao[0] || !item.localizacao[0].referenciaRelativa) {
+            return false;
+        }
+        if (!this.parteDaPecaSelecionada(item)) {
+            return false;
+        }
+        if (item.localizacao[0].referenciaRelativa.referencia != null) {
+            return false;
+        }
+        const ponto = item.pontos && item.pontos[0];
+        return ponto === undefined || ponto == null || ponto === "";
+    }
+
+    getNextPart = () => {
+        const total = this.state.mapa.length;
+        const inicio = this.idxProximo >= 0 && this.idxProximo < total ? this.idxProximo : 0;
+
+        for (let passo = 0; passo < total; passo++) {
+            const idx = (inicio + passo) % total;
+            if (this.parteProntaParaMarcar(this.state.mapa[idx])) {
                 this.idxProximo = idx;
                 return;
             }
         }
         this.idxProximo = -1;
+    }
 
+    alinharIdxProximo = () => {
+        const atual = this.state.mapa[this.idxProximo];
+        if (this.selecionou && atual && this.parteDaPecaSelecionada(atual)) {
+            return;
+        }
+        if (!this.parteProntaParaMarcar(atual)) {
+            this.getNextPart();
+        }
     }
 
     getIcon(idx) {
@@ -415,6 +445,7 @@ export default class ImageMappedPoints extends Component {
             maxWidth: 400,
             maxHeight: 400,
             idsPecasFisicas: this.props.idsPecasFisicas,
+            idsPartesPeca: this.props.idsPartesPeca || [],
             pecaFisicaDigital: this.props.pecaFisicaDigital,
             mapa: this.props.mapa,
             open: false,
@@ -445,12 +476,19 @@ export default class ImageMappedPoints extends Component {
         }
 
         for (let idx = 0; idx < this.state.mapa.length; idx++) {
-            let label = this.getLabelParte(this.state.mapa[idx].parte._id);
+            const itemMapa = this.state.mapa[idx];
+            if (!itemMapa.parte || !itemMapa.localizacao || !itemMapa.localizacao[0]) {
+                continue;
+            }
+            if (!Array.isArray(itemMapa.pontos)) {
+                itemMapa.pontos = [];
+            }
+            let label = this.getLabelParte(itemMapa.parte._id);
 
             if (!this.pontosExcluidos.includes(label)) {
-                this.state.mapa[idx].pontos.push(label)
-                if (this.state.pecaFisicaDigital._id == this.state.mapa[idx].localizacao[0].pecaFisica) {
-                    this.state.mapa[idx].localizacao[0].numero = label;
+                itemMapa.pontos.push(label)
+                if (this.state.pecaFisicaDigital._id == itemMapa.localizacao[0].pecaFisica) {
+                    itemMapa.localizacao[0].numero = label;
                 }
             }
         }
@@ -459,6 +497,8 @@ export default class ImageMappedPoints extends Component {
             const mapaFiltrado = this.state.mapa.filter(m => m.localizacao[0].pecaFisica == this.toEditRefRelLocal.item.localizacao[0].pecaFisica);
             this.state.partesFormLocalizacao = mapaFiltrado.map(i => i.parte).filter(p => p._id != this.toEditRefRelLocal.item.parte._id);
         }
+
+        this.alinharIdxProximo();
 
         return (
             <div>
@@ -473,7 +513,7 @@ export default class ImageMappedPoints extends Component {
 
                                 <div style={{}}>
                                     {
-                                        this.state.idsPecasFisicas.includes(item.localizacao[0].pecaFisica) && <List.Item key={index} style={{ border: '1px solid #e8e8e8' }}>
+                                        this.parteDaPecaSelecionada(item) && <List.Item key={index} style={{ border: '1px solid #e8e8e8' }}>
                                             <div onClick={() => this.setIdxProximo(index, item.pontos[0])} style={{ textAlign: 'left' }}>
                                                 {this.getIcon(index)}
                                                 {item.parte.nome}

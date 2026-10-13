@@ -63,7 +63,7 @@ class FormPecasFisicas extends Component {
 
     render() {
         const { loading } = this.state;
-        const { onChangePecaFisica, erros, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas, tipoPecaMapeamento, onChange, onOpenSnackbar } = this.props;
+        const { onChangePecaFisica, erros, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas, tipoPecaMapeamento, onChange, onOpenSnackbar, roteiro } = this.props;
 
         const _erros = {
             pecasFisicas: erros.campos.indexOf('pecasFisicas'),
@@ -164,7 +164,7 @@ class FormPecasFisicas extends Component {
                                             disabled={isEdit && !item.nova}
                                             value={item.pecaGenerica == "" ? undefined : item.pecaGenerica}
                                             onChange={onChangePecaFisica('pecaGenerica', idx)}
-                                            notFoundContent='Nada foi encontrado'
+                                            notFoundContent={roteiro ? 'Nenhuma peça vinculada a este roteiro' : 'Selecione um roteiro para ver as peças vinculadas'}
                                             optionFilterProp="children"
                                             filterOption={filter}
                                             placeholder='Conteúdo da peça correspondente'

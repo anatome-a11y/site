@@ -31,21 +31,32 @@ class FormMapa extends Component {
     }
 
     showModal = (pecaFisicaDigital, idxPecaFisica, mapa) => {
+        if (!pecaFisicaDigital.midias || pecaFisicaDigital.midias.length === 0) {
+            return;
+        }
+
         var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
         var idsPecasFisicas = this.props.pecasFisicas.filter(p => p.pecaGenerica == pecaFisicaDigital.pecaGenerica).map(function (item) {
             return item._id;
         });
+        const pecaSelecionada = (this.props.listaPecasGenericas || []).find(p => p._id == pecaFisicaDigital.pecaGenerica);
+        const idsPartesPeca = ((pecaSelecionada && pecaSelecionada.partes) || []).map(parte => parte._id || parte);
+
+        if (this.props.onSyncMapaPeca) {
+            this.props.onSyncMapaPeca(pecaFisicaDigital);
+        }
 
         this.setState({
             visible: true,
             offsetTop: rect.offsetTop,
             pecaFisicaDigital: pecaFisicaDigital,
             idsPecasFisicas: idsPecasFisicas,
+            idsPartesPeca: idsPartesPeca,
             pecaFisicaDigitalBkp: JSON.parse(JSON.stringify(pecaFisicaDigital)),
             idxPecaFisicaDigital: idxPecaFisica,
             mapaBkp: mapa,
-            nomeMidia: pecaFisicaDigital.midias[0].name 
+            nomeMidia: pecaFisicaDigital.midias[0].name
         });
     };
 
@@ -98,7 +109,7 @@ class FormMapa extends Component {
                                         bodyStyle={{ padding: 10, height: 320 }}
                                     >
                                         <Row style={{ height: 250, overflowY: 'auto' }}>
-                                            {item.midias.map((t, idxMidia) =>
+                                            {(item.midias || []).map((t, idxMidia) =>
                                                 <Col span={12}>
                                                     {
                                                         is3dFile(t.name) ? (
@@ -124,16 +135,33 @@ class FormMapa extends Component {
                                         </Row>
                                         <Row style={{ position: 'absolute', bottom: 0, width: '100%' }}>
                                             <Col span={24} >
-                                                <Button type='primary'
-                                                    onClick={e => this.showModal(item, idxPecaFisica, mapa)}
-                                                    style={{
-                                                        marginLeft: 'auto',
-                                                        marginRight: '-50%',
-                                                        left: '50%',
-                                                        transform: 'translate(-50%, -50%)'
-                                                    }}>
-                                                    <Icon type='edit' />Setar localização
-                                                </Button>
+                                                {(!item.midias || item.midias.length === 0) ? (
+                                                    <Tooltip title='Vincule uma imagem 2D ou um objeto 3D à peça'>
+                                                        <span style={{ display: 'inline-block' }}>
+                                                            <Button type='primary'
+                                                                disabled
+                                                                style={{
+                                                                    marginLeft: 'auto',
+                                                                    marginRight: '-50%',
+                                                                    left: '50%',
+                                                                    transform: 'translate(-50%, -50%)'
+                                                                }}>
+                                                                <Icon type='edit' />Setar localização
+                                                            </Button>
+                                                        </span>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Button type='primary'
+                                                        onClick={e => this.showModal(item, idxPecaFisica, mapa)}
+                                                        style={{
+                                                            marginLeft: 'auto',
+                                                            marginRight: '-50%',
+                                                            left: '50%',
+                                                            transform: 'translate(-50%, -50%)'
+                                                        }}>
+                                                        <Icon type='edit' />Setar localização
+                                                    </Button>
+                                                )}
                                             </Col>
                                         </Row>
                                     </Card>
@@ -157,6 +185,7 @@ class FormMapa extends Component {
                                 key={mapa._id}
                                 enableOnClick="true"
                                 idsPecasFisicas={this.state.idsPecasFisicas}
+                                idsPartesPeca={this.state.idsPartesPeca}
                                 pecaFisicaDigital={this.state.pecaFisicaDigital}
                                 mapa={mapa}
                                 style={{ top: 0 }}

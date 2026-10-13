@@ -115,12 +115,15 @@ class Anatomp extends Component {
                         }
                     } : {};
 
+                    const roteiroId = (_model.model && _model.model.roteiro) || this.state.model.roteiro;
+                    const roteiroAtual = roteiros.data.find(r => r._id == roteiroId);
+
                     this.setState({
                         ..._model,
                         options: {
                             ...options,
                             listaRoteiros: roteiros.data,
-                            listaPecasGenericas: p.data
+                            listaPecasGenericas: (roteiroAtual && roteiroAtual.pecasGenericas) || []
                         }
                     })
                 } else {
@@ -208,6 +211,7 @@ class Anatomp extends Component {
                     <Panel className='anatome-panel' header={<Header loading={loading} error={this.checkError(['mapa'])} contentQ={<p>...</p>} title="Associação entre o nome e a localização da parte na peça" />} key='mapeamento'>
                         <FormMapa
                             {...model}
+                            listaPecasGenericas={options.listaPecasGenericas}
                             erros={erros}
                             onChange={this.onChange}
                             onChangeMapa={this.onChangeMapa}
@@ -216,6 +220,7 @@ class Anatomp extends Component {
                             onRemovePecaFisica={this.onRemovePecaFisicaDoMapa}
                             onOpenSnackbar={this.props.onOpenSnackbar}
                             onChangePecaFisica={this.onChangePecaFisica}
+                            onSyncMapaPeca={this.onSyncMapaPeca}
                         />
                     </Panel>
                 </Collapse>
@@ -245,11 +250,16 @@ class Anatomp extends Component {
         request('peca', { method: 'GET' })
             .then(p => {
                 if (p.status == 200) {
+                    const roteiro = options.listaRoteiros.find(r => r._id == this.state.model.roteiro);
+                    const idsPartes = new Set(((roteiro && roteiro.partes) || []).map(parte => parte._id || parte));
+                    const listaPecasGenericas = idsPartes.size
+                        ? p.data.filter(peca => (peca.partes || []).some(parte => idsPartes.has(parte._id || parte)))
+                        : [];
 
                     this.setState({
                         options: {
                             ...options,
-                            listaPecasGenericas: p.data
+                            listaPecasGenericas
                         }
                     })
                 } else {
@@ -296,6 +306,70 @@ class Anatomp extends Component {
         })
     }
 
+    idDe = valor => (valor && typeof valor === 'object' ? valor._id : valor) || ''
+
+    incluirPartesDaPeca = (mapa, pecaFisica) => {
+        if (!pecaFisica || !pecaFisica.pecaGenerica) {
+            return mapa;
+        }
+
+        const peca = (this.state.options.listaPecasGenericas || []).find(p => p._id == pecaFisica.pecaGenerica);
+        const partes = ((peca && peca.partes) || []).map(parte => (
+            parte && typeof parte === 'object' ? parte : { _id: parte, nome: '' }
+        )).filter(parte => parte._id);
+
+        if (partes.length === 0) {
+            return mapa;
+        }
+
+        let alterou = false;
+        const atualizado = mapa.map(item => ({
+            ...item,
+            localizacao: [...(item.localizacao || [])]
+        }));
+
+        partes.forEach(parte => {
+            const idx = atualizado.findIndex(item => this.idDe(item.parte) == parte._id);
+            const localizacaoDaPeca = () => ({
+                ...getModelLocalizacao(),
+                pecaFisica: pecaFisica._id,
+                referenciaRelativa: getModelReferenciaRelativa()
+            });
+
+            if (idx === -1) {
+                alterou = true;
+                atualizado.push({
+                    ..._modelMapa,
+                    parte,
+                    pontos: [],
+                    localizacao: [localizacaoDaPeca()]
+                });
+                return;
+            }
+
+            const localizacao = atualizado[idx].localizacao || [];
+            const jaVinculada = localizacao.some(l => this.idDe(l.pecaFisica) == pecaFisica._id);
+            if (jaVinculada) {
+                return;
+            }
+
+            alterou = true;
+            if (localizacao.length === 1 && !this.idDe(localizacao[0].pecaFisica)) {
+                atualizado[idx] = {
+                    ...atualizado[idx],
+                    localizacao: [{ ...localizacao[0], pecaFisica: pecaFisica._id }]
+                };
+            } else {
+                atualizado[idx] = {
+                    ...atualizado[idx],
+                    localizacao: [...localizacao, localizacaoDaPeca()]
+                };
+            }
+        });
+
+        return alterou ? atualizado : mapa;
+    }
+
     mapaComPecas = (mapa, pecasFisicas) => {
         const ids = pecasFisicas.map(pf => pf.pecaGenerica).filter(id => id);
         const unicos = ids.filter((item, pos) => ids.indexOf(item) == pos);
@@ -332,8 +406,12 @@ class Anatomp extends Component {
         ];
         const atualizado = { ...model, pecasFisicas };
 
-        if (field == 'pecaGenerica' && !model.hasOwnProperty('_id')) {
-            atualizado.mapa = this.mapaComPecas(model.mapa, pecasFisicas);
+        if (field == 'pecaGenerica') {
+            let mapa = this.incluirPartesDaPeca(model.mapa, pecasFisicas[idx]);
+            if (!model.hasOwnProperty('_id')) {
+                mapa = this.mapaComPecas(mapa, pecasFisicas);
+            }
+            atualizado.mapa = mapa;
         }
 
         this.setState({ model: atualizado })
@@ -446,6 +524,14 @@ class Anatomp extends Component {
                 mapa: mapaNovo
             }
         })
+    }
+
+    onSyncMapaPeca = pecaFisica => {
+        const { model } = this.state;
+        const mapa = this.incluirPartesDaPeca(model.mapa, pecaFisica);
+        if (mapa !== model.mapa) {
+            this.setState({ model: { ...model, mapa } });
+        }
     }
 
     onBlurPecaFisica = () => {
