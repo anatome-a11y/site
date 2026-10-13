@@ -10,8 +10,6 @@ import FormAnatom from './Anatom/Form'
 import FormRoteiro from './Roteiro'
 import FormMapeamento from './Anatomp'
 import FormPeca from './Peca'
-import Teste3d from './Teste3d';
-import Teste3dFile from './TesteUpload3d';
 
 //
 import TelaCorrecao from './TelaCorrecao'
@@ -44,8 +42,6 @@ class App extends Component {
                         <Route exact path="/peca/cadastrar" component={FormPeca} />
                         <Route exact path="/peca/editar/:id" component={FormPeca} />
                         <Route exact path="/pecas" component={ListPecas} />
-                        <Route exact path="/teste3d" component={Teste3d} />
-                        <Route exact path="/teste3dfile" component={Teste3dFile} />
 
                         <Route exact path="/correcao/:id" component={TelaCorrecao} />
                         <Route exact path="/config" component={TelaConfig} />
