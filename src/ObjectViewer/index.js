@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createViewer, disposeObject, loadModel, statusMessageStyle } from './threeViewer';
+import { useViewerBackground, ViewerBackgroundControl, viewerStatusColor } from './viewerBackground';
 
 const ObjectViewer = ({ url, fileType, height = 200 }) => {
   const containerRef = useRef(null);
   const [status, setStatus] = useState('loading');
+  const [background, setBackground] = useViewerBackground();
 
   useEffect(() => {
     if (!url) {
@@ -43,10 +45,16 @@ const ObjectViewer = ({ url, fileType, height = 200 }) => {
     };
   }, [url, fileType]);
 
+  const messageStyle = { ...statusMessageStyle, zIndex: 2, color: viewerStatusColor(background) };
+
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%', height }}>
-      {status === 'loading' && <div style={statusMessageStyle}>Carregando modelo 3D...</div>}
-      {status === 'error' && <div style={statusMessageStyle}>Não foi possível carregar o modelo 3D.</div>}
+    <div
+      ref={containerRef}
+      style={{ position: 'relative', width: '100%', height, backgroundColor: background.color }}
+    >
+      <ViewerBackgroundControl value={background.id} onChange={setBackground} />
+      {status === 'loading' && <div style={messageStyle}>Carregando modelo 3D...</div>}
+      {status === 'error' && <div style={messageStyle}>Não foi possível carregar o modelo 3D.</div>}
     </div>
   );
 };

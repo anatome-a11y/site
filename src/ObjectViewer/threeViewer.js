@@ -80,7 +80,13 @@ export const createViewer = (container, model) => {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(width, height);
-  renderer.domElement.style.display = 'block';
+  Object.assign(renderer.domElement.style, {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    zIndex: '0',
+    display: 'block',
+  });
   container.appendChild(renderer.domElement);
 
   const labelRenderer = new CSS2DRenderer();
@@ -89,6 +95,7 @@ export const createViewer = (container, model) => {
     position: 'absolute',
     top: '0',
     left: '0',
+    zIndex: '1',
     pointerEvents: 'none',
   });
   container.appendChild(labelRenderer.domElement);

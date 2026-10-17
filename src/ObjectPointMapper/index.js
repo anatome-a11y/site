@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { createViewer, disposeObject, loadModel, pickSurface, statusMessageStyle } from '../ObjectViewer/threeViewer';
+import { useViewerBackground, ViewerBackgroundControl, viewerStatusColor } from '../ObjectViewer/viewerBackground';
 
 // Deslocamento máximo (px) entre pointerdown e pointerup para o gesto contar
 // como clique de marcação e não como rotação da câmera.
@@ -141,7 +142,7 @@ const hintStyle = {
   left: 8,
   right: 8,
   bottom: 8,
-  zIndex: 1,
+  zIndex: 2,
   padding: '4px 8px',
   borderRadius: 4,
   background: 'rgba(0, 0, 0, 0.6)',
@@ -156,6 +157,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
   const containerRef = useRef(null);
   const [viewer, setViewer] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [background, setBackground] = useViewerBackground();
 
   const latestProps = useRef({});
   latestProps.current = { onObject3DClick, onPointClick, idx, enableOnClick };
@@ -405,6 +407,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     };
   }, [viewer, pontosKey, !!onPointClick]);
 
+  const messageStyle = { ...statusMessageStyle, zIndex: 2, color: viewerStatusColor(background) };
+
   return (
     <div
       ref={containerRef}
@@ -413,10 +417,12 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
         width: '100%',
         height: '100%',
         cursor: enableOnClick ? 'crosshair' : 'grab',
+        backgroundColor: background.color,
       }}
     >
-      {status === 'loading' && <div style={statusMessageStyle}>Carregando modelo 3D...</div>}
-      {status === 'error' && <div style={statusMessageStyle}>Não foi possível carregar o modelo 3D.</div>}
+      <ViewerBackgroundControl value={background.id} onChange={setBackground} />
+      {status === 'loading' && <div style={messageStyle}>Carregando modelo 3D...</div>}
+      {status === 'error' && <div style={messageStyle}>Não foi possível carregar o modelo 3D.</div>}
       {status === 'ready' && enableOnClick && (
         <div style={hintStyle}>
           <div>
