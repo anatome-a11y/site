@@ -8,9 +8,9 @@ import {
   chaveMalha,
   contornoFechado,
   corDaParte,
-  facesDentroDoContorno,
   limparDestaques,
   listaFaces,
+  recortarContorno,
 } from '../ObjectViewer/destaqueMalha';
 
 // Deslocamento máximo (px) entre pointerdown e pointerup para o gesto contar
@@ -511,9 +511,11 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       const mesh = tracoAmostras.find(item => chaveMalha(item.mesh) === malha).mesh;
       const tela = tracoAmostras.map(item => item.tela);
       const fechado = contornoFechado(tela, FECHAMENTO_PX);
-      const faces = fechado
-        ? listaFaces(facesDentroDoContorno(mesh, camera, canvas.getBoundingClientRect(), tela))
-        : [];
+      const area = fechado
+        ? recortarContorno(mesh, camera, canvas.getBoundingClientRect(), tela)
+        : null;
+      const faces = area ? listaFaces(area.faces) : [];
+      const recorte = area && area.recorte.length >= 3 ? area.recorte : undefined;
       const traco = tracoAmostras.map(item => ({
         x: item.point.x,
         y: item.point.y,
@@ -522,6 +524,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       emitirPonto(tracoAmostras[0].point, {
         malha,
         faces: faces.length ? faces : undefined,
+        recorte,
         traco,
       });
       // O traço terminou: volta a girar com o arrasto. O botão continua lá para o próximo.
@@ -595,7 +598,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
   // precisa ser derivada do conteúdo, não da referência.
   const pontosKey = (pontos || []).map(p => [
     p.label, p.x, p.y, p.z, p.malha || '', resumoFaces(p.faces),
-    p.traco ? p.traco.length : 0,
+    p.traco ? p.traco.length : 0, p.recorte ? p.recorte.length : 0,
   ].join(':')).join('|');
 
   // Pinos dos pontos já marcados.

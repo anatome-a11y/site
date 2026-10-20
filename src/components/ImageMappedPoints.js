@@ -68,6 +68,7 @@ export default class ImageMappedPoints extends Component {
                     z: z,
                     malha: destaque && destaque.malha,
                     faces: destaque && destaque.faces,
+                    recorte: destaque && destaque.recorte,
                     traco: destaque && destaque.traco,
                 });
             }
@@ -175,6 +176,9 @@ export default class ImageMappedPoints extends Component {
         }
         if (coords.faces && coords.faces.length) {
             ponto.faces = coords.faces;
+        }
+        if (coords.recorte && coords.recorte.length >= 3) {
+            ponto.recorte = coords.recorte;
         }
         if (coords.traco && coords.traco.length > 1) {
             ponto.traco = coords.traco;

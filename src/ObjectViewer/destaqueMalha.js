@@ -52,6 +52,12 @@ export const corDaParte = label => {
 
 const ANGULO_REGIAO_GRAUS = 68;
 const LIMITE_FACES = 15000;
+const LIMITE_RECORTE = 12000;
+const PROFUNDIDADE_RECORTE = 6;
+const ARESTA_MIN_PX = 8;
+// Fração do raio do modelo. O valor antigo (0,006) virava uma faixa grossa
+// em peças grandes ou com escala diferente de 1.
+const FATOR_ESPESSURA_TRACO = 0.0016;
 
 const indiceVertice = (index, face, vertice) => (
   index ? index.getX(face * 3 + vertice) : face * 3 + vertice
@@ -325,7 +331,7 @@ export const facesDentroDoContorno = (mesh, camera, rect, poligono) => {
     }
   });
   const temProfundidade = minZ !== Infinity;
-  const folgaZ = temProfundidade ? Math.max(0.02, (maxZ - minZ) * 0.35) : 0;
+  const folgaZ = temProfundidade ? Math.max(0.012, (maxZ - minZ) * 0.16) : 0;
   mesh.updateWorldMatrix(true, false);
   const mundo = new THREE.Vector3();
   const projetado = new THREE.Vector3();
@@ -361,6 +367,222 @@ export const facesDentroDoContorno = (mesh, camera, rect, poligono) => {
   return destino;
 };
 
+const segmentosCruzam = (a, b, c, d) => {
+  const orientacao = (p, q, r) => (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+  const o1 = orientacao(a, b, c);
+  const o2 = orientacao(a, b, d);
+  const o3 = orientacao(c, d, a);
+  const o4 = orientacao(c, d, b);
+  return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+};
+
+const pontoNoTriangulo = (p, a, b, c) => {
+  const area = (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
+  if (Math.abs(area) < 1e-8) {
+    return false;
+  }
+  const w0 = ((b.x - p.x) * (c.y - p.y) - (c.x - p.x) * (b.y - p.y)) / area;
+  const w1 = ((c.x - p.x) * (a.y - p.y) - (a.x - p.x) * (c.y - p.y)) / area;
+  const w2 = 1 - w0 - w1;
+  return w0 >= -0.001 && w1 >= -0.001 && w2 >= -0.001;
+};
+
+const maiorArestaPx = telas => {
+  let maior = 0;
+  for (let i = 0; i < 3; i += 1) {
+    const a = telas[i];
+    const b = telas[(i + 1) % 3];
+    if (!a || !b) {
+      return Infinity;
+    }
+    maior = Math.max(maior, Math.hypot(a.x - b.x, a.y - b.y));
+  }
+  return maior;
+};
+
+const trianguloSobrepoePoligono = (telas, poligono) => {
+  if (telas.some(ponto => ponto && pontoNoPoligono(ponto.x, ponto.y, poligono))) {
+    return true;
+  }
+  if (telas.some(ponto => !ponto)) {
+    return false;
+  }
+  for (let i = 0; i < poligono.length; i += 1) {
+    const atual = poligono[i];
+    const proximo = poligono[(i + 1) % poligono.length];
+    if (pontoNoTriangulo(atual, telas[0], telas[1], telas[2])) {
+      return true;
+    }
+    for (let aresta = 0; aresta < 3; aresta += 1) {
+      if (segmentosCruzam(telas[aresta], telas[(aresta + 1) % 3], atual, proximo)) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+// Recorta os triângulos da malha no contorno da tela. O triângulo inteiro
+// deixava faixa vazia na borda e mancha fora da forma quando a centroide
+// caía do lado errado.
+export const recortarContorno = (mesh, camera, rect, poligono) => {
+  const vazio = { faces: new Set(), recorte: [] };
+  const info = infoFaces(mesh);
+  const geometry = mesh.geometry;
+  const position = geometry && geometry.attributes && geometry.attributes.position;
+  if (!info || !position || !poligono || poligono.length < 3) {
+    return vazio;
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  poligono.forEach(ponto => {
+    minX = Math.min(minX, ponto.x);
+    minY = Math.min(minY, ponto.y);
+    maxX = Math.max(maxX, ponto.x);
+    maxY = Math.max(maxY, ponto.y);
+    if (ponto.profundidade != null) {
+      minZ = Math.min(minZ, ponto.profundidade);
+      maxZ = Math.max(maxZ, ponto.profundidade);
+    }
+  });
+  const temProfundidade = minZ !== Infinity;
+  const folgaZ = temProfundidade ? Math.max(0.012, (maxZ - minZ) * 0.16) : 0;
+
+  mesh.updateWorldMatrix(true, false);
+  const matrixWorld = mesh.matrixWorld;
+  const projetado = new THREE.Vector3();
+  const mundo = new THREE.Vector3();
+  const faces = new Set();
+  const recorte = [];
+  let emitidos = 0;
+
+  const emitir = locais => {
+    if (emitidos >= LIMITE_RECORTE) {
+      return;
+    }
+    locais.forEach(local => {
+      mundo.copy(local).applyMatrix4(matrixWorld);
+      recorte.push({ x: mundo.x, y: mundo.y, z: mundo.z });
+    });
+    emitidos += 1;
+  };
+
+  const partir = (a, b) => {
+    const local = a.clone().add(b).multiplyScalar(0.5);
+    const tela = projetarNaTela(mundo.copy(local).applyMatrix4(matrixWorld), camera, rect, projetado);
+    return { local, tela };
+  };
+
+  const dividir = (locais, telas, profundidade) => {
+    if (emitidos >= LIMITE_RECORTE || telas.some(ponto => !ponto)) {
+      return;
+    }
+    const dentro = telas.map(ponto => pontoNoPoligono(ponto.x, ponto.y, poligono));
+    const todosDentro = dentro.every(Boolean);
+    const aresta = maiorArestaPx(telas);
+    const cruza = !todosDentro && trianguloSobrepoePoligono(telas, poligono);
+    if (!todosDentro && !cruza && !dentro.some(Boolean)) {
+      return;
+    }
+    const pequeno = profundidade >= PROFUNDIDADE_RECORTE || aresta <= ARESTA_MIN_PX;
+    if (todosDentro && (pequeno || !trianguloSobrepoePoligono(telas, poligono) || dentro.every(Boolean))) {
+      // Todos os vértices dentro e a forma não corta o triângulo: pinta inteiro.
+      const corta = !pequeno && poligono.some((ponto, indice) => {
+        const proximo = poligono[(indice + 1) % poligono.length];
+        return segmentosCruzam(telas[0], telas[1], ponto, proximo)
+          || segmentosCruzam(telas[1], telas[2], ponto, proximo)
+          || segmentosCruzam(telas[2], telas[0], ponto, proximo);
+      });
+      if (!corta) {
+        emitir(locais);
+        return;
+      }
+    }
+    if (pequeno) {
+      const centro = {
+        x: (telas[0].x + telas[1].x + telas[2].x) / 3,
+        y: (telas[0].y + telas[1].y + telas[2].y) / 3,
+      };
+      if (pontoNoPoligono(centro.x, centro.y, poligono) || dentro.some(Boolean)) {
+        emitir(locais);
+      }
+      return;
+    }
+    const ab = partir(locais[0], locais[1]);
+    const bc = partir(locais[1], locais[2]);
+    const ca = partir(locais[2], locais[0]);
+    dividir([locais[0], ab.local, ca.local], [telas[0], ab.tela, ca.tela], profundidade + 1);
+    dividir([ab.local, locais[1], bc.local], [ab.tela, telas[1], bc.tela], profundidade + 1);
+    dividir([ca.local, bc.local, locais[2]], [ca.tela, bc.tela, telas[2]], profundidade + 1);
+    dividir([ab.local, bc.local, ca.local], [ab.tela, bc.tela, ca.tela], profundidade + 1);
+  };
+
+  const index = geometry.index;
+  const local = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+  for (let face = 0; face < info.count; face += 1) {
+    if (emitidos >= LIMITE_RECORTE) {
+      break;
+    }
+    const offset = face * 3;
+    mundo.set(info.centroids[offset], info.centroids[offset + 1], info.centroids[offset + 2]);
+    mundo.applyMatrix4(matrixWorld);
+    const centro = projetarNaTela(mundo, camera, rect, projetado);
+    if (!centro) {
+      continue;
+    }
+    const normal = new THREE.Vector3(
+      info.normals[offset],
+      info.normals[offset + 1],
+      info.normals[offset + 2]
+    ).transformDirection(matrixWorld);
+    const paraCameraX = camera.position.x - mundo.x;
+    const paraCameraY = camera.position.y - mundo.y;
+    const paraCameraZ = camera.position.z - mundo.z;
+    if (normal.x * paraCameraX + normal.y * paraCameraY + normal.z * paraCameraZ <= 0) {
+      continue;
+    }
+    if (temProfundidade && (centro.profundidade < minZ - folgaZ || centro.profundidade > maxZ + folgaZ)) {
+      continue;
+    }
+
+    const telas = [];
+    let foraDaCaixa = true;
+    for (let vertice = 0; vertice < 3; vertice += 1) {
+      local[vertice].fromBufferAttribute(position, indiceVertice(index, face, vertice));
+      const tela = projetarNaTela(
+        mundo.copy(local[vertice]).applyMatrix4(matrixWorld),
+        camera,
+        rect,
+        projetado
+      );
+      telas.push(tela);
+      if (tela && tela.x >= minX - ARESTA_MIN_PX && tela.x <= maxX + ARESTA_MIN_PX
+        && tela.y >= minY - ARESTA_MIN_PX && tela.y <= maxY + ARESTA_MIN_PX) {
+        foraDaCaixa = false;
+      }
+    }
+    if (foraDaCaixa && !trianguloSobrepoePoligono(telas, poligono)) {
+      continue;
+    }
+    const antes = emitidos;
+    dividir(
+      [local[0].clone(), local[1].clone(), local[2].clone()],
+      telas,
+      0
+    );
+    if (emitidos > antes) {
+      faces.add(face);
+    }
+  }
+
+  return { faces, recorte };
+};
+
 export const criarTraco = (parent, pontos, cor, raio, marcacao) => {
   const lista = (pontos || [])
     .map(ponto => new THREE.Vector3(Number(ponto.x), Number(ponto.y), Number(ponto.z)))
@@ -370,11 +592,26 @@ export const criarTraco = (parent, pontos, cor, raio, marcacao) => {
   }
   parent.updateWorldMatrix(true, false);
   const locais = lista.map(ponto => parent.worldToLocal(ponto.clone()));
-  const curva = locais.length === 2
-    ? new THREE.LineCurve3(locais[0], locais[1])
-    : new THREE.CatmullRomCurve3(locais, false, 'centripetal');
-  const segmentos = Math.min(Math.max(locais.length * 3, 8), 300);
-  const geometry = new THREE.TubeGeometry(curva, segmentos, Math.max(raio, 1e-4), 5, false);
+  const caminho = new THREE.CurvePath();
+  for (let i = 1; i < locais.length; i += 1) {
+    if (locais[i].distanceToSquared(locais[i - 1]) < 1e-12) {
+      continue;
+    }
+    caminho.add(new THREE.LineCurve3(locais[i - 1], locais[i]));
+  }
+  if (caminho.curves.length === 0) {
+    return null;
+  }
+  const espessura = Math.max(raio, 1e-4);
+  let percurso = 0;
+  for (let i = 1; i < locais.length; i += 1) {
+    percurso += locais[i].distanceTo(locais[i - 1]);
+  }
+  if (locais.length > 2 && locais[0].distanceTo(locais[locais.length - 1]) <= Math.max(espessura * 6, percurso * 0.04)) {
+    caminho.add(new THREE.LineCurve3(locais[locais.length - 1], locais[0]));
+  }
+  const segmentos = Math.min(Math.max(caminho.curves.length, 2), 400);
+  const geometry = new THREE.TubeGeometry(caminho, segmentos, espessura, 3, false);
   const material = new THREE.MeshBasicMaterial({
     color: cor,
     depthWrite: false,
@@ -434,6 +671,43 @@ export const limparDestaques = model => {
   });
 };
 
+const criarRecorte = (parent, pontos, cor, marcacao) => {
+  const lista = (pontos || [])
+    .map(ponto => new THREE.Vector3(Number(ponto.x), Number(ponto.y), Number(ponto.z)))
+    .filter(ponto => !Number.isNaN(ponto.x) && !Number.isNaN(ponto.y) && !Number.isNaN(ponto.z));
+  if (!parent || lista.length < 3) {
+    return null;
+  }
+  parent.updateWorldMatrix(true, false);
+  const coords = new Float32Array(lista.length * 3);
+  lista.forEach((ponto, indice) => {
+    const local = parent.worldToLocal(ponto);
+    coords[indice * 3] = local.x;
+    coords[indice * 3 + 1] = local.y;
+    coords[indice * 3 + 2] = local.z;
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(coords, 3));
+  const material = new THREE.MeshBasicMaterial({
+    color: cor,
+    transparent: true,
+    opacity: 0.72,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+    toneMapped: false,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.name = 'recorte-parte';
+  mesh.userData.destaqueParte = true;
+  mesh.userData.marcacao = marcacao || null;
+  mesh.renderOrder = 2;
+  parent.add(mesh);
+  return mesh;
+};
+
 const marcacaoDoPonto = ponto => {
   const parte = ponto.parte;
   const parteId = parte && parte._id ? String(parte._id) : (typeof parte === 'string' ? parte : (ponto.parteId || ''));
@@ -463,13 +737,16 @@ export const aplicarDestaques = (model, pontos) => {
     const cor = corDaParte(ponto.label);
     const marcacao = marcacaoDoPonto(ponto);
     const mesh = ponto.malha ? malhas.get(ponto.malha) : null;
-    if (mesh && ponto.faces && ponto.faces.length) {
+    if (ponto.recorte && ponto.recorte.length >= 3) {
+      criarRecorte(model, ponto.recorte, cor, marcacao);
+    } else if (mesh && ponto.faces && ponto.faces.length) {
       const overlay = criarOverlay(mesh, ponto.faces, cor);
       overlay.userData.marcacao = marcacao;
       mesh.add(overlay);
     }
     if (ponto.traco && ponto.traco.length > 1) {
-      criarTraco(model, ponto.traco, cor, (model.userData.raioDestaque || 1) * 0.006, marcacao);
+      const raioMundo = (model.userData.raioDestaque || 1) * FATOR_ESPESSURA_TRACO;
+      criarTraco(model, ponto.traco, cor, raioLocal(model, raioMundo), marcacao);
     }
   });
 };
