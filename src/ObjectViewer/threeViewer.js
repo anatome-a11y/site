@@ -19,6 +19,19 @@ export const loadModel = (url, fileType) => new Promise((resolve, reject) => {
 
 export const disposeObject = object => {
   object.traverse(child => {
+    // O destaque troca o material por um clone. Restaura o original antes de
+    // descartar as texturas, que continuam compartilhadas com esse original.
+    if (child.userData && child.userData.materialOriginal) {
+      const clone = child.material;
+      child.material = child.userData.materialOriginal;
+      delete child.userData.materialOriginal;
+      const clones = Array.isArray(clone) ? clone : [clone];
+      clones.forEach(material => {
+        if (material && material.dispose) {
+          material.dispose();
+        }
+      });
+    }
     if (child.geometry) {
       child.geometry.dispose();
     }
@@ -54,13 +67,19 @@ export const pickSurface = (raycaster, model) => {
   const hits = raycaster.intersectObject(model, true);
   for (let i = 0; i < hits.length; i++) {
     const hit = hits[i];
-    if (hit.object.isMesh && hit.face && isVisibleInScene(hit.object)) {
+    if (hit.object.isMesh && hit.face && isVisibleInScene(hit.object) && !hit.object.userData.destaqueParte) {
       normalMatrix.getNormalMatrix(hit.object.matrixWorld);
       const normal = hit.face.normal.clone().applyMatrix3(normalMatrix).normalize();
       if (normal.dot(raycaster.ray.direction) > 0) {
         normal.negate();
       }
-      return { point: hit.point, normal, distance: hit.distance };
+      return {
+        point: hit.point,
+        normal,
+        distance: hit.distance,
+        mesh: hit.object,
+        faceIndex: hit.faceIndex,
+      };
     }
   }
   return null;

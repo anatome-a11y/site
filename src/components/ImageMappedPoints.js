@@ -43,7 +43,7 @@ export default class ImageMappedPoints extends Component {
         return item && item.parte ? item.parte.nome : null;
     }
 
-    handleObject3DClick = (x, y, z, idx) => {
+    handleObject3DClick = (x, y, z, idx, destaque) => {
         if (this.enableOnClick) {
             this.alinharIdxProximo();
             if (this.idxProximo != -1 && this.parteDaPecaSelecionada(this.state.mapa[this.idxProximo])) {
@@ -59,7 +59,17 @@ export default class ImageMappedPoints extends Component {
                 } else {
                     label = this.getNextLabel();
                 }
-                this.registrarPonto(idx, label, { x: x, y: y, z: z });
+                if (label == null) {
+                    return;
+                }
+                this.registrarPonto(idx, label, {
+                    x: x,
+                    y: y,
+                    z: z,
+                    malha: destaque && destaque.malha,
+                    faces: destaque && destaque.faces,
+                    traco: destaque && destaque.traco,
+                });
             }
         }
     }
@@ -80,6 +90,9 @@ export default class ImageMappedPoints extends Component {
                     }
                 } else {
                     label = this.getNextLabel();
+                }
+                if (label == null) {
+                    return;
                 }
 
                 var offset = this.referenciasImagens[idx].current.getBoundingClientRect();
@@ -121,7 +134,32 @@ export default class ImageMappedPoints extends Component {
         const mapa = this.state.mapa[this.idxProximo];
         this.selecionou = false;
         this.verificaPontoExcluido(label);
-        this.removerPontos(point => this.mesmoId(point.parte, mapa.parte));
+        const malhaInteira = coords.malha
+            && !(coords.faces && coords.faces.length)
+            && !(coords.traco && coords.traco.length);
+        const partesLiberadas = [];
+        this.removerPontos(point => {
+            const mesmaParte = this.mesmoId(point.parte, mapa.parte);
+            const mesmaMalha = malhaInteira
+                && point.malha === coords.malha
+                && !(point.faces && point.faces.length);
+            if (mesmaMalha && !mesmaParte) {
+                partesLiberadas.push(point.parte);
+            }
+            return mesmaParte || mesmaMalha;
+        });
+        partesLiberadas.forEach(parte => {
+            this.state.mapa.forEach(item => {
+                if (!item || !this.mesmoId(item.parte, parte)) {
+                    return;
+                }
+                item.pontos = [];
+                if (item.localizacao && item.localizacao[0]
+                    && this.state.pecaFisicaDigital._id == item.localizacao[0].pecaFisica) {
+                    item.localizacao[0].numero = '';
+                }
+            });
+        });
 
         const ponto = {
             x: coords.x,
@@ -131,6 +169,15 @@ export default class ImageMappedPoints extends Component {
         };
         if (coords.z != null) {
             ponto.z = coords.z;
+        }
+        if (coords.malha) {
+            ponto.malha = coords.malha;
+        }
+        if (coords.faces && coords.faces.length) {
+            ponto.faces = coords.faces;
+        }
+        if (coords.traco && coords.traco.length > 1) {
+            ponto.traco = coords.traco;
         }
 
         const midia = this.state.pecaFisicaDigital.midias[idx];
@@ -172,19 +219,36 @@ export default class ImageMappedPoints extends Component {
 
     }
 
+    quantidadePartesPeca = () => {
+        const mapa = (this.state && this.state.mapa) || [];
+        const daPeca = mapa.filter(item => this.parteDaPecaSelecionada(item));
+        if (daPeca.length > 0) {
+            return daPeca.length;
+        }
+        return (this.state && this.state.idsPartesPeca || []).length;
+    }
+
     getNextLabel = () => {
 
-        // Labels vindos do banco podem ser strings; soma sempre como número
-        // para não gerar "31" a partir de "3".
-        var labelMaior = 0;
+        // O número fica entre 1 e a quantidade de partes. Remover uma marcação
+        // devolve esse número para a próxima, em vez de continuar a sequência.
+        const usados = {};
         for (let idx = 0; idx < this.pontos.length; idx++) {
-            var numero = parseInt(this.pontos[idx].label, 10);
-            if (numero > labelMaior) {
-                labelMaior = numero;
+            const numero = parseInt(this.pontos[idx].label, 10);
+            if (!isNaN(numero) && numero > 0) {
+                usados[numero] = true;
             }
         }
 
-        return labelMaior + 1;
+        const limite = this.quantidadePartesPeca();
+        const teto = limite > 0 ? limite : Object.keys(usados).length + 1;
+        for (let numero = 1; numero <= teto; numero++) {
+            if (!usados[numero]) {
+                return numero;
+            }
+        }
+
+        return null;
 
     }
 
