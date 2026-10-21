@@ -4,7 +4,7 @@ import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin, Row, C
 
 import Midia from '../components/Midia'
 import Label from '../components/Label'
-import { filter, uploadMedia } from '../utils/data'
+import { filter, textoEnvio, uploadMedia } from '../utils/data'
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -15,7 +15,7 @@ const { Option } = Select;
 
 class FormItemTeoria extends Component {
     render() {
-        const { item, idx, onChange, partes, loading } = this.props;
+        const { item, idx, onChange, partes, loading, progresso } = this.props;
         return (
             <div style={_style.item}>
                 <div style={{ width: '40%', marginRight: 5 }}>
@@ -38,7 +38,12 @@ class FormItemTeoria extends Component {
                 </div>
                 <div style={{ alignSelf: 'center' }}>
                     {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
-                    {loading == item._id ? <Spin /> : null}
+                    {loading == item._id ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12 }}>
+                            <Spin size="small" />
+                            <span style={{ marginLeft: 6 }}>{textoEnvio(progresso)}</span>
+                        </span>
+                    ) : null}
                 </div>
             </div>
         )
@@ -56,12 +61,13 @@ class FormTeoria extends Component {
 
     state = {
         loading: false,
+        progresso: 0,
         open: false,
         toDelete: ''
     }
 
     render() {
-        const { loading, open, toDelete } = this.state;
+        const { loading, progresso, open, toDelete } = this.state;
         const { conteudoTeorico, onChangeConteudoTeorico, partes, onAddConteudoTeorico, onDeleteConteudoTeorico } = this.props;
 
         return (
@@ -85,7 +91,7 @@ class FormTeoria extends Component {
                                     </Upload>,
                                     <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                                 ]}>
-                                    <FormItemTeoria partes={partes} loading={loading} item={item} idx={idx} onChange={onChangeConteudoTeorico} />
+                                    <FormItemTeoria partes={partes} loading={loading} progresso={progresso} item={item} idx={idx} onChange={onChangeConteudoTeorico} />
                                 </Item>)}
                         />
                         <div style={{ marginBottom: 20, marginRight: 0, textAlign: 'right' }}>
@@ -142,7 +148,7 @@ class FormTeoria extends Component {
     }
 
     beforeUpload = _id => () => {
-        this.setState({ loading: _id })
+        this.setState({ loading: _id, progresso: 0 })
         return false
     }
 
@@ -152,7 +158,7 @@ class FormTeoria extends Component {
             //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
                 const arquivo = info.file.originFileObj || info.file;
-                uploadMedia(arquivo)
+                uploadMedia(arquivo, valor => this.setState({ progresso: valor }))
                     .then(uploaded => {
                         this.setState({ loading: false });
                         onChangeConteudoTeorico('midias', idx)([...midias, {

@@ -2,7 +2,7 @@ import { Button, Form, Input, List, Radio, Select, Spin, Tooltip, Upload } from 
 import React, { Component, Fragment } from 'react';
 import Label from '../components/Label';
 import MidiaImage from '../components/MidiaImage';
-import { filter, uploadMedia } from '../utils/data';
+import { filter, textoEnvio, uploadMedia } from '../utils/data';
 import { is3dFile } from '../utils/fileUtils';
 
 const { v4: uuidv4 } = require('uuid');
@@ -33,6 +33,7 @@ class FormPecasFisicas extends Component {
 
     state = {
         loading: false,
+        progresso: 0,
         pecasFisicas: this.props.pecasFisicas.length > 0 ? this.props.pecasFisicas : [_modelPecaFisica()]
     }
 
@@ -45,7 +46,7 @@ class FormPecasFisicas extends Component {
     }
 
     beforeUpload = _id => () => {
-        this.setState({ loading: _id })
+        this.setState({ loading: _id, progresso: 0 })
         return false
     }
 
@@ -62,7 +63,7 @@ class FormPecasFisicas extends Component {
     }
 
     render() {
-        const { loading } = this.state;
+        const { loading, progresso } = this.state;
         const { onChangePecaFisica, erros, isEdit, partes, onAddPecaFisica, pecasFisicas, onDeletePecaFisica, listaPecasGenericas, tipoPecaMapeamento, onChange, onOpenSnackbar, roteiro } = this.props;
 
         const _erros = {
@@ -84,7 +85,7 @@ class FormPecasFisicas extends Component {
                 if (info.file.status !== 'uploading') {
                     //Adiciona
                     if (midias.find(f => f.uid == info.file.uid) == undefined) {
-                        uploadMedia(info.file.originFileObj || info.file)
+                        uploadMedia(info.file.originFileObj || info.file, valor => this.setState({ progresso: valor }))
                             .then(uploaded => {
                                 this.setState({ loading: false });
                                 onChangePecaFisica('midias', idx)([...midias, {
@@ -184,7 +185,12 @@ class FormPecasFisicas extends Component {
                                                 <MidiaImage file={t} idx={idxMidia} midias={item.midias} onChange={onChangePecaFisica('midias', idx)} />
                                             </Fragment>)
                                         }
-                                        {loading == item._id ? <Spin /> : null}
+                                        {loading == item._id ? (
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12 }}>
+                                                <Spin size="small" />
+                                                <span style={{ marginLeft: 6 }}>{textoEnvio(progresso)}</span>
+                                            </span>
+                                        ) : null}
                                     </div>
                                 </div>
                             </Item>)}

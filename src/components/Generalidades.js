@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { List, Modal, Tooltip, Button, Select, Input, Icon, Upload, Spin } from 'antd'
 
 import Midia from '../components/Midia'
-import { uploadMedia } from '../utils/data'
+import { textoEnvio, uploadMedia } from '../utils/data'
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -28,7 +28,7 @@ class FormItemGeneralidade extends Component {
     }
 
     render() {
-        const { item, idx, onChange, loading, onEnter, placeholder } = this.props;
+        const { item, idx, onChange, loading, progresso, onEnter, placeholder } = this.props;
         return (
             <div style={_style.item}>
                 <div style={_style.textos}>
@@ -36,7 +36,12 @@ class FormItemGeneralidade extends Component {
                 </div>
                 <div style={{ alignSelf: 'center' }}>
                     {item.midias.map((t, idxMidia) => <Fragment key={t._id}><Midia file={t} idx={idxMidia} midias={item.midias} onChange={onChange('midias', idx)} /></Fragment>)}
-                    {loading == item._id ? <Spin /> : null}
+                    {loading == item._id ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12 }}>
+                            <Spin size="small" />
+                            <span style={{ marginLeft: 6 }}>{textoEnvio(progresso)}</span>
+                        </span>
+                    ) : null}
                 </div>
             </div>
         )
@@ -54,6 +59,7 @@ class Generalidades extends Component {
     state = {
         sinalNovo: '',
         loading: false,
+        progresso: 0,
         open: false,
         toDelete: '',
         itens: this.props.defaultValue.length > 0 ? this.props.defaultValue : [getModelGeneralidade()]
@@ -75,7 +81,7 @@ class Generalidades extends Component {
 
 
     render() {
-        const { loading, open, itens, sinalNovo } = this.state;
+        const { loading, progresso, open, itens, sinalNovo } = this.state;
 
         return (
             <Fragment>
@@ -94,7 +100,7 @@ class Generalidades extends Component {
                             </Upload>,
                             <Tooltip title='Excluir'><Button type='primary' ghost onClick={this.setItem2Delete(idx)} icon='delete' shape='circle' /></Tooltip>
                         ]}>
-                            <FormItemGeneralidade placeholder={this.props.placeholder} sinalNovo={sinalNovo} onEnter={this.onAdd} loading={loading} item={item} idx={idx} onChange={this.onChange} />
+                            <FormItemGeneralidade placeholder={this.props.placeholder} sinalNovo={sinalNovo} onEnter={this.onAdd} loading={loading} progresso={progresso} item={item} idx={idx} onChange={this.onChange} />
                         </Item>)}
                 />
                 <div style={{ marginTop: 5, textAlign: 'right' }}>
@@ -180,7 +186,7 @@ class Generalidades extends Component {
     }
 
     beforeUpload = _id => () => {
-        this.setState({ loading: _id })
+        this.setState({ loading: _id, progresso: 0 })
         return false
     }
 
@@ -190,7 +196,7 @@ class Generalidades extends Component {
             //Adiciona
             if (midias.find(f => f.uid == info.file.uid) == undefined) {
                 const arquivo = info.file.originFileObj || info.file;
-                uploadMedia(arquivo)
+                uploadMedia(arquivo, valor => this.setState({ progresso: valor }))
                     .then(uploaded => {
                         this.setState({ loading: false });
                         this.onChange('midias', idx)([...midias, {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { createViewer, disposeObject, loadModel, pickSurface, statusMessageStyle } from '../ObjectViewer/threeViewer';
+import { createViewer, disposeObject, loadModel, loadingLabel, pickSurface, statusMessageStyle } from '../ObjectViewer/threeViewer';
 import { useViewerBackground, ViewerBackgroundControl, viewerStatusColor } from '../ObjectViewer/viewerBackground';
 import {
   aplicarDestaques,
@@ -175,6 +175,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
   const containerRef = useRef(null);
   const [viewer, setViewer] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [progresso, setProgresso] = useState(0);
   const [desenhando, setDesenhando] = useState(false);
   const desenhandoRef = useRef(false);
   const [background, setBackground] = useViewerBackground();
@@ -191,9 +192,15 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     let cancelled = false;
     let created = null;
     setStatus('loading');
+    setProgresso(0);
     setDesenhando(false);
 
-    loadModel(url, fileType)
+    let ultimo = -1;
+    loadModel(url, fileType, percent => {
+      if (cancelled || percent === ultimo) return;
+      ultimo = percent;
+      setProgresso(percent);
+    })
       .then(model => {
         if (cancelled || !containerRef.current) {
           disposeObject(model);
@@ -721,7 +728,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
           {desenhando ? 'Parar desenho' : 'Desenhar região'}
         </button>
       )}
-      {status === 'loading' && <div style={messageStyle}>Carregando modelo 3D...</div>}
+      {status === 'loading' && <div style={messageStyle}>{loadingLabel(progresso)}</div>}
       {status === 'error' && <div style={messageStyle}>Não foi possível carregar o modelo 3D.</div>}
       {status === 'ready' && enableOnClick && (
         <div style={hintStyle}>

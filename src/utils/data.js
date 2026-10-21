@@ -18,21 +18,41 @@ export const mediaUrl = url => (
 
 export const request = (path, options = {}) => fetch(`${apiUrl}/${path}`, {headers, ...options}).then(r => r.json())
 
-export const uploadMedia = file => {
+export const uploadMedia = (file, onProgress) => new Promise((resolve, reject) => {
   const body = new FormData();
   body.append('file', file, file.name);
-
-  return fetch(`${apiUrl}/midia`, { method: 'POST', body }).then(async response => {
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || 'Não foi possível enviar o arquivo.');
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${apiUrl}/midia`);
+  xhr.upload.onprogress = event => {
+    if (!onProgress || !event.lengthComputable || !event.total) return;
+    onProgress(Math.min(99, Math.round(event.loaded / event.total * 100)));
+  };
+  xhr.upload.onload = () => {
+    if (onProgress) onProgress(100);
+  };
+  xhr.onload = () => {
+    let result = {};
+    try {
+      result = JSON.parse(xhr.responseText || '{}');
+    } catch (e) {
+      result = {};
     }
-    return {
+    if (xhr.status < 200 || xhr.status >= 300) {
+      reject(new Error(result.error || 'Não foi possível enviar o arquivo.'));
+      return;
+    }
+    resolve({
       ...result.data,
       url: mediaUrl(result.data && result.data.url),
-    };
-  });
-}
+    });
+  };
+  xhr.onerror = () => reject(new Error('Não foi possível enviar o arquivo.'));
+  xhr.send(body);
+});
+
+export const textoEnvio = progresso => (
+  progresso >= 100 ? 'Salvando...' : `Enviando ${Math.max(0, progresso || 0)}%`
+);
 
 export const isEmpty = (prop) => (
     prop === null ||

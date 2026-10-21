@@ -6,16 +6,30 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment';
 import { mediaUrl } from '../utils/data';
 
-export const loadModel = (url, fileType) => new Promise((resolve, reject) => {
+export const loadModel = (url, fileType, onProgress) => new Promise((resolve, reject) => {
   const modelUrl = mediaUrl(url);
+  let aviso = -1;
+  const progress = event => {
+    if (!onProgress || !event || !event.lengthComputable || !event.total) return;
+    const percent = Math.round(event.loaded / event.total * 100);
+    if (percent === aviso) return;
+    aviso = percent;
+    onProgress(percent);
+  };
   if (fileType === 'glb' || fileType === 'gltf') {
-    new GLTFLoader().load(modelUrl, gltf => resolve(gltf.scene), undefined, reject);
+    new GLTFLoader().load(modelUrl, gltf => resolve(gltf.scene), progress, reject);
   } else if (fileType === 'obj') {
-    new OBJLoader().load(modelUrl, resolve, undefined, reject);
+    new OBJLoader().load(modelUrl, resolve, progress, reject);
   } else {
     reject(new Error(`Formato não suportado: ${fileType}`));
   }
 });
+
+export const loadingLabel = progresso => {
+  if (progresso >= 100) return 'Preparando modelo 3D...';
+  if (progresso > 0) return `Baixando modelo 3D... ${progresso}%`;
+  return 'Carregando modelo 3D...';
+};
 
 export const disposeObject = object => {
   object.traverse(child => {
