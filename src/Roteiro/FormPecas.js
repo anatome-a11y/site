@@ -41,7 +41,7 @@ class FormPecas extends Component {
                     help={erros.msgs[_erros.partes] || ''}
                     label='Selecione as partes anatômicas das peças a serem identificadas neste roteiro'
                 >
-                    <div style={{ height: 300, overflowY: 'scroll', backgroundColor: '#fafafa', marginBottom: 10 }}>
+                    <div className="anatome-scroll-panel" style={{ height: 300, overflowY: 'scroll', marginBottom: 10 }}>
                         {pecas.length > 0 && <Tree defaultExpandedKeys={[pecas[0].key]} {...treeProps} />}
                     </div>
                     Ou <a onClick={this.onOpen}>clique aqui para criar um novo conteúdo de peça</a>.

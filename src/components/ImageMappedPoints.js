@@ -506,8 +506,8 @@ export default class ImageMappedPoints extends Component {
         }
 
         this.state = {
-            maxWidth: 400,
-            maxHeight: 400,
+            maxWidth: '100%',
+            maxHeight: 640,
             idsPecasFisicas: this.props.idsPecasFisicas,
             idsPartesPeca: this.props.idsPartesPeca || [],
             pecaFisicaDigital: this.props.pecaFisicaDigital,

@@ -9,9 +9,9 @@ const Barra = ({title,children}) => {
 
     return (
         <div style={{ paddingLeft: 24 , paddingRight: 24 }}>
-            <Collapse 
-                bordered={false} 
-                style={{backgroundColor:'white'}}
+            <Collapse
+                bordered={false}
+                className="anatome-collapse"
                 defaultActiveKey={['key']}
             >
                 <Panel 

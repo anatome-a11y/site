@@ -1,10 +1,9 @@
 import React from 'react';
 
 
-const Label = ({ children, style = {} }) => <div style={{
+const Label = ({ children, style = {} }) => <div className="anatome-label" style={{
     lineHeight: '1.6rem',
     marginBottom: 15,
-    color: 'rgba(0, 0, 0, 0.85)',
     ...style
 }}>
     {children}

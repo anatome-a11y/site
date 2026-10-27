@@ -11,6 +11,10 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { withRouter } from 'react-router'
 
 import { version } from '../package.json'
+import { applyTheme, readTheme, subscribeTheme, toggleTheme, THEME_DARK } from './theme'
+import './theme.css'
+
+applyTheme(readTheme());
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -26,9 +30,20 @@ class Content extends React.Component {
 		erros: {
 			campos: [],
 			msgs: []
-		}
+		},
+		theme: readTheme(),
 	}
 
+
+	componentDidMount() {
+		this.unsubscribeTheme = subscribeTheme(theme => this.setState({ theme }));
+	}
+
+	componentWillUnmount() {
+		if (this.unsubscribeTheme) {
+			this.unsubscribeTheme();
+		}
+	}
 
 	componentWillReceiveProps(next) {
 		if (this.props.location.pathname !== next.location.pathname) {
@@ -38,17 +53,28 @@ class Content extends React.Component {
 
 	render() {
 
-		const { isLogged, zoom, loading, erros } = this.state;
+		const { isLogged, zoom, loading, erros, theme } = this.state;
+		const modoEscuro = theme === THEME_DARK;
 		const { history, location } = this.props;
 
 		return (
 			<div>
 				<div className='shadow2'>
-					<div style={{ backgroundColor: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 24, paddingLeft: 24, borderBottom: '1px solid #d9d9d9' }}>
+					<div className='anatome-toolbar'>
 						<div></div>
 						<div>
 							<Button type='primary' onClick={ () => history.push('/config')}ghost shape='circle' icon='setting' style={{ margin: '4px 4px' }} />
-							<Button type='primary' ghost shape='circle' icon='bulb' style={{ margin: '4px 4px' }} />
+							<Button
+								type='primary'
+								ghost={!modoEscuro}
+								shape='circle'
+								icon='bulb'
+								title={modoEscuro ? 'Usar modo claro' : 'Usar modo escuro'}
+								aria-label={modoEscuro ? 'Usar modo claro' : 'Usar modo escuro'}
+								aria-pressed={modoEscuro}
+								onClick={this.onToggleTheme}
+								style={{ margin: '4px 4px' }}
+							/>
 							<Divider type='vertical' />
 							<Button type='primary' ghost disabled={zoom == 16} onClick={this.onZoomOut} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A-</Button>
 							<Button type='primary' ghost disabled={zoom == 25} onClick={this.onZoomIn} style={{ margin: '4px 4px', width: 35, padding: 0 }} >A+</Button>
@@ -65,6 +91,10 @@ class Content extends React.Component {
 				{isLogged ? <App history={history} erros={erros} onOpenSnackbar={this.onOpenSnackbar} onSetAppState={this.onSetAppState} loading={loading} isLogged={isLogged} /> : null}
 			</div>
 		)
+	}
+
+	onToggleTheme = () => {
+		toggleTheme();
 	}
 
 	onZoomIn = () => {

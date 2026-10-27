@@ -10,7 +10,7 @@ const TelaLogin = ({history}) => {
 
     return (
         <div style={styles.center}>
-            <div style={styles.container}>
+            <div className="login-card" style={styles.container}>
                 <div style={styles.center}>
                     <div style={styles.circle}>
                         <img style={styles.image} src={iconLock} alt='asd'/>
@@ -45,7 +45,6 @@ const TelaLogin = ({history}) => {
 const styles = {
     container: {
         marginTop: '50px',
-        backgroundColor: '#E8E8E8',
     },
     circle: {
         width: 70,

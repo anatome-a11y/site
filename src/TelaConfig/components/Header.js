@@ -4,18 +4,11 @@ const Header = ({style,title,children}) => {
    return (
        <div style={{display:'flex',flexDirection:'column',...style}}>
 
-           <div style={{
-              border:'1px solid #d2d2d2',
-              backgroundColor:'#fafafa',
-              fontSize:'2rem',
-              display:'flex',
-              justifyContent:'center',
-              padding:12,
-           }}>  
+           <div className="config-section-title">
                {title}
            </div>
 
-           <div style={{flex:1,border:'1px solid #d2d2d2'}}>
+           <div className="config-section-body">
                {children}
            </div>
 

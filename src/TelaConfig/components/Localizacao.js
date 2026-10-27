@@ -5,7 +5,7 @@ import NumberShow from './NumberShow'
 
 const Localizacao = ({loc,edit}) => {
    return (
-       <div style={{flex:1,border:'1px solid #d2d2d2',borderTop:0,borderBottom:0,padding:10}} >
+       <div className="config-split" style={{flex:1,padding:10}} >
 
             <div>
                 <div style={{fontWeight:'bold'}}>Localização</div> 

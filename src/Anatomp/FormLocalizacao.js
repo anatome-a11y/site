@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 const Option = Select.Option
 
 const Label = ({ children, error = null }) => (
-    <div style={{ color: error ? '#f5222d' : '#000000d1', marginBottom: 5, marginTop: 15 }}>
+    <div style={{ color: error ? '#f5222d' : 'inherit', marginBottom: 5, marginTop: 15 }}>
         {children}
     </div>
 )

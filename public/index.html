@@ -4,6 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem('anatome.theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
@@ -43,6 +52,12 @@
         width: auto !important;
         height: auto !important;
         background-color: #fff !important
+      }
+
+      html[data-theme="dark"],
+      html[data-theme="dark"] body{
+        background-color: #141414 !important;
+        color: rgba(255, 255, 255, 0.85);
       }
 
       .ant-collapse-header .arrow{

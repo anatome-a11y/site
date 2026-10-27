@@ -101,21 +101,24 @@ class FormMapa extends Component {
                         <Label>Clique na imagem ou no modelo 3D da peça digital para associar o nome a cada parte anatômica</Label>
 
                         <List
-                            grid={{ gutter: 16, column: 4 }}
+                            grid={{ gutter: 16, column: 2 }}
                             dataSource={pecasFisicas}
-                            renderItem={(item, idxPecaFisica) => (
+                            renderItem={(item, idxPecaFisica) => {
+                                const temModelo = (item.midias || []).some(t => is3dFile(t.name));
+                                return (
                                 <List.Item>
                                     <Card title={<div style={{ fontWeight: 'bold' }}>{item.nome}</div>}
-                                        bodyStyle={{ padding: 10, height: 320 }}
+                                        bodyStyle={{ padding: 10, height: temModelo ? 560 : 320, position: 'relative' }}
                                     >
-                                        <Row style={{ height: 250, overflowY: 'auto' }}>
+                                        <Row style={{ height: temModelo ? 480 : 250, overflowY: 'auto' }}>
                                             {(item.midias || []).map((t, idxMidia) =>
-                                                <Col span={12}>
+                                                <Col span={is3dFile(t.name) ? 24 : 12} key={t._id || idxMidia}>
                                                     {
                                                         is3dFile(t.name) ? (
-                                                            <ObjectViewer 
-                                                                url={mediaUrl(item.midias[idxMidia].url)} 
-                                                                fileType={getExtensionFromFileName(t.name)} 
+                                                            <ObjectViewer
+                                                                url={mediaUrl(item.midias[idxMidia].url)}
+                                                                fileType={getExtensionFromFileName(t.name)}
+                                                                height={440}
                                                             />
                                                         ) : (
                                                            <img key={t._id}
@@ -166,14 +169,15 @@ class FormMapa extends Component {
                                         </Row>
                                     </Card>
                                 </List.Item>
-                            )}
+                                );
+                            }}
                         />
 
                         <Modal title="Mapear peça digital"
                             visible={this.state.visible}
                             onOk={this.hideModalOk}
                             onCancel={hideModalCancel}
-                            width={1000}
+                            width={1200}
                             okText="Salvar"
                             cancelText="Cancelar"
                             centered={false}
