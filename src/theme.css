@@ -225,9 +225,46 @@ html[data-theme="dark"] .ant-input-group-addon {
   color: rgba(255, 255, 255, 0.85);
 }
 
+html[data-theme="dark"] .ant-input:hover,
+html[data-theme="dark"] .ant-input:focus,
+html[data-theme="dark"] .ant-input:active,
+html[data-theme="dark"] textarea.ant-input:hover,
+html[data-theme="dark"] textarea.ant-input:focus,
+html[data-theme="dark"] .ant-input-number:hover,
+html[data-theme="dark"] .ant-input-number:focus,
+html[data-theme="dark"] .ant-input-number-focused,
+html[data-theme="dark"] .ant-input-number-input,
+html[data-theme="dark"] .ant-select-selection:hover,
+html[data-theme="dark"] .ant-select-selection:focus,
+html[data-theme="dark"] .ant-select-focused .ant-select-selection,
+html[data-theme="dark"] .ant-select-search__field,
+html[data-theme="dark"] .ant-select-search__field:focus {
+  background-color: #141414 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.85);
+  caret-color: rgba(255, 255, 255, 0.85);
+}
+
+html[data-theme="dark"] .ant-input:focus,
+html[data-theme="dark"] textarea.ant-input:focus,
+html[data-theme="dark"] .ant-input-number-focused,
+html[data-theme="dark"] .ant-select-focused .ant-select-selection {
+  border-color: #177ddc;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+html[data-theme="dark"] .ant-input::selection,
+html[data-theme="dark"] textarea::selection {
+  background: #177ddc;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
 html[data-theme="dark"] .ant-input::placeholder,
+html[data-theme="dark"] .ant-input:focus::placeholder,
 html[data-theme="dark"] .ant-select-selection__placeholder {
   color: rgba(255, 255, 255, 0.3);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.3);
 }
 
 html[data-theme="dark"] .ant-input[disabled],
