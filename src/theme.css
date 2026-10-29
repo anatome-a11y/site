@@ -121,6 +121,24 @@ html[data-theme="dark"] .ant-collapse > .ant-collapse-item > .ant-collapse-heade
   color: rgba(255, 255, 255, 0.85);
 }
 
+.ant-collapse-header .anatome-header-spin.ant-spin {
+  position: static;
+  display: inline-block;
+  opacity: 1;
+  width: auto;
+  height: auto;
+  margin-left: 8px;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.ant-collapse-header .anatome-header-spin .ant-spin-dot {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+}
+
 html[data-theme="dark"] .anatome-panel,
 html[data-theme="dark"] .ant-collapse,
 html[data-theme="dark"] .ant-collapse-item,

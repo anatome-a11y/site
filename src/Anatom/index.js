@@ -435,8 +435,9 @@ class Main extends Component {
 
     onGetData = () => {
         const { onOpenSnackbar, onSetAppState } = this.props;
+        onSetAppState({ loading: true });
 
-        Promise.all([request('anatomp'), request('roteiro')])
+        return Promise.all([request('anatomp'), request('roteiro')])
             .then(([anatomp, roteiros]) => {
 
                 const rots = roteiros.data.map(d => ({
@@ -475,18 +476,17 @@ class Main extends Component {
             .then(ret => {
                 if (ret.status == 200) {
                     this.props.onOpenSnackbar(nome + ' excluído com sucesso!', 'success');
-                    this.onGetData();
-                } else {
-                    throw ret.error
+                    return this.onGetData();
                 }
+                throw ret.error
             })
             .catch(e => {
                 const msg = typeof e == 'string' ? e : 'Não foi possível excluir o ' + nome.toLowerCase() + ' selecionado';
                 this.props.onOpenSnackbar(msg);
+                this.props.onSetAppState({ loading: false })
             })
             .finally(() => {
                 this.onClose()
-                this.props.onSetAppState({ loading: false })
             })
     }
 

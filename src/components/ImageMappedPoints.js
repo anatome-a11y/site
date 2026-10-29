@@ -67,6 +67,7 @@ export default class ImageMappedPoints extends Component {
                     y: y,
                     z: z,
                     malha: destaque && destaque.malha,
+                    malhas: destaque && destaque.malhas,
                     faces: destaque && destaque.faces,
                     recorte: destaque && destaque.recorte,
                     traco: destaque && destaque.traco,
@@ -135,15 +136,39 @@ export default class ImageMappedPoints extends Component {
         const mapa = this.state.mapa[this.idxProximo];
         this.selecionou = false;
         this.verificaPontoExcluido(label);
-        const malhaInteira = coords.malha
+        const chaves = [];
+        if (coords.malhas && coords.malhas.length) {
+            coords.malhas.forEach(chave => {
+                if (chave && chaves.indexOf(String(chave)) === -1) {
+                    chaves.push(String(chave));
+                }
+            });
+        }
+        if (coords.malha && chaves.indexOf(String(coords.malha)) === -1) {
+            chaves.push(String(coords.malha));
+        }
+        const malhaInteira = chaves.length
             && !(coords.faces && coords.faces.length)
             && !(coords.traco && coords.traco.length);
+        const chavesDoPonto = point => {
+            const lista = [];
+            if (point && point.malhas && point.malhas.length) {
+                point.malhas.forEach(chave => {
+                    if (chave) lista.push(String(chave));
+                });
+            }
+            if (point && point.malha) {
+                lista.push(String(point.malha));
+            }
+            return lista;
+        };
         const partesLiberadas = [];
         this.removerPontos(point => {
             const mesmaParte = this.mesmoId(point.parte, mapa.parte);
             const mesmaMalha = malhaInteira
-                && point.malha === coords.malha
-                && !(point.faces && point.faces.length);
+                && !(point.faces && point.faces.length)
+                && !(point.traco && point.traco.length > 1)
+                && chavesDoPonto(point).some(chave => chaves.indexOf(chave) !== -1);
             if (mesmaMalha && !mesmaParte) {
                 partesLiberadas.push(point.parte);
             }
@@ -173,6 +198,9 @@ export default class ImageMappedPoints extends Component {
         }
         if (coords.malha) {
             ponto.malha = coords.malha;
+        }
+        if (chaves.length) {
+            ponto.malhas = chaves;
         }
         if (coords.faces && coords.faces.length) {
             ponto.faces = coords.faces;

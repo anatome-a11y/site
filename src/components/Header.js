@@ -13,7 +13,7 @@ const Header = ({ title, contentQ, error, loading, extra = null }) => {
             alignItems: 'center',
             paddingRight: 24,
         }}>
-            <div style={error ? {color: '#f5222d'} : undefined}>{title}{loading ? <Spin size='small' style={{marginLeft: 5}} /> : null}</div>
+            <div style={error ? {color: '#f5222d'} : undefined}>{title}{loading ? <Spin className='anatome-header-spin' size='small' /> : null}</div>
             <div style={{ display: 'flex' }}>
                 {extra}
                 <Helper title={title} contentQ={contentQ} />

@@ -7,6 +7,7 @@ import {
   aplicarDestaques,
   chaveMalha,
   contornoFechado,
+  malhasDaMesmaParte,
   corDaParte,
   limparDestaques,
   listaFaces,
@@ -78,9 +79,7 @@ const createSurfaceCursor = () => {
 const createPinElement = (ponto, onSelect) => {
   const nomeParte = ponto.parte && ponto.parte.nome ? ponto.parte.nome : '';
   const label = String(ponto.label);
-  const cor = (ponto.faces && ponto.faces.length) || (ponto.traco && ponto.traco.length > 1)
-    ? corDaParte(ponto.label)
-    : MARKER_COLOR;
+  const cor = corDaParte(ponto.label);
 
   const pin = document.createElement('div');
   pin.title = nomeParte;
@@ -176,13 +175,15 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
   const [viewer, setViewer] = useState(null);
   const [status, setStatus] = useState('loading');
   const [progresso, setProgresso] = useState(0);
-  const [desenhando, setDesenhando] = useState(false);
-  const desenhandoRef = useRef(false);
+  const [modoMarcacao, setModoMarcacao] = useState(null);
+  const modoRef = useRef(null);
   const [background, setBackground] = useViewerBackground();
 
   const latestProps = useRef({});
   latestProps.current = { onObject3DClick, onPointClick, idx, enableOnClick };
-  desenhandoRef.current = desenhando;
+  modoRef.current = modoMarcacao;
+  const desenhando = modoMarcacao === 'regiao';
+  const escolhendoParte = modoMarcacao === 'parte';
 
   useEffect(() => {
     if (!url) {
@@ -193,7 +194,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     let created = null;
     setStatus('loading');
     setProgresso(0);
-    setDesenhando(false);
+    setModoMarcacao(null);
 
     let ultimo = -1;
     loadModel(url, fileType, percent => {
@@ -224,8 +225,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     return () => {
       cancelled = true;
       setViewer(null);
-      setDesenhando(false);
-      desenhandoRef.current = false;
+      setModoMarcacao(null);
+      modoRef.current = null;
       if (created) {
         created.dispose();
         created = null;
@@ -233,7 +234,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     };
   }, [url, fileType]);
 
-  // Clique simples marca o ponto. Shift+arrastar, ou o botão Desenhar região, traça o contorno.
+  // Clique marca o ponto. Ctrl+clique, ou Escolher parte, colore a malha.
+  // Shift+arrastar, ou Desenhar região, traça o contorno.
   useEffect(() => {
     if (!viewer) {
       return undefined;
@@ -258,6 +260,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     let gestureStart = null;
     let gestureCancelled = false;
     let gestoDesenha = false;
+    let modoDoGesto = 'ponto';
     let travarOrbita = false;
     let hoverPosition = null;
     let frame = null;
@@ -280,7 +283,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     };
 
     const sincronizarBotoes = () => {
-      if (desenhandoRef.current || travarOrbita) {
+      const travado = modoRef.current === 'regiao' || modoRef.current === 'parte' || travarOrbita;
+      if (travado) {
         controls.mouseButtons.LEFT = -1;
         controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
         controls.touches.ONE = -1;
@@ -291,6 +295,18 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
         controls.touches.ONE = toqueOriginal;
         controls.touches.TWO = toqueDoisOriginal;
       }
+    };
+
+    const modoNoEvento = event => {
+      const comCtrl = event.ctrlKey || event.metaKey;
+      const comShift = event.shiftKey;
+      if (comShift || (modoRef.current === 'regiao' && !comCtrl)) {
+        return 'regiao';
+      }
+      if (comCtrl || modoRef.current === 'parte') {
+        return 'parte';
+      }
+      return 'ponto';
     };
 
     const isDragging = () => activePointers.size > 0 && (gestureCancelled || !gestureStart);
@@ -371,7 +387,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       amostras.push({
         point: hit.point.clone(),
         mesh: hit.mesh,
-        tela: { x: clientX, y: clientY, profundidade: projetado.z },
+        tela: { x: clientX, y: clientY, profundidade: projetado.z, distancia: hit.distance },
       });
       atualizarLinha();
     };
@@ -407,7 +423,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       if (event.button !== 0) {
         return;
       }
-      travarOrbita = desenhandoRef.current || event.shiftKey;
+      modoDoGesto = modoNoEvento(event);
+      travarOrbita = modoDoGesto !== 'ponto';
       sincronizarBotoes();
     };
 
@@ -416,7 +433,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       if (activePointers.size === 1 && event.button === 0) {
         gestureStart = { x: event.clientX, y: event.clientY };
         gestureCancelled = false;
-        gestoDesenha = travarOrbita;
+        gestoDesenha = modoDoGesto === 'regiao';
         amostras = [];
         percursoPx = 0;
         ultimoPonteiro = { x: event.clientX, y: event.clientY };
@@ -496,9 +513,19 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
           return;
         }
         const hit = pickAt(start.x, start.y);
-        if (hit) {
-          emitirPonto(hit.point);
+        if (!hit || !hit.mesh) {
+          return;
         }
+        if (modoDoGesto === 'parte') {
+          const grupo = malhasDaMesmaParte(model, hit.mesh);
+          const chaves = grupo.map(item => chaveMalha(item));
+          emitirPonto(hit.point, {
+            malha: chaveMalha(hit.mesh),
+            malhas: chaves,
+          });
+          return;
+        }
+        emitirPonto(hit.point);
         return;
       }
 
@@ -534,9 +561,8 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
         recorte,
         traco,
       });
-      // O traço terminou: volta a girar com o arrasto. O botão continua lá para o próximo.
-      if (desenhandoRef.current) {
-        setDesenhando(false);
+      if (modoRef.current === 'regiao') {
+        setModoMarcacao(null);
       }
     };
 
@@ -578,15 +604,15 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       scene.remove(cursor.object);
       cursor.dispose();
     };
-  }, [viewer, enableOnClick, desenhando]);
+  }, [viewer, enableOnClick, modoMarcacao]);
 
-  // Sem parte pendente o botão some. O modo desenho não pode ficar ligado depois disso,
+  // Sem parte pendente os botões somem. O modo não pode ficar ligado depois disso,
   // senão o arrasto continua traçando e a peça não gira.
   useEffect(() => {
-    if (!instrucao && desenhando) {
-      setDesenhando(false);
+    if (!instrucao && modoMarcacao) {
+      setModoMarcacao(null);
     }
-  }, [instrucao, desenhando]);
+  }, [instrucao, modoMarcacao]);
 
 
   const resumoFaces = faces => {
@@ -604,7 +630,7 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
   // O pai altera o array de pontos no lugar, então a dependência do efeito
   // precisa ser derivada do conteúdo, não da referência.
   const pontosKey = (pontos || []).map(p => [
-    p.label, p.x, p.y, p.z, p.malha || '', resumoFaces(p.faces),
+    p.label, p.x, p.y, p.z, p.malha || '', (p.malhas || []).join(','), resumoFaces(p.faces),
     p.traco ? p.traco.length : 0, p.recorte ? p.recorte.length : 0,
   ].join(':')).join('|');
 
@@ -697,36 +723,57 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
         position: 'relative',
         width: '100%',
         height: '100%',
-        cursor: desenhando ? 'crosshair' : 'grab',
+        cursor: desenhando ? 'crosshair' : (escolhendoParte ? 'pointer' : 'grab'),
         backgroundColor: background.color,
       }}
     >
       <ViewerBackgroundControl value={background.id} onChange={setBackground} />
-      {status === 'ready' && enableOnClick && (instrucao || desenhando) && (
-        <button
-          type="button"
+      {status === 'ready' && enableOnClick && (instrucao || modoMarcacao) && (
+        <div
           onPointerDown={event => event.stopPropagation()}
-          onClick={event => {
-            event.stopPropagation();
-            setDesenhando(ativo => !ativo);
-          }}
+          onClick={event => event.stopPropagation()}
           style={{
             position: 'absolute',
             top: 6,
             left: 6,
             zIndex: 2,
-            minHeight: 32,
-            padding: '4px 10px',
-            border: '1px solid rgba(0, 0, 0, 0.25)',
-            borderRadius: 4,
-            background: desenhando ? '#f5222d' : '#fff',
-            color: desenhando ? '#fff' : 'rgba(0, 0, 0, 0.75)',
-            fontSize: 12,
-            cursor: 'pointer',
+            display: 'flex',
+            gap: 6,
           }}
         >
-          {desenhando ? 'Parar desenho' : 'Desenhar região'}
-        </button>
+          <button
+            type="button"
+            onClick={() => setModoMarcacao(atual => (atual === 'parte' ? null : 'parte'))}
+            style={{
+              minHeight: 32,
+              padding: '4px 10px',
+              border: '1px solid rgba(0, 0, 0, 0.25)',
+              borderRadius: 4,
+              background: escolhendoParte ? '#1890ff' : '#fff',
+              color: escolhendoParte ? '#fff' : 'rgba(0, 0, 0, 0.75)',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            Escolher parte
+          </button>
+          <button
+            type="button"
+            onClick={() => setModoMarcacao(atual => (atual === 'regiao' ? null : 'regiao'))}
+            style={{
+              minHeight: 32,
+              padding: '4px 10px',
+              border: '1px solid rgba(0, 0, 0, 0.25)',
+              borderRadius: 4,
+              background: desenhando ? '#f5222d' : '#fff',
+              color: desenhando ? '#fff' : 'rgba(0, 0, 0, 0.75)',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            Desenhar região
+          </button>
+        </div>
       )}
       {status === 'loading' && <div style={messageStyle}>{loadingLabel(progresso)}</div>}
       {status === 'error' && <div style={messageStyle}>Não foi possível carregar o modelo 3D.</div>}
@@ -734,16 +781,21 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
         <div style={hintStyle}>
           <div>
             {!instrucao && 'Todas as partes foram marcadas'}
-            {instrucao && !desenhando && (
-              <React.Fragment>Clique marca o ponto de <b>{instrucao}</b>. Shift+arrastar, ou <b>Desenhar região</b>, contorna a área.</React.Fragment>
+            {instrucao && !modoMarcacao && (
+              <React.Fragment>
+                Clique marca o ponto de <b>{instrucao}</b>. Ctrl+clique, ou <b>Escolher parte</b>, colore a parte inteira. Shift+arrastar, ou <b>Desenhar região</b>, contorna a área.
+              </React.Fragment>
+            )}
+            {instrucao && escolhendoParte && (
+              <React.Fragment>Clique colore a parte inteira de <b>{instrucao}</b>.</React.Fragment>
             )}
             {instrucao && desenhando && (
               <React.Fragment>Arraste o contorno de <b>{instrucao}</b>. Feche a forma para colorir a área; se ficar aberta, só a linha é marcada.</React.Fragment>
             )}
           </div>
           <div style={{ opacity: 0.75 }}>
-            {desenhando
-              ? 'Botão direito ou dois dedos: girar · Roda: aproximar · Parar desenho: voltar a arrastar'
+            {modoMarcacao
+              ? 'Botão direito ou dois dedos: girar · Roda: aproximar · Clique de novo no botão: voltar a arrastar'
               : 'Arrastar: girar · Botão direito: mover · Roda: aproximar'}
           </div>
         </div>
