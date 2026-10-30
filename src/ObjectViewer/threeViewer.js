@@ -3,7 +3,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment';
 import { mediaUrl } from '../utils/data';
 
 export const loadModel = (url, fileType, onProgress) => new Promise((resolve, reject) => {
@@ -105,13 +104,54 @@ const getContainerSize = container => {
   return { width, height };
 };
 
+// Acima disto o modelo (o crânio explodido passa de um milhão de triângulos)
+// não aguenta pixel cheio, antialias e um raio por pino a cada quadro.
+const LIMITE_MODELO_PESADO = 80000;
+
+const contarTriangulos = model => {
+  let total = 0;
+  model.traverse(child => {
+    if (!child.isMesh || !child.geometry || (child.userData && child.userData.destaqueParte)) {
+      return;
+    }
+    const geometry = child.geometry;
+    if (geometry.index) {
+      total += geometry.index.count / 3;
+    } else if (geometry.attributes && geometry.attributes.position) {
+      total += geometry.attributes.position.count / 3;
+    }
+  });
+  return total;
+};
+
+// Luz presa à câmera, com o alvo também na câmera, para o sombreado
+// acompanhar o ponto de vista e não o mundo.
+const acrescentarLuz = (camera, luz, posicao) => {
+  const alvo = new THREE.Object3D();
+  alvo.position.set(0, 0, -1);
+  luz.position.copy(posicao);
+  luz.target = alvo;
+  camera.add(luz);
+  camera.add(alvo);
+};
+
 // O modelo nunca é transformado: as coordenadas de mundo dos pontos marcados
 // coincidem com as coordenadas do próprio arquivo 3D.
 export const createViewer = (container, model) => {
   const { width, height } = getContainerSize(container);
+  const pesado = contarTriangulos(model) > LIMITE_MODELO_PESADO;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({
+    antialias: !pesado,
+    alpha: true,
+    powerPreference: 'high-performance',
+  });
+  // r156 liga a luz física por padrão. Junto com o mapa de ambiente isso
+  // estourava o bege do osso e apagava o relevo, sobretudo visto de cima.
+  renderer._useLegacyLights = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1;
+  renderer.setPixelRatio(pesado ? 1 : Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(width, height);
   Object.assign(renderer.domElement.style, {
     position: 'absolute',
@@ -135,22 +175,13 @@ export const createViewer = (container, model) => {
 
   const scene = new THREE.Scene();
 
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const room = new RoomEnvironment(renderer);
-  const environment = pmrem.fromScene(room, 0.04).texture;
-  scene.environment = environment;
-  room.dispose();
-  pmrem.dispose();
-
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5));
+  // Sem mapa de ambiente: ele somava uma luz de teto e deixava a calota branca.
+  // A principal vem de cima e de lado, para a vista superior ainda mostrar o osso.
+  scene.add(new THREE.HemisphereLight(0xfff4ea, 0x5a5856, 0.72));
 
   const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  const headLight = new THREE.DirectionalLight(0xffffff, 1.5);
-  const headLightTarget = new THREE.Object3D();
-  headLightTarget.position.set(0, 0, -1);
-  headLight.target = headLightTarget;
-  camera.add(headLight);
-  camera.add(headLightTarget);
+  acrescentarLuz(camera, new THREE.DirectionalLight(0xfff7f0, 1.05), new THREE.Vector3(0.42, 1.15, 0.72));
+  acrescentarLuz(camera, new THREE.DirectionalLight(0xd5dde6, 0.34), new THREE.Vector3(-0.95, 0.05, 0.55));
   scene.add(camera);
 
   scene.add(model);
@@ -170,17 +201,33 @@ export const createViewer = (container, model) => {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(center);
-  controls.enableDamping = true;
+  controls.enableDamping = !pesado;
   controls.zoomToCursor = true;
   controls.minDistance = radius * 0.2;
   controls.maxDistance = distance * 5;
   controls.update();
 
-  renderer.setAnimationLoop(() => {
+  let quadro = 0;
+
+  const desenhar = () => {
     controls.update();
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
-  });
+  };
+
+  const pedirQuadro = () => {
+    if (quadro) {
+      return;
+    }
+    quadro = requestAnimationFrame(() => {
+      quadro = 0;
+      desenhar();
+    });
+  };
+
+  const aoMudarCamera = () => pedirQuadro();
+  controls.addEventListener('change', aoMudarCamera);
+  pedirQuadro();
 
   const resize = () => {
     const size = getContainerSize(container);
@@ -188,6 +235,7 @@ export const createViewer = (container, model) => {
     camera.updateProjectionMatrix();
     renderer.setSize(size.width, size.height);
     labelRenderer.setSize(size.width, size.height);
+    pedirQuadro();
   };
 
   let resizeObserver = null;
@@ -199,7 +247,11 @@ export const createViewer = (container, model) => {
   }
 
   const dispose = () => {
-    renderer.setAnimationLoop(null);
+    if (quadro) {
+      cancelAnimationFrame(quadro);
+      quadro = 0;
+    }
+    controls.removeEventListener('change', aoMudarCamera);
     if (resizeObserver) {
       resizeObserver.disconnect();
     } else {
@@ -208,7 +260,6 @@ export const createViewer = (container, model) => {
     controls.dispose();
     scene.remove(model);
     disposeObject(model);
-    environment.dispose();
     renderer.dispose();
     renderer.forceContextLoss();
     [renderer.domElement, labelRenderer.domElement].forEach(element => {
@@ -218,7 +269,17 @@ export const createViewer = (container, model) => {
     });
   };
 
-  return { scene, camera, renderer, controls, model, radius, dispose };
+  return {
+    scene,
+    camera,
+    renderer,
+    controls,
+    model,
+    radius,
+    pesado,
+    requestRender: pedirQuadro,
+    dispose,
+  };
 };
 
 export const statusMessageStyle = {

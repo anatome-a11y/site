@@ -30,6 +30,31 @@ const OCCLUSION_INTERVAL_MS = 100;
 
 const MARKER_COLOR = '#f5222d';
 
+// Esferas em mundo para um modelo grande. O raio contra cada triângulo,
+// repetido para cada pino, travava o giro do crânio com todas as partes marcadas.
+const esferasDoModelo = modelo => {
+  if (modelo.userData.esferasOclusao) {
+    return modelo.userData.esferasOclusao;
+  }
+  const lista = [];
+  modelo.updateMatrixWorld(true);
+  modelo.traverse(child => {
+    if (!child.isMesh || !child.geometry || (child.userData && child.userData.destaqueParte)) {
+      return;
+    }
+    if (!child.geometry.boundingSphere) {
+      child.geometry.computeBoundingSphere();
+    }
+    const origem = child.geometry.boundingSphere;
+    if (!origem) {
+      return;
+    }
+    lista.push(origem.clone().applyMatrix4(child.matrixWorld));
+  });
+  modelo.userData.esferasOclusao = lista;
+  return lista;
+};
+
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 // Cursor desenhado sobre a superfície do modelo, alinhado à normal do ponto
@@ -400,13 +425,17 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       }
       const { enableOnClick } = latestProps.current;
       const hit = hoverPosition && enableOnClick && !gestoDesenha && !isDragging()
+        && !(viewer.pesado && activePointers.size > 0)
         ? pickAt(hoverPosition.x, hoverPosition.y)
         : null;
       if (!hit) {
         cursor.object.visible = false;
-        return;
+      } else {
+        cursor.place(hit.point, hit.normal, worldPerPixelAt(hit.point) * CURSOR_RADIUS_PX);
       }
-      cursor.place(hit.point, hit.normal, worldPerPixelAt(hit.point) * CURSOR_RADIUS_PX);
+      if (viewer.requestRender) {
+        viewer.requestRender();
+      }
     };
 
     const scheduleCursor = () => {
@@ -583,7 +612,9 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerCancel);
     canvas.addEventListener('pointerleave', onPointerLeave);
-    controls.addEventListener('change', scheduleCursor);
+    if (!viewer.pesado) {
+      controls.addEventListener('change', scheduleCursor);
+    }
 
     return () => {
       if (frame !== null) {
@@ -600,7 +631,9 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointercancel', onPointerCancel);
       canvas.removeEventListener('pointerleave', onPointerLeave);
-      controls.removeEventListener('change', scheduleCursor);
+      if (!viewer.pesado) {
+        controls.removeEventListener('change', scheduleCursor);
+      }
       scene.remove(cursor.object);
       cursor.dispose();
     };
@@ -664,36 +697,82 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
 
     const raycaster = new THREE.Raycaster();
     const direction = new THREE.Vector3();
+    const pontoTeste = new THREE.Vector3();
     const tolerance = radius * 0.005;
     let occlusionTimeout = null;
+    let interagindo = false;
+    const esferas = viewer.pesado ? esferasDoModelo(model) : null;
 
     // Pinos atrás da superfície ficam translúcidos e sem interação.
+    // Durante o giro o teste fica parado: no crânio ele percorria mais de um
+    // milhão de triângulos para cada parte marcada.
     const updateOcclusion = () => {
       occlusionTimeout = null;
       pins.forEach(pin => {
         direction.subVectors(pin.position, camera.position);
         const distance = direction.length();
-        raycaster.set(camera.position, direction.normalize());
-        raycaster.far = distance;
-        const hit = pickSurface(raycaster, model);
-        const occluded = hit !== null && hit.distance < distance - tolerance;
+        if (distance < 1e-8) {
+          return;
+        }
+        direction.multiplyScalar(1 / distance);
+        let occluded = false;
+        if (esferas) {
+          raycaster.ray.set(camera.position, direction);
+          for (let i = 0; i < esferas.length; i += 1) {
+            const esfera = esferas[i];
+            if (esfera.containsPoint(pin.position)) {
+              continue;
+            }
+            const hit = raycaster.ray.intersectSphere(esfera, pontoTeste);
+            if (hit && hit.distanceTo(camera.position) < distance - tolerance) {
+              occluded = true;
+              break;
+            }
+          }
+        } else {
+          raycaster.set(camera.position, direction);
+          raycaster.far = distance;
+          const hit = pickSurface(raycaster, model);
+          occluded = hit !== null && hit.distance < distance - tolerance;
+        }
         pin.element.style.opacity = occluded ? '0.3' : '1';
         pin.element.style.pointerEvents = occluded ? 'none' : 'auto';
       });
     };
 
     const scheduleOcclusion = () => {
-      if (occlusionTimeout === null) {
-        occlusionTimeout = setTimeout(updateOcclusion, OCCLUSION_INTERVAL_MS);
+      if (interagindo) {
+        return;
       }
+      if (occlusionTimeout !== null) {
+        clearTimeout(occlusionTimeout);
+      }
+      occlusionTimeout = setTimeout(updateOcclusion, OCCLUSION_INTERVAL_MS);
+    };
+
+    const aoComecarGesto = () => {
+      interagindo = true;
+      if (occlusionTimeout !== null) {
+        clearTimeout(occlusionTimeout);
+        occlusionTimeout = null;
+      }
+    };
+    const aoTerminarGesto = () => {
+      interagindo = false;
+      scheduleOcclusion();
     };
 
     updateOcclusion();
-    controls.addEventListener('change', scheduleOcclusion);
+    controls.addEventListener('start', aoComecarGesto);
+    controls.addEventListener('end', aoTerminarGesto);
+    if (viewer.requestRender) {
+      viewer.requestRender();
+    }
 
     return () => {
       clearTimeout(occlusionTimeout);
-      controls.removeEventListener('change', scheduleOcclusion);
+      controls.removeEventListener('start', aoComecarGesto);
+      controls.removeEventListener('end', aoTerminarGesto);
       pins.forEach(pin => {
         if (pin.element.parentNode) {
           pin.element.parentNode.removeChild(pin.element);
@@ -710,6 +789,9 @@ const ObjectPointMapper = ({ url, fileType, onObject3DClick, onPointClick, idx, 
     }
     viewer.model.userData.raioDestaque = viewer.radius;
     aplicarDestaques(viewer.model, pontos || []);
+    if (viewer.requestRender) {
+      viewer.requestRender();
+    }
     return () => limparDestaques(viewer.model);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewer, pontosKey]);
